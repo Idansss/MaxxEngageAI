@@ -9,6 +9,7 @@ import uuid
 from pathlib import Path
 
 import anthropic
+from json_repair import repair_json
 from app.core.config import get_settings
 from app.core.logging import logger
 from app.models.assess import AssessRequest, AssessResponse, DimensionScore, ReviewFeedback
@@ -29,6 +30,7 @@ Non-negotiable rules:
 2. The `rationale` for each dimension must be written in plain English a non-expert can understand.
 3. If you cannot assess a dimension confidently (e.g., submission is too short), set confidence < 0.5 and explain why.
 4. Never fabricate evidence quotes. Only quote text that actually appears in the submission.
+5. CRITICAL: When mentioning HTML tags or attributes inside a JSON string value, ALWAYS use single quotes for HTML attributes. Write <button type='button'> NOT <button type="button">. Double quotes inside a JSON string will break the JSON — use single quotes exclusively for all HTML attribute values in your rationale text.
 """
 
 GRADING_PROMPT_TEMPLATE = """
@@ -80,6 +82,40 @@ def _compute_prompt_hash(prompt: str) -> str:
     return hashlib.sha256(prompt.encode()).hexdigest()[:16]
 
 
+def _extract_json(raw: str) -> dict:
+    """Parse JSON from model output that may be wrapped in markdown fences or contain minor errors."""
+    text = raw.strip()
+    # Strip ```json ... ``` or ``` ... ``` fences
+    if text.startswith("```"):
+        lines = text.splitlines()
+        inner = "\n".join(lines[1:-1]) if lines[-1].strip() == "```" else "\n".join(lines[1:])
+        text = inner.strip()
+    # Try direct parse first (fastest path)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    # Attempt structural repair (handles unterminated strings, unescaped quotes, trailing commas)
+    try:
+        repaired = repair_json(text, return_objects=True)
+        if isinstance(repaired, dict) and repaired:
+            return repaired
+    except Exception:
+        pass
+    # Last resort: find the outermost { } block and repair that
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        fragment = text[start : end + 1]
+        try:
+            return json.loads(fragment)
+        except json.JSONDecodeError:
+            repaired = repair_json(fragment, return_objects=True)
+            if isinstance(repaired, dict) and repaired:
+                return repaired
+    raise ValueError("No valid JSON object found in model response")
+
+
 def _needs_human_review(
     overall_score: float, confidence: float, settings
 ) -> bool:
@@ -113,7 +149,7 @@ async def grade_submission(request: AssessRequest) -> AssessResponse:
 
     message = client.messages.create(
         model=settings.primary_grading_model,
-        max_tokens=2048,
+        max_tokens=4096,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": grading_prompt}],
     )
@@ -122,8 +158,8 @@ async def grade_submission(request: AssessRequest) -> AssessResponse:
     log.info("grading.raw_response_received", length=len(raw))
 
     try:
-        result = json.loads(raw)
-    except json.JSONDecodeError as e:
+        result = _extract_json(raw)
+    except (json.JSONDecodeError, ValueError) as e:
         log.error("grading.json_parse_error", error=str(e), raw=raw[:500])
         raise ValueError(f"Model returned non-JSON output: {e}") from e
 

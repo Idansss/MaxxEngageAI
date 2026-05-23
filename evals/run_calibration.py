@@ -66,7 +66,7 @@ def run(eval_path: str) -> None:
     print(f"Eval file : {eval_path}")
     print(f"Timestamp : {datetime.now(timezone.utc).isoformat()}")
     print(f"Samples   : {len(samples)}")
-    print("─" * 72)
+    print("-" * 72)
 
     for i, sample in enumerate(samples, 1):
         eval_id = sample["eval_id"]
