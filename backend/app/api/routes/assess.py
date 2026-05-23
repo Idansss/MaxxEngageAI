@@ -29,6 +29,7 @@ async def assess(request: AssessRequest) -> AssessResponse:
         logger.error("assess.unexpected_error", error=str(e))
         raise HTTPException(status_code=500, detail="Internal grading error.")
 
-    submission_id = await persist_assessment(request, response)
+    submission_id, credential_id = await persist_assessment(request, response)
     response.submission_id = submission_id
+    response.credential_id = credential_id
     return response

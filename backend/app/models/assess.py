@@ -62,3 +62,4 @@ class AssessResponse(BaseModel):
     prompt_hash: str
     review_id: str
     submission_id: str | None = Field(None, description="DB record ID; null for anonymous submissions.")
+    credential_id: str | None = Field(None, description="Issued W3C VC credential ID; null when not eligible.")

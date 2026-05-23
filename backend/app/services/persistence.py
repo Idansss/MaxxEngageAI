@@ -9,6 +9,7 @@ import uuid
 from app.core.database import get_pool
 from app.core.logging import logger
 from app.models.assess import AssessRequest, AssessResponse
+from app.services.credentials import issue_credential
 
 
 def _is_valid_uuid(val: str | None) -> bool:
@@ -24,17 +25,17 @@ def _is_valid_uuid(val: str | None) -> bool:
 async def persist_assessment(
     request: AssessRequest,
     response: AssessResponse,
-) -> str | None:
+) -> tuple[str | None, str | None]:
     """
-    Write submission + AI review to the DB.
+    Write submission + AI review to the DB, then issue a credential if eligible.
 
-    Returns the submission UUID if saved, None if skipped or on error.
+    Returns (submission_id, credential_id). Both are None when skipped or on error.
     Skipped when user_id is absent (anonymous diagnostic) or task_id is not
     a real UUID (e.g. eval fixture strings like 'task-001').
     """
     if not _is_valid_uuid(request.user_id):
         logger.info("persistence.skip", reason="no user_id (anonymous submission)")
-        return None
+        return None, None
 
     if not _is_valid_uuid(request.task_id):
         logger.info(
@@ -42,13 +43,13 @@ async def persist_assessment(
             reason="task_id is not a UUID",
             task_id=request.task_id,
         )
-        return None
+        return None, None
 
     try:
         pool = get_pool()
     except RuntimeError:
         logger.warning("persistence.skip", reason="db pool not initialised")
-        return None
+        return None, None
 
     submission_id = str(uuid.uuid4())
     review_id = response.review_id
@@ -115,8 +116,13 @@ async def persist_assessment(
             overall_score=response.overall_score,
             credential_eligible=response.credential_eligible,
         )
-        return submission_id
+
+        credential_id: str | None = None
+        if response.credential_eligible:
+            credential_id = await issue_credential(request, response, submission_id)
+
+        return submission_id, credential_id
 
     except Exception as e:
         log.error("persistence.error", error=str(e))
-        return None
+        return None, None
