@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { CheckCircle, Award, BookOpen, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 async function getSkillPaths() {
   try {
@@ -28,9 +29,7 @@ export default async function HomePage() {
             <Link href="/assess" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Take Assessment
             </Link>
-            <Button asChild size="sm">
-              <Link href="/assess">Get Started</Link>
-            </Button>
+            <Link href="/assess" className={cn(buttonVariants({ size: "sm" }))}>Get Started</Link>
           </div>
         </nav>
       </header>
@@ -51,12 +50,8 @@ export default async function HomePage() {
               No expensive courses. No gatekeeping. Just your work, fairly judged.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button asChild size="lg" className="text-base">
-                <Link href="/assess">Start Free Assessment</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="text-base">
-                <Link href="#how-it-works">See How It Works</Link>
-              </Button>
+              <Link href="/assess" className={cn(buttonVariants({ size: "lg" }), "text-base")}>Start Free Assessment</Link>
+              <Link href="#how-it-works" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "text-base")}>See How It Works</Link>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
               Free forever for learners &middot; No account required to try
@@ -145,11 +140,9 @@ export default async function HomePage() {
                         <p className="text-xs text-muted-foreground mb-3">
                           {sp.levels.length} levels &middot; Credential refreshes every {sp.decay_half_life_months} months
                         </p>
-                        <Button asChild className="w-full" size="sm">
-                          <Link href={`/assess?path=${sp.slug}`}>
-                            Start assessment
-                          </Link>
-                        </Button>
+                        <Link href={`/assess?path=${sp.slug}`} className={cn(buttonVariants({ size: "sm" }), "w-full justify-center")}>
+                          Start assessment
+                        </Link>
                       </div>
                     </CardContent>
                   </Card>

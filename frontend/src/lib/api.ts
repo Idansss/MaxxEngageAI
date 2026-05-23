@@ -69,26 +69,53 @@ export interface AssessRequest {
 
 export interface LearnPathRequest {
   skill_path_slug: string;
-  current_score: number;
-  level: number;
+  diagnostic_score: number;
+  available_hours_per_week: number;
+  user_id?: string;
+  preferred_language?: string;
   weak_dimensions?: string[];
+}
+
+export interface Resource {
+  title: string;
+  url: string;
+  type: "article" | "video" | "interactive" | "project" | "reference";
+  estimated_minutes: number;
+  free: boolean;
+  requires_signup: boolean;
+  low_bandwidth_friendly: boolean;
 }
 
 export interface WeekPlan {
   week: number;
   theme: string;
-  objectives: string[];
-  resources: { title: string; url: string; type: string; low_bandwidth_friendly: boolean }[];
+  focus_areas: string[];
+  resources: Resource[];
   practice_task: string;
+  estimated_hours: number;
+  is_assessment_week: boolean;
+}
+
+export interface MilestoneAssessment {
+  after_week: number;
+  rubric_id: string;
+  description: string;
+  expected_score_range: [number, number];
 }
 
 export interface LearnPathResponse {
   skill_path_slug: string;
-  current_score: number;
-  target_score: number;
-  estimated_weeks: number;
+  user_id: string | null;
+  diagnostic_score: number;
+  current_level: number;
+  level_label: string;
+  score_gap_to_pass: number;
+  duration_weeks: number;
+  total_estimated_hours: number;
   weekly_plan: WeekPlan[];
-  milestones: { week: number; description: string; assessment_type: string }[];
+  milestone_assessments: MilestoneAssessment[];
+  path_rationale: string;
+  next_assessment_date: string;
 }
 
 export interface UserResponse {

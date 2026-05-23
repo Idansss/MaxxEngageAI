@@ -3,11 +3,12 @@
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, XCircle, Award, AlertTriangle, ArrowRight, RotateCcw } from "lucide-react";
+import { CheckCircle, XCircle, Award, ArrowRight, RotateCcw } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 
 function ResultsContent({ reviewId }: { reviewId: string }) {
@@ -68,11 +69,9 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
               Share the link below — anyone can verify it without contacting us.
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Button asChild variant="default" size="sm" className="flex-1">
-                <Link href={`/credentials/${credentialId}`}>
-                  View credential <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                </Link>
-              </Button>
+              <Link href={`/credentials/${credentialId}`} className={cn(buttonVariants({ size: "sm" }), "flex-1 justify-center")}>
+                View credential <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+              </Link>
               <Button
                 variant="outline"
                 size="sm"
@@ -116,14 +115,10 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
                 You passed Level 1. Ready to push further?
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
-                <Button asChild variant="default" size="sm">
-                  <Link href="/assess?path=web-dev-frontend&level=2">
-                    Attempt Level 2 <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/">Explore other paths</Link>
-                </Button>
+                <Link href="/assess?path=web-dev-frontend&level=2" className={cn(buttonVariants({ size: "sm" }))}>
+                  Attempt Level 2 <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Link>
+                <Link href="/" className={cn(buttonVariants({ size: "sm", variant: "outline" }))}>Explore other paths</Link>
               </div>
             </>
           ) : (
@@ -133,16 +128,12 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
                 learning path and come back stronger.
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
-                <Button asChild variant="default" size="sm">
-                  <Link href={`/learn/web-dev-frontend?score=${score}`}>
-                    Get learning path <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/assess">
-                    <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Try again
-                  </Link>
-                </Button>
+                <Link href={`/learn/web-dev-frontend?score=${score}`} className={cn(buttonVariants({ size: "sm" }))}>
+                  Get learning path <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Link>
+                <Link href="/assess" className={cn(buttonVariants({ size: "sm", variant: "outline" }))}>
+                  <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Try again
+                </Link>
               </div>
             </>
           )}
