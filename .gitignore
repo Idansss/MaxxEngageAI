@@ -19,6 +19,8 @@ evals/calibration_results/
 
 # Logs
 backend/server.log
+server.log
+server.log.err
 
 # OS
 .DS_Store
