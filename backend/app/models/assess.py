@@ -61,3 +61,4 @@ class AssessResponse(BaseModel):
     model_used: str
     prompt_hash: str
     review_id: str
+    submission_id: str | None = Field(None, description="DB record ID; null for anonymous submissions.")
