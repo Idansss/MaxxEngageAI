@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from app.core.config import get_settings
 from app.core.logging import configure_logging, logger
-from app.api.routes import assess, health
+from app.api.routes import assess, health, learn_path
 
 
 @asynccontextmanager
@@ -38,6 +38,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router)
     app.include_router(assess.router)
+    app.include_router(learn_path.router)
 
     return app
 
