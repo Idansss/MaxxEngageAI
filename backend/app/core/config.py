@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     # App
     environment: str = "development"
     log_level: str = "INFO"
+    port: int = 8000
+    # Comma-separated list of allowed origins.
+    # Production: set to your Vercel URL, e.g. https://proofos.vercel.app
     cors_origins: str = "http://localhost:3000"
 
     # Scoring thresholds
