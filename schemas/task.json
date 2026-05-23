@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12",
+  "$id": "https://proofos.org/schemas/task.json",
+  "title": "Task",
+  "description": "A real-world micro-task issued to a user. Gradable by AI against a rubric.",
+  "type": "object",
+  "required": ["id", "skill_path_id", "level", "type", "prompt", "rubric_id", "created_at"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "skill_path_id": { "type": "string", "format": "uuid" },
+    "level": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "type": {
+      "type": "string",
+      "enum": ["diagnostic", "learning", "assessment", "refresh"],
+      "description": "diagnostic = placement; learning = practice; assessment = credential-eligible; refresh = decay prevention."
+    },
+    "prompt": {
+      "type": "object",
+      "required": ["text"],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The task description shown to the user. Markdown supported."
+        },
+        "context": {
+          "type": "string",
+          "description": "Optional background / scenario framing."
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "url"],
+            "properties": {
+              "type": { "type": "string", "enum": ["image", "code", "csv", "pdf", "url"] },
+              "url": { "type": "string", "format": "uri" },
+              "label": { "type": "string" }
+            }
+          }
+        },
+        "expected_output_format": {
+          "type": "string",
+          "enum": ["text", "code", "html_css_js", "json", "markdown", "url", "file_upload"],
+          "description": "Tells the UI which submission widget to render."
+        },
+        "time_limit_minutes": {
+          "type": "integer",
+          "minimum": 5,
+          "description": "Soft limit shown to user. Hard enforcement is optional in MVP."
+        }
+      }
+    },
+    "rubric_id": {
+      "type": "string",
+      "description": "Filename slug referencing /rubrics/<rubric_id>.json"
+    },
+    "difficulty_rating": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Calibrated from historical pass rates. Starts null, updated by evals."
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "authored_by": {
+      "type": "string",
+      "enum": ["ai_generated", "human_curated", "community"],
+      "default": "ai_generated"
+    },
+    "active": { "type": "boolean", "default": true }
+  },
+  "additionalProperties": false
+}

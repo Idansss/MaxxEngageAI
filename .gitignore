@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Secrets — never commit
+backend/.env
+backend/secrets/
+*.pem
+*.key
+
+# Calibration results (large, regenerate locally)
+evals/calibration_results/
+
+# Logs
+backend/server.log
+
+# OS
+.DS_Store
+Thumbs.db

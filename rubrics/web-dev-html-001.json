@@ -1,0 +1,98 @@
+{
+  "$schema": "https://proofos.org/schemas/rubric.json",
+  "id": "web-dev-html-001",
+  "version": "1.0.0",
+  "skill_path_slug": "web-dev-frontend",
+  "level": 1,
+  "level_label": "Foundations",
+  "title": "HTML & CSS Foundations — Responsive Card Component",
+  "description": "Assesses whether the candidate can write semantic HTML and clean CSS to produce a responsive, accessible UI component from a spec.",
+  "pass_threshold": 70,
+  "pass_label": "Foundations Certified",
+  "authored_by": "human_curated",
+  "created_at": "2026-05-23",
+
+  "task_prompt": {
+    "text": "Build a **product card component** in HTML and CSS (no frameworks, no JavaScript required).\n\nThe card must:\n1. Show a product image (use a placeholder `<img>` with `alt` text).\n2. Show a product name, a short description, and a price.\n3. Have a 'Add to Cart' button.\n4. Be readable on both a 375px mobile screen and a 1280px desktop screen (no horizontal scroll on mobile).\n5. Use only one external stylesheet — no inline styles.\n\nSubmit your HTML and CSS as a single code block.",
+    "expected_output_format": "html_css_js",
+    "time_limit_minutes": 45
+  },
+
+  "dimensions": [
+    {
+      "id": "semantic_html",
+      "name": "Semantic HTML",
+      "description": "Does the HTML use elements for their meaning, not just their appearance?",
+      "weight": 0.20,
+      "max_score": 20,
+      "scoring_guide": {
+        "17-20": "Uses <article> or <section> for card, <img> with meaningful alt text, <h2>/<h3> for product name, <p> for description, <button> (not <div> or <a>) for the action. No presentational elements like <b> or <font>.",
+        "12-16": "Mostly semantic but minor misuse: e.g., uses <div> for the button, or heading level is skipped.",
+        "6-11": "Some semantic elements present but significant misuse: e.g., no alt text, heading used for styling not structure, price in a <span> with no context.",
+        "0-5": "Almost entirely <div>/<span> soup with no semantic meaning. No alt text."
+      }
+    },
+    {
+      "id": "css_quality",
+      "name": "CSS Quality & Organisation",
+      "description": "Is the CSS maintainable, specific enough, and free of anti-patterns?",
+      "weight": 0.20,
+      "max_score": 20,
+      "scoring_guide": {
+        "17-20": "Classes are descriptive (BEM or similar logical naming). No inline styles. No !important. Selectors are not overly specific (no deep nesting like .card div ul li a). Styles in one external file.",
+        "12-16": "Mostly good, minor issues: e.g., one use of !important, or some inline styles for layout.",
+        "6-11": "Multiple anti-patterns: overly specific selectors, heavy reliance on inline styles, or hard-coded pixel values where relative units would work better.",
+        "0-5": "Inline styles dominant, !important used extensively, or no external stylesheet."
+      }
+    },
+    {
+      "id": "responsiveness",
+      "name": "Responsiveness",
+      "description": "Does the card work correctly at both 375px (mobile) and 1280px (desktop) without horizontal overflow?",
+      "weight": 0.25,
+      "max_score": 25,
+      "scoring_guide": {
+        "21-25": "Uses relative units (%, rem, em, fr) and/or media queries. Image uses max-width: 100%. No fixed widths that cause overflow. Card is usable on both breakpoints.",
+        "14-20": "Works at one breakpoint but has a minor issue at the other (e.g., image overflows on mobile, or card is too narrow on desktop).",
+        "7-13": "Partial responsiveness: some relative units, but key elements overflow or break at one breakpoint.",
+        "0-6": "Fixed pixel widths throughout; card breaks on mobile."
+      }
+    },
+    {
+      "id": "accessibility",
+      "name": "Accessibility",
+      "description": "Would a screen reader user and keyboard-only user be able to interact with this card?",
+      "weight": 0.15,
+      "max_score": 15,
+      "scoring_guide": {
+        "13-15": "Image has descriptive alt text. Button has a clear accessible label. Color contrast is likely sufficient (not verifiable without rendering, but no red flags like grey text on white). Card is logically ordered in DOM.",
+        "8-12": "Alt text present but generic ('image', 'photo'). Button is present but label is ambiguous ('click here').",
+        "4-7": "Missing alt text OR button is a <div>/<span> with no role. Some effort but clear gaps.",
+        "0-3": "No accessibility consideration visible: missing alt, non-interactive element used as button, no logical DOM order."
+      }
+    },
+    {
+      "id": "correctness",
+      "name": "Technical Correctness",
+      "description": "Does the code run without errors and meet the functional spec?",
+      "weight": 0.20,
+      "max_score": 20,
+      "scoring_guide": {
+        "17-20": "HTML is valid (no unclosed tags, no missing required attributes). CSS is syntactically correct. All five spec requirements (image, name, description, price, button) are present.",
+        "12-16": "Minor validity issues (e.g., one unclosed tag, one missing semicolon in CSS). All five spec elements present.",
+        "6-11": "Notable validity errors, or one of the five spec requirements is missing.",
+        "0-5": "Code would not render correctly, multiple broken elements, or more than two spec requirements missing."
+      }
+    }
+  ],
+
+  "weighting_note": "Weights sum to 1.0. Overall score = sum(dimension.score / dimension.max_score * dimension.weight) * 100.",
+
+  "calibration_history": [
+    {
+      "date": "2026-05-23",
+      "version": "1.0.0",
+      "note": "Initial rubric — not yet calibrated against human graders. First calibration exercise pending (Day 5 of build week)."
+    }
+  ]
+}

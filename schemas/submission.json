@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12",
+  "$id": "https://proofos.org/schemas/submission.json",
+  "title": "Submission",
+  "description": "A user's response to a Task. Immutable once created — only review_id is added.",
+  "type": "object",
+  "required": ["id", "user_id", "task_id", "content", "submitted_at", "status"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "user_id": { "type": "string", "format": "uuid" },
+    "task_id": { "type": "string", "format": "uuid" },
+    "content": {
+      "type": "object",
+      "required": ["type"],
+      "description": "The actual submitted work.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["text", "code", "html_css_js", "json", "markdown", "url", "file_cid"]
+        },
+        "body": {
+          "type": "string",
+          "description": "Raw text / code / markdown body."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "For url-type submissions (e.g. hosted CodePen, GitHub Gist)."
+        },
+        "file_cid": {
+          "type": "string",
+          "description": "IPFS CID for file uploads. Content-addressed; tamper-proof."
+        },
+        "language": {
+          "type": "string",
+          "description": "Programming language if type=code. e.g. 'javascript', 'python'."
+        }
+      }
+    },
+    "submitted_at": { "type": "string", "format": "date-time" },
+    "time_spent_minutes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Self-reported or inferred from session timing."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending_ai_review", "ai_reviewed", "pending_human_review", "human_reviewed", "appealed", "final"],
+      "description": "Tracks the submission through the review pipeline."
+    },
+    "review_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Set when an AI or human review is linked."
+    },
+    "attempt_number": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Which attempt this is for the given task+user combo."
+    }
+  },
+  "additionalProperties": false
+}

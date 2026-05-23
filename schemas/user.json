@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12",
+  "$id": "https://proofos.org/schemas/user.json",
+  "title": "User",
+  "description": "A registered ProofOS user. Owns their data; platform is the renter.",
+  "type": "object",
+  "required": ["id", "did", "created_at", "profile"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Internal surrogate key (Supabase UUID)."
+    },
+    "did": {
+      "type": "string",
+      "pattern": "^did:",
+      "description": "W3C Decentralized Identifier the user controls. May be did:key initially."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "profile": {
+      "type": "object",
+      "required": ["display_name", "country_code"],
+      "properties": {
+        "display_name": { "type": "string", "maxLength": 80 },
+        "bio": { "type": "string", "maxLength": 500 },
+        "country_code": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "description": "ISO 3166-1 alpha-2. Affects language/rubric defaults."
+        },
+        "preferred_language": {
+          "type": "string",
+          "description": "IETF BCP 47 language tag, e.g. 'en', 'yo', 'ha', 'fr', 'sw'."
+        },
+        "avatar_url": { "type": "string", "format": "uri" },
+        "public_profile": {
+          "type": "boolean",
+          "default": false,
+          "description": "User controls visibility of their proof page."
+        }
+      }
+    },
+    "sybil_resistance": {
+      "type": "object",
+      "description": "Proof-of-personhood signals. Multiple weak signals combine; none is mandatory alone.",
+      "properties": {
+        "gitcoin_passport_score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "vouched_by": {
+          "type": "array",
+          "items": { "type": "string", "format": "uuid" },
+          "description": "User IDs of trust-network vouchers."
+        },
+        "phone_verified": { "type": "boolean", "default": false },
+        "email_verified": { "type": "boolean", "default": false }
+      }
+    },
+    "reputation": {
+      "type": "object",
+      "description": "Aggregate reputation signal. Derived, never manually set.",
+      "properties": {
+        "overall_score": { "type": "number", "minimum": 0, "maximum": 1000 },
+        "last_computed_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

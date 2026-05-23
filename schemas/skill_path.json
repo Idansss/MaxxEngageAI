@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12",
+  "$id": "https://proofos.org/schemas/skill_path.json",
+  "title": "SkillPath",
+  "description": "A structured learning + assessment path for one skill domain. Config-driven so new domains don't require code changes.",
+  "type": "object",
+  "required": ["id", "slug", "name", "domain", "levels", "decay_model"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "examples": ["web-dev-frontend", "data-analysis", "technical-writing"]
+    },
+    "name": { "type": "string", "maxLength": 100 },
+    "domain": {
+      "type": "string",
+      "enum": ["technology", "design", "data", "writing", "business", "ops", "science"]
+    },
+    "description": { "type": "string", "maxLength": 1000 },
+    "levels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["level", "label", "rubric_id"],
+        "properties": {
+          "level": { "type": "integer", "minimum": 1, "maximum": 10 },
+          "label": {
+            "type": "string",
+            "examples": ["Foundations", "Practitioner", "Advanced", "Expert"]
+          },
+          "rubric_id": {
+            "type": "string",
+            "description": "Points to a rubric file in /rubrics/."
+          },
+          "typical_duration_weeks": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "decay_model": {
+      "type": "object",
+      "description": "Skill credibility decays over time. A 2019 HTML cert is worth less today.",
+      "required": ["half_life_months"],
+      "properties": {
+        "half_life_months": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Months after which skill confidence halves if not re-verified."
+        },
+        "refresh_task_required_at_months": {
+          "type": "integer",
+          "description": "Months after which user must complete a refresh task to maintain level."
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "active": { "type": "boolean", "default": true }
+  },
+  "additionalProperties": false
+}
