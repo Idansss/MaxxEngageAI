@@ -21,6 +21,15 @@ evals/calibration_results/
 backend/server.log
 server.log
 server.log.err
+frontend/.next-dev.log
+frontend/.next-dev.err
+
+# Next.js build output
+frontend/.next/
+frontend/out/
+
+# Frontend env secrets
+frontend/.env.local
 
 # OS
 .DS_Store
