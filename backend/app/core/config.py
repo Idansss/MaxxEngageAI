@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     pass_score_threshold: int = 70
     human_review_score_band: int = 5
 
+    # Admin — comma-separated list of emails that can access /admin/* routes
+    admin_emails: str = ""
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -3,10 +3,15 @@
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Loader2, LogOut, User } from "lucide-react";
+import { Loader2, LogOut, User, ShieldAlert } from "lucide-react";
+
+const ADMIN_EMAILS = new Set(
+  (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase())
+);
 
 export function Navbar() {
   const { session, profile, loading, signOut } = useAuth();
+  const isAdmin = !!session?.user.email && ADMIN_EMAILS.has(session.user.email.toLowerCase());
 
   return (
     <header className="border-b bg-white sticky top-0 z-50">
@@ -20,6 +25,15 @@ export function Navbar() {
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           ) : session ? (
             <>
+              {isAdmin && (
+                <Link
+                  href="/admin/queue"
+                  className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 transition-colors"
+                >
+                  <ShieldAlert className="h-3.5 w-3.5" />
+                  Review queue
+                </Link>
+              )}
               {profile?.id && (
                 <Link
                   href={`/profile/${profile.id}`}
