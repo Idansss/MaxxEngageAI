@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from app.core.config import get_settings
 from app.core.logging import configure_logging, logger
 from app.core.database import init_pool, close_pool
-from app.api.routes import admin, assess, auth, credentials, health, learn_path, skill_paths, users
+from app.api.routes import admin, assess, auth, credentials, health, learn_path, skill_paths, submissions, users
 
 
 @asynccontextmanager
@@ -47,6 +47,7 @@ def create_app() -> FastAPI:
     app.include_router(learn_path.router)
     app.include_router(skill_paths.router)
     app.include_router(credentials.router)
+    app.include_router(submissions.router)
 
     return app
 

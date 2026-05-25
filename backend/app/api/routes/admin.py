@@ -31,6 +31,7 @@ async def get_queue(_admin: dict = Depends(get_admin_user)):
             r.model_version,
             r.reviewed_at,
             r.credential_eligible,
+            r.appeal_reason,
 
             s.id              AS submission_id,
             s.content         AS submission_content,

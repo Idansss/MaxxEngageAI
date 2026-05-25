@@ -61,7 +61,9 @@ function AssessForm() {
         rubric_id: "web-dev-html-001",
       }),
     onSuccess: (data) => {
-      router.push(`/results/${data.review_id}?score=${data.overall_score}&passed=${data.passed}&credential=${data.credential_id ?? ""}`);
+      router.push(
+        `/results/${data.review_id}?score=${data.overall_score}&passed=${data.passed}&credential=${data.credential_id ?? ""}&submission=${data.submission_id ?? ""}`
+      );
     },
   });
 

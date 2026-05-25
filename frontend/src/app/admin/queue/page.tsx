@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   CheckCircle, XCircle, ChevronDown, ChevronUp,
-  Loader2, ShieldAlert, Award, User, Clock
+  Loader2, ShieldAlert, Award, User, Clock, MessageSquare
 } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -34,6 +34,7 @@ interface QueueItem {
   reviewed_at: string;
   submitted_at: string;
   submission_status: string;
+  appeal_reason: string | null;
   model_version: string | null;
   submission_content: { type: string; body: string };
   feedback: {
@@ -104,6 +105,11 @@ function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string,
               <p className="text-xs text-muted-foreground">confidence {(item.confidence * 100).toFixed(0)}%</p>
             </div>
             <div className="flex flex-col gap-1">
+              {item.submission_status === "appealed" && (
+                <Badge className="text-xs bg-orange-100 text-orange-700 border-orange-300 gap-1">
+                  <MessageSquare className="h-3 w-3" /> Appeal
+                </Badge>
+              )}
               {item.credential_issued && (
                 <Badge variant="secondary" className="text-xs gap-1">
                   <Award className="h-3 w-3" />
@@ -119,11 +125,22 @@ function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string,
       </CardHeader>
 
       <CardContent className="space-y-3">
+        {/* Appeal reason — shown prominently so admin can read before deciding */}
+        {item.submission_status === "appealed" && item.appeal_reason && (
+          <div className="rounded-md border border-orange-200 bg-orange-50 px-3 py-2.5">
+            <p className="text-xs font-semibold text-orange-700 mb-1 flex items-center gap-1">
+              <MessageSquare className="h-3.5 w-3.5" /> Learner&apos;s appeal
+            </p>
+            <p className="text-sm text-orange-900">{item.appeal_reason}</p>
+          </div>
+        )}
+
         {/* AI summary */}
         <p className="text-sm text-muted-foreground">{item.feedback.summary}</p>
 
         {/* Toggle full detail */}
         <button
+          type="button"
           onClick={() => setExpanded(!expanded)}
           className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
         >

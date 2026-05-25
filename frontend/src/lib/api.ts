@@ -176,4 +176,11 @@ export const api = {
     get: (id: string) => apiFetch<UserResponse>(`/users/${id}`),
     credentials: (id: string) => apiFetch<UserCredential[]>(`/users/${id}/credentials`),
   },
+  submissions: {
+    appeal: (submissionId: string, reason: string) =>
+      apiFetch<{ ok: boolean; submission_id: string; status: string }>(
+        `/submissions/${submissionId}/appeal`,
+        { method: "POST", body: JSON.stringify({ reason }) }
+      ),
+  },
 };

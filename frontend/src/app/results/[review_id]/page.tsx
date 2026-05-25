@@ -7,18 +7,29 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, XCircle, Award, ArrowRight, RotateCcw, User } from "lucide-react";
+import { CheckCircle, XCircle, Award, ArrowRight, RotateCcw, User, MessageSquare, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { Navbar } from "@/components/navbar";
+import { api } from "@/lib/api";
 
 function ResultsContent({ reviewId }: { reviewId: string }) {
   const params = useSearchParams();
   const score = parseFloat(params.get("score") ?? "0");
   const passed = params.get("passed") === "true";
   const credentialId = params.get("credential") ?? "";
+  const submissionId = params.get("submission") ?? "";
   const { profile } = useAuth();
+
+  const [appealReason, setAppealReason] = useState("");
+  const [appealDone, setAppealDone] = useState(false);
+
+  const { mutate: submitAppeal, isPending: appealing, error: appealError } = useMutation({
+    mutationFn: () => api.submissions.appeal(submissionId, appealReason),
+    onSuccess: () => setAppealDone(true),
+  });
 
   const scoreColor =
     score >= 70 ? "text-green-600" : score >= 50 ? "text-amber-600" : "text-red-600";
@@ -110,6 +121,56 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
           </code>
         </CardContent>
       </Card>
+
+      {/* Appeal section — only shown when failed and submission was persisted */}
+      {!passed && submissionId && (
+        <Card className="mb-6 border-amber-100">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-amber-500" />
+              Disagree with this score?
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {appealDone ? (
+              <div className="flex items-center gap-2 text-sm text-green-700">
+                <CheckCircle className="h-4 w-4 shrink-0" />
+                Appeal submitted. A human reviewer will re-evaluate your work.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  If you believe the AI score is inaccurate, explain why below.
+                  A human reviewer will re-examine your submission.
+                </p>
+                <textarea
+                  value={appealReason}
+                  onChange={(e) => setAppealReason(e.target.value)}
+                  placeholder="e.g. My responsive layout works correctly — the CSS uses valid media queries and I tested in Chrome and Firefox..."
+                  maxLength={500}
+                  className="w-full text-sm rounded-md border px-3 py-2 resize-none h-24 focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{appealReason.length}/500</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={appealReason.trim().length < 20 || appealing}
+                    onClick={() => submitAppeal()}
+                    className="gap-1.5"
+                  >
+                    {appealing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <MessageSquare className="h-3.5 w-3.5" />}
+                    Submit appeal
+                  </Button>
+                </div>
+                {appealError && (
+                  <p className="text-xs text-destructive">{(appealError as Error).message}</p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Next steps */}
       <Card>
