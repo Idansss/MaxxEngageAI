@@ -7,15 +7,18 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, XCircle, Award, ArrowRight, RotateCcw } from "lucide-react";
+import { CheckCircle, XCircle, Award, ArrowRight, RotateCcw, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { Navbar } from "@/components/navbar";
 
 function ResultsContent({ reviewId }: { reviewId: string }) {
   const params = useSearchParams();
   const score = parseFloat(params.get("score") ?? "0");
   const passed = params.get("passed") === "true";
   const credentialId = params.get("credential") ?? "";
+  const { profile } = useAuth();
 
   const scoreColor =
     score >= 70 ? "text-green-600" : score >= 50 ? "text-amber-600" : "text-red-600";
@@ -68,10 +71,15 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
               A W3C VC 2.0 credential has been issued to your DID and stored on ProofOS.
               Share the link below — anyone can verify it without contacting us.
             </p>
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex flex-col sm:flex-row gap-2 flex-wrap">
               <Link href={`/credentials/${credentialId}`} className={cn(buttonVariants({ size: "sm" }), "flex-1 justify-center")}>
                 View credential <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
               </Link>
+              {profile?.id && (
+                <Link href={`/profile/${profile.id}`} className={cn(buttonVariants({ size: "sm", variant: "outline" }), "flex-1 justify-center gap-1.5")}>
+                  <User className="h-3.5 w-3.5" /> My Profile
+                </Link>
+              )}
               <Button
                 variant="outline"
                 size="sm"
@@ -146,13 +154,7 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
 export default function ResultsPage({ params }: { params: Promise<{ review_id: string }> }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white">
-        <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center">
-          <Link href="/" className="font-bold tracking-tight">
-            Proof<span className="text-blue-600">OS</span>
-          </Link>
-        </nav>
-      </header>
+      <Navbar />
       <Suspense fallback={<div className="flex items-center justify-center py-20 text-muted-foreground text-sm">Loading results...</div>}>
         <ResultsContentWrapper params={params} />
       </Suspense>

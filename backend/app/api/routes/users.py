@@ -7,6 +7,42 @@ from app.core.logging import logger
 router = APIRouter(prefix="/users", tags=["users"])
 
 
+@router.get("/{user_id}/credentials", summary="List credentials for a user")
+async def get_user_credentials(user_id: str):
+    try:
+        uuid.UUID(user_id)
+    except ValueError:
+        raise HTTPException(status_code=422, detail="user_id must be a valid UUID.")
+
+    pool = get_pool()
+
+    # Verify user exists and has a public profile (or just return for now without restriction)
+    user = await pool.fetchrow(
+        "SELECT id, public_profile FROM public.users WHERE id = $1::uuid", user_id
+    )
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    rows = await pool.fetch(
+        """
+        SELECT c.id, c.level, c.level_label, c.score, c.percentile,
+               c.verified_by_human, c.zk_proof_available,
+               c.valid_from, c.valid_until, c.created_at,
+               sp.slug AS skill_path_slug, sp.name AS skill_path_name, sp.domain
+        FROM public.credentials c
+        JOIN public.skill_paths sp ON sp.id = c.skill_path_id
+        WHERE c.user_id = $1::uuid
+        ORDER BY c.created_at DESC
+        """,
+        user_id,
+    )
+
+    return [
+        {**dict(r), "id": str(r["id"])}
+        for r in rows
+    ]
+
+
 @router.post("", response_model=UserResponse, status_code=201, summary="Register a new user")
 async def create_user(request: CreateUserRequest) -> UserResponse:
     did = request.did or f"did:proofos:{uuid.uuid4()}"

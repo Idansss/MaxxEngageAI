@@ -143,6 +143,22 @@ export interface UserResponse {
   created_at: string;
 }
 
+export interface UserCredential {
+  id: string;
+  skill_path_slug: string;
+  skill_path_name: string;
+  domain: string;
+  level: number;
+  level_label: string;
+  score: number;
+  percentile: number | null;
+  verified_by_human: boolean;
+  zk_proof_available: boolean;
+  valid_from: string;
+  valid_until: string | null;
+  created_at: string;
+}
+
 // ── API calls ──────────────────────────────────────────────────────────────
 
 export const api = {
@@ -158,5 +174,6 @@ export const api = {
     create: (body: { display_name: string; country_code: string; bio?: string }) =>
       apiFetch<UserResponse>("/users", { method: "POST", body: JSON.stringify(body) }),
     get: (id: string) => apiFetch<UserResponse>(`/users/${id}`),
+    credentials: (id: string) => apiFetch<UserCredential[]>(`/users/${id}/credentials`),
   },
 };

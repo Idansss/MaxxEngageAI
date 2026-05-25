@@ -20,10 +20,15 @@ export function Navbar() {
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           ) : session ? (
             <>
-              <span className="hidden sm:flex items-center gap-1.5 text-sm text-muted-foreground">
-                <User className="h-3.5 w-3.5" />
-                {profile?.display_name ?? session.user.email?.split("@")[0]}
-              </span>
+              {profile?.id && (
+                <Link
+                  href={`/profile/${profile.id}`}
+                  className="hidden sm:flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <User className="h-3.5 w-3.5" />
+                  {profile.display_name}
+                </Link>
+              )}
               <Button variant="ghost" size="sm" onClick={signOut} className="gap-1.5">
                 <LogOut className="h-3.5 w-3.5" />
                 Sign out
