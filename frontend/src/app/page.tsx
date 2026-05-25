@@ -19,21 +19,6 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Nav */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <nav className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="font-bold text-lg tracking-tight">
-            Proof<span className="text-blue-600">OS</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/assess" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Take Assessment
-            </Link>
-            <Link href="/assess" className={cn(buttonVariants({ size: "sm" }))}>Get Started</Link>
-          </div>
-        </nav>
-      </header>
-
       <main className="flex-1">
         {/* Hero */}
         <section className="bg-linear-to-b from-blue-50 to-white py-20 px-4">

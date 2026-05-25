@@ -7,12 +7,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, ArrowLeft, AlertCircle } from "lucide-react";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
+import { Navbar } from "@/components/navbar";
 
 const schema = z.object({
   content: z.string().min(50, "Submission must be at least 50 characters."),
@@ -23,6 +25,21 @@ function AssessForm() {
   const router = useRouter();
   const params = useSearchParams();
   const pathSlug = params.get("path") ?? "web-dev-frontend";
+  const { session, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && !session) {
+      router.replace(`/login?next=/assess${pathSlug ? `?path=${pathSlug}` : ""}`);
+    }
+  }, [authLoading, session, router, pathSlug]);
+
+  if (authLoading || !session) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   const { data: skillPath, isLoading: pathLoading } = useQuery({
     queryKey: ["skill-path", pathSlug],
@@ -164,13 +181,7 @@ function AssessForm() {
 export default function AssessPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white">
-        <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center">
-          <Link href="/" className="font-bold tracking-tight">
-            Proof<span className="text-blue-600">OS</span>
-          </Link>
-        </nav>
-      </header>
+      <Navbar />
       <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>}>
         <AssessForm />
       </Suspense>
