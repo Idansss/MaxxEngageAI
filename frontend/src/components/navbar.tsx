@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Loader2, LogOut, User, ShieldAlert } from "lucide-react";
 
 const ADMIN_EMAILS = new Set(
@@ -49,9 +49,7 @@ export function Navbar() {
               </Button>
             </>
           ) : (
-            <Button asChild size="sm">
-              <Link href="/login">Sign in</Link>
-            </Button>
+            <Link href="/login" className={buttonVariants({ size: "sm" })}>Sign in</Link>
           )}
         </div>
       </nav>

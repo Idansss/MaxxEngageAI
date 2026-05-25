@@ -6,7 +6,7 @@ import Link from "next/link";
 import { api, type UserCredential } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Award, MapPin, Calendar, Share2, ExternalLink,
@@ -174,9 +174,7 @@ export default function ProfilePage() {
               <Share2 className="h-3.5 w-3.5" /> Share
             </Button>
             {isOwner && (
-              <Button asChild size="sm">
-                <Link href="/assess">Take assessment</Link>
-              </Button>
+              <Link href="/assess" className={buttonVariants({ size: "sm" })}>Take assessment</Link>
             )}
           </div>
         </div>
@@ -202,9 +200,9 @@ export default function ProfilePage() {
               <Award className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
               <p className="text-muted-foreground text-sm">No credentials earned yet.</p>
               {isOwner && (
-                <Button asChild size="sm" className="mt-4">
-                  <Link href="/assess">Take your first assessment</Link>
-                </Button>
+                <Link href="/assess" className={`${buttonVariants({ size: "sm" })} mt-4`}>
+                  Take your first assessment
+                </Link>
               )}
             </CardContent>
           </Card>
