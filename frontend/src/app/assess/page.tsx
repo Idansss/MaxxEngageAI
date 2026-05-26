@@ -12,9 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, ArrowLeft, AlertCircle } from "lucide-react";
+import { Loader2, ArrowLeft, AlertCircle, Sparkles } from "lucide-react";
 import { Suspense, useEffect } from "react";
-import { Navbar } from "@/components/navbar";
 
 const schema = z.object({
   content: z.string().min(50, "Submission must be at least 50 characters."),
@@ -83,18 +82,13 @@ function AssessForm() {
     },
   });
 
-  if (authLoading || !session) {
+  if (authLoading || !session || pathLoading || taskLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (pathLoading || taskLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="flex items-center justify-center py-28">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Preparing your assessment…</p>
+        </div>
       </div>
     );
   }
@@ -102,9 +96,12 @@ function AssessForm() {
   if (taskError) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10">
-        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive flex items-start gap-2">
-          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-          Could not load assessment task: {(taskError as Error).message}
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-5 text-sm text-destructive flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-semibold mb-0.5">Could not load assessment task</p>
+            <p className="text-destructive/80">{(taskError as Error).message}</p>
+          </div>
         </div>
       </div>
     );
@@ -116,30 +113,36 @@ function AssessForm() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
-      <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
-        <ArrowLeft className="h-4 w-4" /> Back
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
+      >
+        <ArrowLeft className="h-4 w-4" /> Back to paths
       </Link>
 
+      {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-2 mb-2">
-          <Badge variant="secondary">{skillPath?.domain ?? "technology"}</Badge>
+        <div className="flex items-center gap-2 mb-3">
+          <Badge variant="secondary" className="capitalize">{skillPath?.domain ?? "technology"}</Badge>
           <Badge variant="outline">{levelLabel}</Badge>
         </div>
-        <h1 className="text-2xl font-bold">{skillPath?.name ?? "Frontend Web Development"}</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Diagnostic assessment &middot; rubric: {rubricId} &middot; pass threshold: 70/100
+        <h1 className="text-3xl font-extrabold">{skillPath?.name ?? "Frontend Web Development"}</h1>
+        <p className="text-muted-foreground mt-1.5 text-sm">
+          Diagnostic assessment &middot; rubric: <code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{rubricId}</code> &middot; pass threshold: 70/100
         </p>
         {adaptiveTask?.reasoning && adaptiveTask.recommended_level > 1 && (
-          <p className="mt-2 text-xs text-blue-600 bg-blue-50 rounded px-3 py-1.5 border border-blue-100 inline-block">
+          <div className="mt-3 inline-flex items-center gap-2 text-xs text-primary bg-primary/8 rounded-lg px-3 py-2 border border-primary/15">
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
             {adaptiveTask.reasoning}
-          </p>
+          </div>
         )}
       </div>
 
       {/* Task prompt */}
-      <Card className="mb-6 border-blue-100 bg-blue-50/50">
+      <Card className="mb-6 overflow-hidden">
+        <div className="h-1 bg-primary" />
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Your task</CardTitle>
+          <CardTitle className="text-base font-bold">Your task</CardTitle>
         </CardHeader>
         <CardContent className="text-sm leading-relaxed text-muted-foreground">
           {taskText ? (
@@ -147,27 +150,30 @@ function AssessForm() {
           ) : (
             <>
               <p>
-                Build a <strong className="text-foreground">semantic, accessible, responsive HTML/CSS landing page</strong> for
-                a fictional local business of your choice. The page must include:
+                Build a{" "}
+                <strong className="text-foreground font-semibold">
+                  semantic, accessible, responsive HTML/CSS landing page
+                </strong>{" "}
+                for a fictional local business of your choice. The page must include:
               </p>
-              <ul className="list-disc list-inside space-y-1 pl-2 mt-2">
+              <ul className="list-disc list-inside space-y-1 pl-2 mt-3">
                 <li>A navigation bar with at least 3 links</li>
                 <li>A hero section with a headline and call-to-action button</li>
                 <li>A features or services section with at least 3 items</li>
                 <li>A footer with contact info</li>
               </ul>
-              <p className="mt-2">Use only HTML and CSS — no JavaScript required.</p>
+              <p className="mt-3">Use only HTML and CSS — no JavaScript required.</p>
             </>
           )}
-          <p className="text-xs pt-3">
-            Work at your own pace &mdash; time is not scored. Paste your full HTML below.
+          <p className="text-xs pt-4 text-muted-foreground/70">
+            Work at your own pace — time is not scored. Paste your full HTML below.
           </p>
         </CardContent>
       </Card>
 
-      {/* Rubric dimensions preview */}
+      {/* Rubric dimensions */}
       <div className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
           Graded on
         </p>
         <div className="flex flex-wrap gap-2">
@@ -178,8 +184,11 @@ function AssessForm() {
             { label: "Accessibility", pts: 15 },
             { label: "Correctness", pts: 20 },
           ].map((d) => (
-            <div key={d.label} className="flex items-center gap-1.5 bg-white border rounded-full px-3 py-1 text-xs">
-              <span>{d.label}</span>
+            <div
+              key={d.label}
+              className="flex items-center gap-1.5 bg-card border rounded-full px-3 py-1 text-xs shadow-sm"
+            >
+              <span className="font-medium">{d.label}</span>
               <span className="text-muted-foreground">{d.pts}pts</span>
             </div>
           ))}
@@ -191,38 +200,46 @@ function AssessForm() {
         <div className="mb-4">
           <Textarea
             {...register("content")}
-            placeholder="<!DOCTYPE html>&#10;<html lang='en'>&#10;  ..."
-            className="font-mono text-xs min-h-[320px] resize-y"
+            placeholder={"<!DOCTYPE html>\n<html lang='en'>\n  ..."}
+            className="font-mono text-xs min-h-[340px] resize-y"
             disabled={isPending}
           />
           {errors.content && (
-            <p className="text-destructive text-xs mt-1.5 flex items-center gap-1">
+            <p className="text-destructive text-xs mt-2 flex items-center gap-1.5">
               <AlertCircle className="h-3.5 w-3.5" /> {errors.content.message}
             </p>
           )}
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive flex items-start gap-2">
+          <div className="mb-4 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive flex items-start gap-3">
             <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-            {error.message}
+            {(error as Error).message}
           </div>
         )}
 
-        <Button type="submit" disabled={isPending || !adaptiveTask} className="w-full sm:w-auto" size="lg">
+        <Button
+          type="submit"
+          disabled={isPending || !adaptiveTask}
+          className="w-full sm:w-auto h-11 px-8 text-base font-semibold gap-2"
+          size="lg"
+        >
           {isPending ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Queued for AI review...
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Queued for AI review…
             </>
           ) : (
-            "Submit for grading"
+            <>
+              <Sparkles className="h-4 w-4" />
+              Submit for grading
+            </>
           )}
         </Button>
 
         {isPending && (
-          <p className="text-xs text-muted-foreground mt-3">
-            AI grading runs in the background. This page will move on when the result is ready.
+          <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+            AI grading runs in the background. This page will navigate automatically when your result is ready.
           </p>
         )}
       </form>
@@ -232,9 +249,14 @@ function AssessForm() {
 
 export default function AssessPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>}>
+    <div className="min-h-[calc(100vh-3.5rem)] bg-background">
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center py-28">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        }
+      >
         <AssessForm />
       </Suspense>
     </div>

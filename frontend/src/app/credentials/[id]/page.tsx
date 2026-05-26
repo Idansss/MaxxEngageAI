@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Award, CheckCircle, ExternalLink } from "lucide-react";
+import { Award, CheckCircle, ShieldCheck } from "lucide-react";
 
 export default async function CredentialPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -27,73 +27,81 @@ export default async function CredentialPage({ params }: { params: Promise<{ id:
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white">
-        <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center">
-          <Link href="/" className="font-bold tracking-tight">
-            Maxx<span className="text-blue-600"> Engage</span>
-          </Link>
-        </nav>
-      </header>
-
-      <div className="max-w-2xl mx-auto px-4 py-10">
-        {error ? (
-          <Card className="border-red-200 bg-red-50">
-            <CardContent className="pt-8 text-center space-y-2">
-              <p className="font-semibold text-red-600">{error}</p>
-              <p className="text-sm text-muted-foreground">
-                Credential ID: <code className="font-mono text-xs">{id}</code>
-              </p>
-            </CardContent>
-          </Card>
-        ) : credential ? (
-          <>
-            <div className="text-center mb-8 space-y-3">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto">
-                <Award className="h-8 w-8 text-blue-600" />
-              </div>
-              <h1 className="text-2xl font-bold">Verified Competence Credential</h1>
-              <p className="text-muted-foreground text-sm">
-                This credential was issued by Maxx Engage and is verifiable by anyone.
+    <div className="max-w-2xl mx-auto px-4 py-12">
+      {error ? (
+        <Card className="ring-1 ring-destructive/20 overflow-hidden">
+          <div className="h-1 bg-destructive" />
+          <CardContent className="pt-8 text-center space-y-2">
+            <p className="font-semibold text-destructive">{error}</p>
+            <p className="text-sm text-muted-foreground">
+              Credential ID: <code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{id}</code>
+            </p>
+            <Link href="/" className="text-sm text-primary font-medium hover:underline underline-offset-2 inline-block mt-2">
+              Go home
+            </Link>
+          </CardContent>
+        </Card>
+      ) : credential ? (
+        <>
+          {/* Credential hero */}
+          <div className="text-center mb-10 space-y-4">
+            <div className="w-18 h-18 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Award className="h-9 w-9 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-extrabold">Verified Competence Credential</h1>
+              <p className="text-muted-foreground text-sm mt-1.5 max-w-sm mx-auto leading-relaxed">
+                This credential was issued by Maxx Engage and is publicly verifiable by anyone.
               </p>
             </div>
+          </div>
 
-            <Card className="mb-4 border-green-200">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <CardTitle className="text-base">Credential verified</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Row label="Credential ID" value={<code className="text-xs font-mono break-all">{id}</code>} />
-                <Separator />
-                <Row label="Type" value={
-                  <Badge variant="secondary">Maxx Engage Competence Credential</Badge>
-                } />
-                <Row label="Issuer" value="Maxx Engage" />
-                <Row label="Standard" value="W3C Verifiable Credentials 2.0" />
-              </CardContent>
-            </Card>
+          {/* Verified status */}
+          <Card className="mb-4 ring-1 ring-(--success)/30 overflow-hidden">
+            <div className="h-1 bg-success" />
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-success" />
+                <CardTitle className="text-base font-bold">Credential verified</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Row label="Credential ID" value={<code className="text-xs font-mono break-all bg-muted px-2 py-0.5 rounded-lg">{id}</code>} />
+              <Separator />
+              <Row
+                label="Type"
+                value={
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <CheckCircle className="h-3 w-3 text-success" />
+                    Maxx Engage Competence Credential
+                  </Badge>
+                }
+              />
+              <Row label="Issuer" value={<span className="font-semibold">Maxx Engage</span>} />
+              <Row label="Standard" value="W3C Verifiable Credentials 2.0" />
+            </CardContent>
+          </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Raw VC document</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xs text-muted-foreground mb-3">
-                  The full W3C VC 2.0 JSON document. Import this into any compatible wallet.
-                </p>
-                <pre className="text-xs bg-muted rounded-lg p-4 overflow-x-auto leading-relaxed">
-                  {JSON.stringify(credential, null, 2)}
-                </pre>
-              </CardContent>
-            </Card>
-          </>
-        ) : (
-          <div className="text-center py-20 text-muted-foreground text-sm">Loading...</div>
-        )}
-      </div>
+          {/* Raw VC document */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-bold">Raw VC document</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                The full W3C VC 2.0 JSON-LD document. Import this into any compatible wallet.
+              </p>
+              <pre className="text-xs bg-muted rounded-xl p-4 overflow-x-auto leading-relaxed">
+                {JSON.stringify(credential, null, 2)}
+              </pre>
+            </CardContent>
+          </Card>
+        </>
+      ) : (
+        <div className="text-center py-24 text-muted-foreground text-sm">
+          Loading credential…
+        </div>
+      )}
     </div>
   );
 }

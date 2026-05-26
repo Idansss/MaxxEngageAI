@@ -4,7 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Loader2, LogOut, User, ShieldAlert, LayoutDashboard, ShieldCheck, Target, WalletCards } from "lucide-react";
+import {
+  Loader2, LogOut, User, ShieldAlert, LayoutDashboard,
+  ShieldCheck, Target, WalletCards, Zap,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ADMIN_EMAILS = new Set(
@@ -16,65 +19,103 @@ export function Navbar() {
   const isAdmin = !!session?.user.email && ADMIN_EMAILS.has(session.user.email.toLowerCase());
   const pathname = usePathname();
 
-  function navLink(href: string) {
-    return cn(
-      "hidden sm:flex items-center gap-1.5 text-sm transition-colors",
-      pathname === href
-        ? "text-foreground font-medium"
-        : "text-muted-foreground hover:text-foreground"
+  function isActive(href: string) {
+    return pathname === href || pathname.startsWith(href + "/");
+  }
+
+  function navLink(href: string, label: string, icon: React.ReactNode) {
+    const active = isActive(href);
+    return (
+      <Link
+        href={href}
+        className={cn(
+          "hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150",
+          active
+            ? "bg-primary/10 text-primary"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted"
+        )}
+      >
+        {icon}
+        {label}
+      </Link>
     );
   }
 
   return (
-    <header className="border-b bg-white sticky top-0 z-50">
-      <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="font-bold tracking-tight text-base shrink-0">
-          Maxx<span className="text-blue-600"> Engage</span>
+    <header className="glass-nav sticky top-0 z-50 border-b border-border/60 shadow-sm shadow-border/30">
+      <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+
+        {/* Logo */}
+        <Link
+          href="/"
+          className="font-extrabold text-base tracking-tight shrink-0 flex items-center gap-1"
+        >
+          <span className="text-foreground">Maxx</span>
+          <span className="text-gradient">Engage</span>
         </Link>
 
-        <div className="flex items-center gap-4">
+        {/* Nav links + actions */}
+        <div className="flex items-center gap-1">
           {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mx-2" />
           ) : session ? (
             <>
-              <Link href="/dashboard" className={navLink("/dashboard")}>
-                <LayoutDashboard className="h-3.5 w-3.5" />
-                Dashboard
-              </Link>
-              <Link href="/onboarding" className={navLink("/onboarding")}>
-                <Target className="h-3.5 w-3.5" />
-                Start
-              </Link>
-              <Link href="/identity" className={navLink("/identity")}>
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Identity
-              </Link>
-              <Link href="/wallet" className={navLink("/wallet")}>
-                <WalletCards className="h-3.5 w-3.5" />
-                Wallet
-              </Link>
+              {navLink("/dashboard", "Dashboard", <LayoutDashboard className="h-3.5 w-3.5" />)}
+              {navLink("/onboarding", "Start", <Target className="h-3.5 w-3.5" />)}
+              {navLink("/identity", "Identity", <ShieldCheck className="h-3.5 w-3.5" />)}
+              {navLink("/wallet", "Wallet", <WalletCards className="h-3.5 w-3.5" />)}
+
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 transition-colors"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-amber-600 hover:bg-amber-50 transition-all"
                 >
                   <ShieldAlert className="h-3.5 w-3.5" />
                   Admin
                 </Link>
               )}
+
               {profile?.id && (
-                <Link href={`/profile/${profile.id}`} className={navLink(`/profile/${profile.id}`)}>
+                <Link
+                  href={`/profile/${profile.id}`}
+                  className={cn(
+                    "hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                    isActive(`/profile/${profile.id}`)
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  )}
+                >
                   <User className="h-3.5 w-3.5" />
-                  <span className="max-w-[120px] truncate">{profile.display_name}</span>
+                  <span className="max-w-[100px] truncate">{profile.display_name}</span>
                 </Link>
               )}
-              <Button variant="ghost" size="sm" onClick={signOut} className="gap-1.5">
+
+              {/* Assess CTA */}
+              <Link
+                href="/assess"
+                className={cn(
+                  buttonVariants({ size: "sm" }),
+                  "ml-1 gap-1.5 hidden sm:inline-flex"
+                )}
+              >
+                <Zap className="h-3.5 w-3.5" />
+                Assess
+              </Link>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={signOut}
+                className="gap-1.5 text-muted-foreground hover:text-foreground ml-1"
+              >
                 <LogOut className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Sign out</span>
               </Button>
             </>
           ) : (
-            <Link href="/login" className={buttonVariants({ size: "sm" })}>Sign in</Link>
+            <Link href="/login" className={buttonVariants({ size: "sm" })}>
+              Sign in
+            </Link>
           )}
         </div>
       </nav>
