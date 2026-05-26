@@ -340,7 +340,7 @@ export default function DashboardPage() {
               <Link href="/submissions" className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full justify-start gap-2")}>
                 <Clock className="h-3.5 w-3.5" /> Submission history
               </Link>
-              <Link href="/" className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full justify-start gap-2")}>
+              <Link href="/skill-paths" className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full justify-start gap-2")}>
                 <BookOpen className="h-3.5 w-3.5" /> Browse skill paths
               </Link>
             </CardContent>

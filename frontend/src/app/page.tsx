@@ -156,7 +156,7 @@ export default async function HomePage() {
         </section>
 
         {/* ── Skill Paths ──────────────────────────────────────────────────── */}
-        <section className="py-24 px-4 bg-secondary/30">
+        <section id="skill-paths" className="py-24 px-4 bg-secondary/30">
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
               <div>
