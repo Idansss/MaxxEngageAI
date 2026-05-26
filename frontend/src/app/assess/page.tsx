@@ -43,10 +43,10 @@ function AssessForm() {
   });
 
   const { data: adaptiveTask, isLoading: taskLoading, error: taskError } = useQuery({
-    queryKey: ["adaptive-task", pathSlug, profile?.id],
+    queryKey: ["adaptive-task", pathSlug],
     queryFn: () => api.assessmentJobs.adaptiveTask(pathSlug, profile?.id),
-    enabled: !!session && !!profile?.id,
-    staleTime: 60_000,
+    enabled: !!session,  // profile?.id is optional — don't block on it
+    staleTime: 5 * 60_000,
   });
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
@@ -55,15 +55,17 @@ function AssessForm() {
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: async (content: string) => {
-      if (!adaptiveTask) throw new Error("Task not loaded. Please refresh.");
-      const submissionType = SUBMISSION_TYPE_FOR_RUBRIC[adaptiveTask.rubric_id] ?? "text";
+      const rubricId  = adaptiveTask?.rubric_id          ?? "web-dev-html-001";
+      const taskId    = adaptiveTask?.task_id             ?? "web-dev-html-001-l1";
+      const level     = adaptiveTask?.recommended_level   ?? 1;
+      const submissionType = SUBMISSION_TYPE_FOR_RUBRIC[rubricId] ?? "html_css_js";
       const job = await api.assessmentJobs.create({
-        task_id: adaptiveTask.task_id,
+        task_id: taskId,
         skill_path_slug: pathSlug,
-        level: adaptiveTask.recommended_level,
+        level,
         submission_type: submissionType as AssessRequest["submission_type"],
         content,
-        rubric_id: adaptiveTask.rubric_id,
+        rubric_id: rubricId,
         user_id: profile?.id,
       });
 
@@ -220,7 +222,7 @@ function AssessForm() {
 
         <Button
           type="submit"
-          disabled={isPending || !adaptiveTask}
+          disabled={isPending}
           className="w-full sm:w-auto h-11 px-8 text-base font-semibold gap-2"
           size="lg"
         >
