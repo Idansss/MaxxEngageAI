@@ -43,10 +43,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setSupabaseUser(data.session?.user ?? null);
-      if (data.session) loadProfile(data.session).finally(() => setLoading(false));
-      else setLoading(false);
+      const s = data.session;
+      setSession(s);
+      setSupabaseUser(s?.user ?? null);
+      setLoading(false); // unblock UI immediately; profile loads in background
+      if (s) loadProfile(s);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
@@ -62,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithEmail = async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/onboarding` },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
     return { error: error?.message ?? null };
   };
