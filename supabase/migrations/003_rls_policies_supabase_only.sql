@@ -1,4 +1,4 @@
--- ProofOS — Migration 003: Auth-dependent RLS policies
+﻿-- Maxx Engage — Migration 003: Auth-dependent RLS policies
 -- SUPABASE ONLY — requires the auth schema injected by Supabase.
 -- Apply this via the Supabase dashboard SQL editor, NOT the migration runner.
 

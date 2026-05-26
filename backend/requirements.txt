@@ -24,6 +24,15 @@ python-multipart==0.0.12
 json-repair==0.30.3
 python-dotenv==1.0.1
 structlog==24.4.0
+slowapi==0.1.9
+sentry-sdk[fastapi]>=2.19.0,<3.0
+langsmith>=0.2.0,<1.0
+opentelemetry-api>=1.29.0,<2.0
+opentelemetry-sdk>=1.29.0,<2.0
+opentelemetry-exporter-otlp-proto-http>=1.29.0,<2.0
+opentelemetry-instrumentation-fastapi>=0.50b0,<1.0
+opentelemetry-instrumentation-httpx>=0.50b0,<1.0
+opentelemetry-instrumentation-asyncpg>=0.50b0,<1.0
 
 # Dev / test
 pytest==8.3.4

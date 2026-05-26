@@ -9,6 +9,7 @@ import uuid
 from app.core.database import get_pool
 from app.core.logging import logger
 from app.models.assess import AssessRequest, AssessResponse
+from app.services.audit import append_audit_log
 from app.services.credentials import issue_credential
 
 
@@ -115,6 +116,33 @@ async def persist_assessment(
             "persistence.saved",
             overall_score=response.overall_score,
             credential_eligible=response.credential_eligible,
+        )
+        await append_audit_log(
+            action="review.ai_created",
+            actor_type="ai",
+            actor_id=response.model_used,
+            entity_type="review",
+            entity_id=review_id,
+            new_values={
+                "submission_id": submission_id,
+                "user_id": request.user_id,
+                "overall_score": response.overall_score,
+                "confidence": response.confidence,
+                "credential_eligible": response.credential_eligible,
+                "human_review_requested": response.human_review_requested,
+                "model_version": response.model_used,
+                "prompt_hash": response.prompt_hash,
+                "secondary_model_used": response.secondary_model_used,
+                "secondary_overall_score": response.secondary_overall_score,
+                "model_disagreement": response.model_disagreement,
+                "model_disagreement_reason": response.model_disagreement_reason,
+            },
+            metadata={
+                "task_id": request.task_id,
+                "rubric_id": request.rubric_id,
+                "skill_path_slug": request.skill_path_slug,
+                "level": request.level,
+            },
         )
 
         credential_id: str | None = None

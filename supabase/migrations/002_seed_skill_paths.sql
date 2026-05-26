@@ -1,4 +1,4 @@
--- ProofOS — Migration 002: Seed first skill path
+﻿-- Maxx Engage — Migration 002: Seed first skill path
 -- web-dev-frontend is the MVP domain.
 
 INSERT INTO public.skill_paths (slug, name, domain, description, levels, decay_half_life_months, decay_refresh_months, tags)

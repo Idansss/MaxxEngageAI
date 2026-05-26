@@ -12,7 +12,7 @@ async def health():
 @router.get("/", summary="API root")
 async def root():
     return {
-        "name": "ProofOS API",
+        "name": "Maxx Engage API",
         "version": "0.1.0",
         "description": "Verified Competence Engine — Engine 1 of Civilization OS",
         "docs": "/docs",

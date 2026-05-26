@@ -1,4 +1,4 @@
-# ProofOS — Verified Competence for Global Digital Talent
+# Maxx Engage — Verified Competence for Global Digital Talent
 ## A Manifesto for the Competence Engine of Civilization OS
 
 > *"No degree? No connections? Prove what you can do."*
@@ -20,7 +20,7 @@ Every macro problem — corruption, inequality of opportunity, misinformation, w
 A developer in Lagos with better skills than a graduate from a European university cannot prove it.  
 A writer in Nairobi, a data analyst in Accra, a designer in Kigali — invisible to the world, not because they lack ability, but because they lack the right paper from the right institution in the right country.
 
-This is a coordination failure. ProofOS is the fix.
+This is a coordination failure. Maxx Engage is the fix.
 
 ---
 
@@ -28,13 +28,13 @@ This is a coordination failure. ProofOS is the fix.
 
 > To build a public-benefit AI system that helps humans prove competence, verify truth, learn faster, make better decisions, and coordinate action — through transparent, evidence-based, decentralized AI that no single person, company, or government can control.
 
-**ProofOS** is the first engine of **Civilization OS** — a coordination substrate for human civilization.
+**Maxx Engage** is the first engine of **Civilization OS** — a coordination substrate for human civilization.
 
 ---
 
-## What ProofOS Does
+## What Maxx Engage Does
 
-ProofOS is a **Verified Competence Engine**. It:
+Maxx Engage is a **Verified Competence Engine**. It:
 
 1. Tests users with real-world challenges graded against transparent rubrics
 2. Reviews submissions with AI — and human experts for top work
@@ -48,11 +48,11 @@ ProofOS is a **Verified Competence Engine**. It:
 
 ## The Seven Engines (Long Vision)
 
-ProofOS is Engine 1. The full system is:
+Maxx Engage is Engine 1. The full system is:
 
 | # | Engine | Purpose |
 |---|---|---|
-| 1 | **Competence Engine** (ProofOS) | Prove what you can do |
+| 1 | **Competence Engine** (Maxx Engage) | Prove what you can do |
 | 2 | **Truth Engine** | Immutable public memory for claims, predictions, outcomes |
 | 3 | **Learning Engine** | AI tutor that meets users where they are |
 | 4 | **Decision Engine** | GPS for life decisions with causal inference |
@@ -145,7 +145,7 @@ This is a strategic wedge: a market the West underserves, a population we unders
 | Phase | Name | Duration |
 |---|---|---|
 | 0 | Living Whitepaper | 2–4 wks |
-| 1 | ProofOS MVP | 3 mo |
+| 1 | Maxx Engage MVP | 3 mo |
 | 2 | Verification Network | 3 mo |
 | 3 | Truth Memory Kernel | 3 mo |
 | 4 | Self-Sovereign Identity | 3 mo |

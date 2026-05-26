@@ -6,10 +6,10 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { api } from "@/lib/api";
+import { api, type AssessRequest } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, ArrowLeft, AlertCircle } from "lucide-react";
@@ -21,17 +21,67 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
+const SUBMISSION_TYPE_FOR_RUBRIC: Record<string, string> = {
+  "web-dev-html-001": "html_css_js",
+};
+
 function AssessForm() {
   const router = useRouter();
   const params = useSearchParams();
   const pathSlug = params.get("path") ?? "web-dev-frontend";
-  const { session, loading: authLoading } = useAuth();
+  const { session, profile, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (!authLoading && !session) {
       router.replace(`/login?next=/assess${pathSlug ? `?path=${pathSlug}` : ""}`);
     }
   }, [authLoading, session, router, pathSlug]);
+
+  const { data: skillPath, isLoading: pathLoading } = useQuery({
+    queryKey: ["skill-path", pathSlug],
+    queryFn: () => api.skillPaths.get(pathSlug),
+    enabled: !!session,
+  });
+
+  const { data: adaptiveTask, isLoading: taskLoading, error: taskError } = useQuery({
+    queryKey: ["adaptive-task", pathSlug, profile?.id],
+    queryFn: () => api.assessmentJobs.adaptiveTask(pathSlug, profile?.id),
+    enabled: !!session && !!profile?.id,
+    staleTime: 60_000,
+  });
+
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: async (content: string) => {
+      if (!adaptiveTask) throw new Error("Task not loaded. Please refresh.");
+      const submissionType = SUBMISSION_TYPE_FOR_RUBRIC[adaptiveTask.rubric_id] ?? "text";
+      const job = await api.assessmentJobs.create({
+        task_id: adaptiveTask.task_id,
+        skill_path_slug: pathSlug,
+        level: adaptiveTask.recommended_level,
+        submission_type: submissionType as AssessRequest["submission_type"],
+        content,
+        rubric_id: adaptiveTask.rubric_id,
+        user_id: profile?.id,
+      });
+
+      for (let attempt = 0; attempt < 90; attempt += 1) {
+        const latest = await api.assessmentJobs.get(job.id);
+        if (latest.status === "succeeded" && latest.result) return latest.result;
+        if (latest.status === "failed") throw new Error(latest.error ?? "Assessment failed.");
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+      throw new Error("Assessment is still running. Check submission history in a few minutes.");
+    },
+    onSuccess: (data) => {
+      router.push(
+        `/results/${data.review_id}?score=${data.overall_score}&passed=${data.passed}&credential=${data.credential_id ?? ""}&submission=${data.submission_id ?? ""}`
+      );
+    },
+  });
 
   if (authLoading || !session) {
     return (
@@ -41,39 +91,28 @@ function AssessForm() {
     );
   }
 
-  const { data: skillPath, isLoading: pathLoading } = useQuery({
-    queryKey: ["skill-path", pathSlug],
-    queryFn: () => api.skillPaths.get(pathSlug),
-  });
-
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  });
-
-  const { mutate, isPending, error, data: result } = useMutation({
-    mutationFn: (content: string) =>
-      api.assess({
-        task_id: "8f451824-8a4c-4f55-acac-2aafdec5755f",
-        skill_path_slug: pathSlug,
-        level: 1,
-        submission_type: "html_css_js",
-        content,
-        rubric_id: "web-dev-html-001",
-      }),
-    onSuccess: (data) => {
-      router.push(
-        `/results/${data.review_id}?score=${data.overall_score}&passed=${data.passed}&credential=${data.credential_id ?? ""}&submission=${data.submission_id ?? ""}`
-      );
-    },
-  });
-
-  if (pathLoading) {
+  if (pathLoading || taskLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
+
+  if (taskError) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-10">
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive flex items-start gap-2">
+          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+          Could not load assessment task: {(taskError as Error).message}
+        </div>
+      </div>
+    );
+  }
+
+  const levelLabel = adaptiveTask?.level_label ?? "Level 1 — Foundations";
+  const taskText = adaptiveTask?.prompt?.text ?? "";
+  const rubricId = adaptiveTask?.rubric_id ?? "web-dev-html-001";
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
@@ -84,12 +123,17 @@ function AssessForm() {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-2">
           <Badge variant="secondary">{skillPath?.domain ?? "technology"}</Badge>
-          <Badge variant="outline">Level 1 — Foundations</Badge>
+          <Badge variant="outline">{levelLabel}</Badge>
         </div>
         <h1 className="text-2xl font-bold">{skillPath?.name ?? "Frontend Web Development"}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Diagnostic assessment &middot; rubric: web-dev-html-001 &middot; pass threshold: 70/100
+          Diagnostic assessment &middot; rubric: {rubricId} &middot; pass threshold: 70/100
         </p>
+        {adaptiveTask?.reasoning && adaptiveTask.recommended_level > 1 && (
+          <p className="mt-2 text-xs text-blue-600 bg-blue-50 rounded px-3 py-1.5 border border-blue-100 inline-block">
+            {adaptiveTask.reasoning}
+          </p>
+        )}
       </div>
 
       {/* Task prompt */}
@@ -97,19 +141,25 @@ function AssessForm() {
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Your task</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm leading-relaxed space-y-3 text-muted-foreground">
-          <p>
-            Build a <strong className="text-foreground">semantic, accessible, responsive HTML/CSS landing page</strong> for
-            a fictional local business of your choice. The page must include:
-          </p>
-          <ul className="list-disc list-inside space-y-1 pl-2">
-            <li>A navigation bar with at least 3 links</li>
-            <li>A hero section with a headline and call-to-action button</li>
-            <li>A features or services section with at least 3 items</li>
-            <li>A footer with contact info</li>
-          </ul>
-          <p>Use only HTML and CSS — no JavaScript required.</p>
-          <p className="text-xs pt-1">
+        <CardContent className="text-sm leading-relaxed text-muted-foreground">
+          {taskText ? (
+            <p>{taskText}</p>
+          ) : (
+            <>
+              <p>
+                Build a <strong className="text-foreground">semantic, accessible, responsive HTML/CSS landing page</strong> for
+                a fictional local business of your choice. The page must include:
+              </p>
+              <ul className="list-disc list-inside space-y-1 pl-2 mt-2">
+                <li>A navigation bar with at least 3 links</li>
+                <li>A hero section with a headline and call-to-action button</li>
+                <li>A features or services section with at least 3 items</li>
+                <li>A footer with contact info</li>
+              </ul>
+              <p className="mt-2">Use only HTML and CSS — no JavaScript required.</p>
+            </>
+          )}
+          <p className="text-xs pt-3">
             Work at your own pace &mdash; time is not scored. Paste your full HTML below.
           </p>
         </CardContent>
@@ -159,11 +209,11 @@ function AssessForm() {
           </div>
         )}
 
-        <Button type="submit" disabled={isPending} className="w-full sm:w-auto" size="lg">
+        <Button type="submit" disabled={isPending || !adaptiveTask} className="w-full sm:w-auto" size="lg">
           {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Grading with Claude...
+              Queued for AI review...
             </>
           ) : (
             "Submit for grading"
@@ -172,7 +222,7 @@ function AssessForm() {
 
         {isPending && (
           <p className="text-xs text-muted-foreground mt-3">
-            AI grading typically takes 15–30 seconds. Do not close this tab.
+            AI grading runs in the background. This page will move on when the result is ready.
           </p>
         )}
       </form>

@@ -13,7 +13,7 @@ function LoginForm() {
   const { signInWithEmail, session } = useAuth();
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") ?? "/";
+  const next = params.get("next") ?? "/onboarding";
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -94,7 +94,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       <Link href="/" className="font-bold text-xl tracking-tight mb-8">
-        Proof<span className="text-blue-600">OS</span>
+        Maxx<span className="text-blue-600"> Engage</span>
       </Link>
 
       <Card className="w-full max-w-sm">

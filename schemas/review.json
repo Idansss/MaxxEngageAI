@@ -1,6 +1,6 @@
-{
+﻿{
   "$schema": "https://json-schema.org/draft/2020-12",
-  "$id": "https://proofos.org/schemas/review.json",
+  "$id": "https://maxx-engage.io/schemas/review.json",
   "title": "Review",
   "description": "An AI or human review of a Submission against a Rubric. All reasoning is visible to the user — no secret scores.",
   "type": "object",

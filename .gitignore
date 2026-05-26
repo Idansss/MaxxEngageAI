@@ -10,6 +10,7 @@ build/
 
 # Secrets — never commit
 backend/.env
+.env.local
 backend/secrets/
 *.pem
 *.key

@@ -8,7 +8,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ProofOS — Verified Competence for Global Talent",
+  title: "Maxx Engage — Verified Competence for Global Talent",
   description:
     "Prove your skills with AI-graded assessments and earn W3C Verifiable Credentials. Built for Africa's digital talent.",
 };

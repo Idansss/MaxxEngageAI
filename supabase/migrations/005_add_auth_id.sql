@@ -1,4 +1,4 @@
--- Migration 005: Link Supabase Auth users to ProofOS profiles
+﻿-- Migration 005: Link Supabase Auth users to Maxx Engage profiles
 -- Run this in Supabase SQL Editor or via supabase db push.
 
 ALTER TABLE public.users

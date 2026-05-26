@@ -11,7 +11,7 @@ class CreateUserRequest(BaseModel):
     public_profile: bool = False
     did: str | None = Field(
         None,
-        description="W3C DID. If omitted, a did:proofos: identifier is auto-generated.",
+        description="W3C DID. If omitted, a did:key: identifier is auto-generated.",
     )
 
 

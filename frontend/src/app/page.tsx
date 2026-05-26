@@ -6,6 +6,8 @@ import { api } from "@/lib/api";
 import { CheckCircle, Award, BookOpen, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 async function getSkillPaths() {
   try {
     return await api.skillPaths.list();
@@ -160,7 +162,7 @@ export default async function HomePage() {
       {/* Footer */}
       <footer className="border-t py-8 px-4 text-center text-sm text-muted-foreground">
         <p>
-          ProofOS &mdash; Engine 1 of{" "}
+          Maxx Engage &mdash; Engine 1 of{" "}
           <span className="font-medium text-foreground">Civilization OS</span>.
           {" "}Built for global talent. Owned by no one.
         </p>

@@ -1,16 +1,17 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { api, type UserCredential } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
+import { Navbar } from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Award, MapPin, Calendar, Share2, ExternalLink,
-  ShieldCheck, Clock, Loader2, UserCircle
+  ShieldCheck, Clock, Loader2, UserCircle, Eye, EyeOff
 } from "lucide-react";
 
 function domainColor(domain: string) {
@@ -93,6 +94,7 @@ function CredentialCard({ cred }: { cred: UserCredential }) {
 export default function ProfilePage() {
   const { userId } = useParams<{ userId: string }>();
   const { profile: myProfile } = useAuth();
+  const queryClient = useQueryClient();
   const isOwner = myProfile?.id === userId;
 
   const { data: user, isLoading: userLoading, error: userError } = useQuery({
@@ -104,6 +106,22 @@ export default function ProfilePage() {
     queryKey: ["user-credentials", userId],
     queryFn: () => api.users.credentials(userId),
     enabled: !!userId,
+  });
+
+  const { data: myCredentialStatus, isLoading: ownerCredsLoading } = useQuery({
+    queryKey: ["my-credential-visibility"],
+    queryFn: () => api.credentials.myDecayStatus(),
+    enabled: isOwner,
+  });
+
+  const { mutate: setVisibility, isPending: visibilitySaving } = useMutation({
+    mutationFn: ({ id, isPublic }: { id: string; isPublic: boolean }) =>
+      api.credentials.setVisibility(id, isPublic),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-credential-visibility"] });
+      queryClient.invalidateQueries({ queryKey: ["user-credentials", userId] });
+      queryClient.invalidateQueries({ queryKey: ["user-credentials", myProfile?.id] });
+    },
   });
 
   const shareProfile = () => {
@@ -133,6 +151,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar />
       <main className="max-w-4xl mx-auto px-4 py-10">
 
         {/* Profile header */}
@@ -178,6 +197,58 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
+
+        {isOwner && (
+          <Card className="mb-8">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Eye className="h-4 w-4 text-blue-600" />
+                Credential visibility
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {ownerCredsLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
+              ) : !myCredentialStatus?.credentials.length ? (
+                <p className="text-sm text-muted-foreground">
+                  Earn a credential, then choose whether it appears on this public profile.
+                </p>
+              ) : (
+                <div className="divide-y">
+                  {myCredentialStatus.credentials.map((cred) => (
+                    <div key={cred.id} className="py-3 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">{cred.skill_path_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Level {cred.level} - {cred.level_label} - score {cred.raw_score.toFixed(0)}
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant={cred.is_public ? "outline" : "default"}
+                        disabled={visibilitySaving}
+                        onClick={() => setVisibility({ id: cred.id, isPublic: !cred.is_public })}
+                        className="gap-1.5 shrink-0"
+                      >
+                        {cred.is_public ? (
+                          <>
+                            <Eye className="h-3.5 w-3.5" /> Public
+                          </>
+                        ) : (
+                          <>
+                            <EyeOff className="h-3.5 w-3.5" /> Private
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Credentials section */}
         <div className="mb-4 flex items-center justify-between">

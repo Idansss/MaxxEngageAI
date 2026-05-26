@@ -1,4 +1,4 @@
--- ProofOS — Migration 004: Seed diagnostic task for web-dev-frontend Level 1
+﻿-- Maxx Engage — Migration 004: Seed diagnostic task for web-dev-frontend Level 1
 -- Provides a real task_id for end-to-end assessment + credential testing.
 
 INSERT INTO public.tasks (skill_path_id, level, type, prompt, rubric_id, difficulty_rating, authored_by)
@@ -14,7 +14,7 @@ SELECT
     }'::jsonb,
     'web-dev-html-001',
     0.35,
-    'proofos_seed'
+    'Maxx Engage_seed'
 FROM public.skill_paths sp
 WHERE sp.slug = 'web-dev-frontend'
 ON CONFLICT DO NOTHING;

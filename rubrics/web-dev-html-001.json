@@ -1,5 +1,5 @@
-{
-  "$schema": "https://proofos.org/schemas/rubric.json",
+﻿{
+  "$schema": "https://maxx-engage.io/schemas/rubric.json",
   "id": "web-dev-html-001",
   "version": "1.0.0",
   "skill_path_slug": "web-dev-frontend",

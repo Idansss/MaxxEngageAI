@@ -1,6 +1,6 @@
-{
+﻿{
   "$schema": "https://json-schema.org/draft/2020-12",
-  "$id": "https://proofos.org/schemas/submission.json",
+  "$id": "https://maxx-engage.io/schemas/submission.json",
   "title": "Submission",
   "description": "A user's response to a Task. Immutable once created — only review_id is added.",
   "type": "object",

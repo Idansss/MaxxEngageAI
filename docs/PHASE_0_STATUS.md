@@ -1,6 +1,6 @@
 # Phase 0 Status
 
-Phase 0 goal: make ProofOS publicly legible before expanding the product.
+Phase 0 goal: make Maxx Engage publicly legible before expanding the product.
 
 ## Checklist
 
@@ -29,7 +29,7 @@ Suggested body:
 ```md
 ## Decision
 
-Pick the first skill domain for ProofOS MVP.
+Pick the first skill domain for Maxx Engage MVP.
 
 ## Default candidate
 

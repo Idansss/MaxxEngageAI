@@ -23,7 +23,7 @@ export default async function CredentialPage({ params }: { params: Promise<{ id:
       error = "Failed to load credential.";
     }
   } catch {
-    error = "Could not reach the ProofOS server.";
+    error = "Could not reach the Maxx Engage server.";
   }
 
   return (
@@ -31,7 +31,7 @@ export default async function CredentialPage({ params }: { params: Promise<{ id:
       <header className="border-b bg-white">
         <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center">
           <Link href="/" className="font-bold tracking-tight">
-            Proof<span className="text-blue-600">OS</span>
+            Maxx<span className="text-blue-600"> Engage</span>
           </Link>
         </nav>
       </header>
@@ -54,7 +54,7 @@ export default async function CredentialPage({ params }: { params: Promise<{ id:
               </div>
               <h1 className="text-2xl font-bold">Verified Competence Credential</h1>
               <p className="text-muted-foreground text-sm">
-                This credential was issued by ProofOS and is verifiable by anyone.
+                This credential was issued by Maxx Engage and is verifiable by anyone.
               </p>
             </div>
 
@@ -69,9 +69,9 @@ export default async function CredentialPage({ params }: { params: Promise<{ id:
                 <Row label="Credential ID" value={<code className="text-xs font-mono break-all">{id}</code>} />
                 <Separator />
                 <Row label="Type" value={
-                  <Badge variant="secondary">ProofOS Competence Credential</Badge>
+                  <Badge variant="secondary">Maxx Engage Competence Credential</Badge>
                 } />
-                <Row label="Issuer" value="ProofOS (did:web:proofos.io)" />
+                <Row label="Issuer" value="Maxx Engage" />
                 <Row label="Standard" value="W3C Verifiable Credentials 2.0" />
               </CardContent>
             </Card>

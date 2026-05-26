@@ -1,6 +1,6 @@
-{
+﻿{
   "$schema": "https://json-schema.org/draft/2020-12",
-  "$id": "https://proofos.org/schemas/skill_path.json",
+  "$id": "https://maxx-engage.io/schemas/skill_path.json",
   "title": "SkillPath",
   "description": "A structured learning + assessment path for one skill domain. Config-driven so new domains don't require code changes.",
   "type": "object",

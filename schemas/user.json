@@ -1,8 +1,8 @@
-{
+﻿{
   "$schema": "https://json-schema.org/draft/2020-12",
-  "$id": "https://proofos.org/schemas/user.json",
+  "$id": "https://maxx-engage.io/schemas/user.json",
   "title": "User",
-  "description": "A registered ProofOS user. Owns their data; platform is the renter.",
+  "description": "A registered Maxx Engage user. Owns their data; platform is the renter.",
   "type": "object",
   "required": ["id", "did", "created_at", "profile"],
   "properties": {

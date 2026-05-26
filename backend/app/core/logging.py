@@ -21,4 +21,4 @@ def configure_logging() -> None:
     )
 
 
-logger = structlog.get_logger("proofos")
+logger = structlog.get_logger("maxx-engage")

@@ -47,7 +47,7 @@ function LoadingState() {
         <p className="text-muted-foreground text-sm transition-all">{LOADING_MESSAGES[idx]}</p>
       </div>
       <p className="text-xs text-muted-foreground max-w-xs">
-        Claude is designing a personalised {"{weeks}"}-week curriculum based on your diagnostic score. This takes 20–40 seconds.
+        Claude is designing a personalised curriculum based on your diagnostic score. This takes 20–40 seconds.
       </p>
     </div>
   );
@@ -373,7 +373,7 @@ function PathView({ data }: { data: LearnPathResponse }) {
         <h3 className="font-semibold">Studied the material? Ready to prove it?</h3>
         <p className="text-sm text-muted-foreground">
           Take the assessment when you feel confident. Your score and any earned credential are
-          stored permanently on ProofOS.
+          stored permanently on Maxx Engage.
         </p>
         <Link href={`/assess?path=${data.skill_path_slug}`} className={cn(buttonVariants({ size: "lg" }), "mt-2")}>
           Take the assessment <ArrowRight className="ml-2 h-4 w-4" />

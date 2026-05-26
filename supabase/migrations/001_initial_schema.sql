@@ -1,4 +1,4 @@
--- ProofOS — Migration 001: Initial Schema
+﻿-- Maxx Engage — Migration 001: Initial Schema
 -- Applies to: Postgres 15+ (Neon / Supabase)
 -- All tables use UUID PKs, JSONB for nested structures, RLS from day one.
 -- Service role key bypasses RLS automatically — only anon/user tokens are restricted.
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     reputation_last_computed_at TIMESTAMPTZ
 );
 
-COMMENT ON TABLE  public.users IS 'ProofOS users. Platform is the renter; user owns their data via DID.';
+COMMENT ON TABLE  public.users IS 'Maxx Engage users. Platform is the renter; user owns their data via DID.';
 COMMENT ON COLUMN public.users.did IS 'W3C Decentralized Identifier the user controls. E.g. did:key:z6Mk...';
 
 -- ── 2. skill_paths ────────────────────────────────────────────────────────────

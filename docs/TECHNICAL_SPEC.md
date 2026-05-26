@@ -1,15 +1,15 @@
-# ProofOS Technical Spec
+# Maxx Engage Technical Spec
 
 ## Status
 
-Phase 0/1 technical baseline for ProofOS, the Competence Engine of Civilization OS.
+Phase 0/1 technical baseline for Maxx Engage, the Competence Engine of Civilization OS.
 This document defines the current MVP architecture, data contracts, trust model,
 and verification loop. It should be updated whenever scoring, identity,
 credentials, or user-facing review behavior changes.
 
 ## Mission Boundary
 
-ProofOS verifies competence through real tasks, transparent rubrics, calibrated AI
+Maxx Engage verifies competence through real tasks, transparent rubrics, calibrated AI
 review, human escalation, and user-owned credentials.
 
 The MVP focuses on one wedge: frontend web development for global digital talent,
@@ -154,7 +154,7 @@ The first calibration target is `evals/web-dev-html-001.jsonl`.
 
 ## Identity and Sybil Resistance
 
-ProofOS starts with pragmatic identity signals and keeps the path open to
+Maxx Engage starts with pragmatic identity signals and keeps the path open to
 self-sovereign credentials:
 
 - Gitcoin/Human Passport score via `GITCOIN_SCORER_ID`

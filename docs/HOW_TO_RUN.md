@@ -1,4 +1,4 @@
-# How to Run ProofOS Backend (Local Dev)
+# How to Run Maxx Engage Backend (Local Dev)
 
 ## Prerequisites
 - Python 3.11+

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
-import { api } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
+import { Navbar } from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,7 +78,7 @@ async function postDecision(reviewId: string, decision: "approve" | "reject", no
 
 // ── Queue item card ───────────────────────────────────────────────────────────
 
-function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string, d: "approve" | "reject") => void }) {
+function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string, d: "approve" | "reject", note: string) => void }) {
   const [expanded, setExpanded] = useState(false);
   const [note, setNote] = useState("");
   const [confirming, setConfirming] = useState<"approve" | "reject" | null>(null);
@@ -219,7 +219,7 @@ function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string,
               <Button
                 size="sm"
                 variant={confirming === "approve" ? "default" : "destructive"}
-                onClick={() => { onDecide(item.review_id, confirming); setConfirming(null); }}
+                onClick={() => { onDecide(item.review_id, confirming, note); setConfirming(null); }}
               >
                 Confirm {confirming}
               </Button>
@@ -252,7 +252,6 @@ function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string,
 export default function AdminQueuePage() {
   const { session, loading: authLoading } = useAuth();
   const queryClient = useQueryClient();
-  const [notes, setNotes] = useState<Record<string, string>>({});
 
   const { data: queue = [], isLoading, error } = useQuery({
     queryKey: ["admin-queue"],
@@ -262,8 +261,8 @@ export default function AdminQueuePage() {
   });
 
   const { mutate: decide, isPending: deciding } = useMutation({
-    mutationFn: ({ reviewId, decision }: { reviewId: string; decision: "approve" | "reject" }) =>
-      postDecision(reviewId, decision, notes[reviewId] ?? ""),
+    mutationFn: ({ reviewId, decision, note }: { reviewId: string; decision: "approve" | "reject"; note: string }) =>
+      postDecision(reviewId, decision, note),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-queue"] }),
   });
 
@@ -283,8 +282,10 @@ export default function AdminQueuePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar />
       <main className="max-w-4xl mx-auto px-4 py-10">
-        <div className="mb-6">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <ShieldAlert className="h-6 w-6 text-amber-500" />
             Human Review Queue
@@ -292,6 +293,10 @@ export default function AdminQueuePage() {
           <p className="text-muted-foreground text-sm mt-1">
             Submissions the AI flagged for human judgement. Approve to verify the credential; reject to decline.
           </p>
+          </div>
+          <Link href="/admin" className="text-sm text-blue-600 hover:underline">
+            Admin dashboard
+          </Link>
         </div>
 
         {isLoading ? (
@@ -319,7 +324,7 @@ export default function AdminQueuePage() {
               <QueueCard
                 key={item.review_id}
                 item={item}
-                onDecide={(reviewId, decision) => decide({ reviewId, decision })}
+                onDecide={(reviewId, decision, note) => decide({ reviewId, decision, note })}
               />
             ))}
           </div>

@@ -1,6 +1,6 @@
-{
+﻿{
   "$schema": "https://json-schema.org/draft/2020-12",
-  "$id": "https://proofos.org/schemas/task.json",
+  "$id": "https://maxx-engage.io/schemas/task.json",
   "title": "Task",
   "description": "A real-world micro-task issued to a user. Gradable by AI against a rubric.",
   "type": "object",

@@ -72,7 +72,7 @@ FREE_RESOURCES: dict[str, list[dict]] = {
     ],
 }
 
-SYSTEM_PROMPT = """You are a world-class curriculum designer for ProofOS — a public-benefit platform that helps African digital talent prove competence.
+SYSTEM_PROMPT = """You are a world-class curriculum designer for Maxx Engage — a public-benefit platform that helps African digital talent prove competence.
 
 Your task: design a personalized, week-by-week learning path for a user based on their diagnostic score.
 
