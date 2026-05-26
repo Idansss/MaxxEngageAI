@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, ArrowLeft, AlertCircle, Sparkles } from "lucide-react";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 
 const schema = z.object({
   content: z.string().min(50, "Submission must be at least 50 characters."),
@@ -49,9 +49,25 @@ function AssessForm() {
     staleTime: 5 * 60_000,
   });
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const draftKey = `assess-draft-${pathSlug}`;
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      content: typeof window !== "undefined" ? (localStorage.getItem(draftKey) ?? "") : "",
+    },
   });
+
+  // Auto-save to localStorage with 800ms debounce
+  const contentValue = watch("content");
+  useEffect(() => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      if (contentValue) localStorage.setItem(draftKey, contentValue);
+    }, 800);
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
+  }, [contentValue, draftKey]);
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: async (content: string) => {
@@ -78,6 +94,7 @@ function AssessForm() {
       throw new Error("Assessment is still running. Check submission history in a few minutes.");
     },
     onSuccess: (data) => {
+      localStorage.removeItem(draftKey);
       router.push(
         `/results/${data.review_id}?score=${data.overall_score}&passed=${data.passed}&credential=${data.credential_id ?? ""}&submission=${data.submission_id ?? ""}`
       );
@@ -200,6 +217,23 @@ function AssessForm() {
       {/* Submission form */}
       <form onSubmit={handleSubmit((data) => mutate(data.content))}>
         <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs text-muted-foreground">
+              {contentValue?.length ?? 0} characters
+              {contentValue && contentValue.length >= 50 && (
+                <span className="ml-2 text-success">· Draft auto-saved</span>
+              )}
+            </p>
+            {contentValue && (
+              <button
+                type="button"
+                onClick={() => { setValue("content", ""); localStorage.removeItem(draftKey); }}
+                className="text-xs text-muted-foreground hover:text-destructive transition-colors underline underline-offset-2"
+              >
+                Clear draft
+              </button>
+            )}
+          </div>
           <Textarea
             {...register("content")}
             placeholder={"<!DOCTYPE html>\n<html lang='en'>\n  ..."}
