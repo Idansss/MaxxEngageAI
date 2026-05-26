@@ -104,6 +104,20 @@ export default function IdentityPage() {
     enabled: !!session,
   });
 
+  // Auto-claim email stamp — user is already verified by magic link sign-in
+  useEffect(() => {
+    if (!session || stampsLoading || !stampsData) return;
+    const hasEmail = stampsData.stamps.some((s) => s.stamp_type === "email" && s.active);
+    if (hasEmail) return;
+    api.identity.stampEmail()
+      .then(() => {
+        qc.invalidateQueries({ queryKey: ["my-humanity-score"] });
+        qc.invalidateQueries({ queryKey: ["my-stamps"] });
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stampsLoading, stampsData]);
+
   function parseGithubUsername(raw: string): string {
     const match = raw.trim().match(/github\.com\/([^/?#]+)/);
     return match ? match[1] : raw.trim();

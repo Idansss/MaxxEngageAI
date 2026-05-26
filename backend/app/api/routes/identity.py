@@ -60,6 +60,40 @@ async def _resolve_user_id(auth_user: dict) -> str:
     return str(row["id"])
 
 
+# ── Email stamp ───────────────────────────────────────────────────────────────
+
+@router.post(
+    "/stamps/email",
+    summary="Claim the email verification stamp",
+)
+async def stamp_email(auth_user: dict = Depends(get_current_user)):
+    """
+    Awards +10 pts for having a verified email (magic link sign-in = verified).
+    Idempotent — safe to call multiple times; subsequent calls are no-ops.
+    """
+    user_id = await _resolve_user_id(auth_user)
+    pool = get_pool()
+
+    await pool.execute(
+        """
+        INSERT INTO public.stamps (user_id, stamp_type, score_contribution, metadata)
+        VALUES ($1::uuid, 'email', 10, '{}'::jsonb)
+        ON CONFLICT (user_id, stamp_type) DO NOTHING
+        """,
+        user_id,
+    )
+    score = await recompute_humanity_score(user_id, pool)
+
+    logger.info("identity.email.stamped", user_id=user_id)
+    return {
+        "ok": True,
+        "stamp_type": "email",
+        "score_contribution": 10,
+        "message": "Email verified via magic link. +10 points added.",
+        "metadata": {},
+    }
+
+
 # ── GitHub stamp ──────────────────────────────────────────────────────────────
 
 @router.post(

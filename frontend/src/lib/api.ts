@@ -326,6 +326,38 @@ export interface AssessmentJob {
   request?: Record<string, unknown> | null;
 }
 
+export interface KnowledgeSource {
+  title: string;
+  url: string;
+  source_type: "wikipedia" | "wikidata" | string;
+  summary: string;
+}
+
+export interface GitHubCommunityStatus {
+  repo: {
+    name: string;
+    url: string;
+    description: string | null;
+    stars: number;
+    forks: number;
+    open_issues: number;
+    license: string | null;
+    default_branch: string | null;
+  };
+  issues: {
+    number: number;
+    title: string;
+    url: string;
+    labels: string[];
+    created_at: string;
+  }[];
+  docs: { title: string; url: string }[];
+  community: {
+    discord_invite_url: string;
+    github_url: string;
+  };
+}
+
 // ── API calls ──────────────────────────────────────────────────────────────
 
 export const api = {
@@ -372,6 +404,11 @@ export const api = {
   identity: {
     myScore: () => apiFetch<HumanityScore>("/identity/score"),
     myStamps: () => apiFetch<{ user_id: string; stamps: Stamp[] }>("/identity/stamps"),
+    stampEmail: () =>
+      apiFetch<{ ok: boolean; stamp_type: string; score_contribution: number; message: string; metadata: Record<string, unknown> }>(
+        "/identity/stamps/email",
+        { method: "POST" }
+      ),
     stampGitHub: (username: string) =>
       apiFetch<{ ok: boolean; stamp_type: string; score_contribution: number; message: string; metadata: Record<string, unknown> }>(
         "/identity/stamps/github",
@@ -396,6 +433,13 @@ export const api = {
   },
   reviews: {
     get: (reviewId: string) => apiFetch<ReviewDetail>(`/reviews/${reviewId}`),
+  },
+  knowledge: {
+    search: (q: string) =>
+      apiFetch<{ query: string; sources: KnowledgeSource[] }>(`/knowledge/search?q=${encodeURIComponent(q)}`),
+  },
+  community: {
+    github: () => apiFetch<GitHubCommunityStatus>("/community/github"),
   },
   admin: {
     queue: () => apiFetch<AdminQueueItem[]>("/admin/queue"),
