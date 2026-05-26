@@ -134,8 +134,11 @@ async def persist_assessment(
                 "prompt_hash": response.prompt_hash,
                 "secondary_model_used": response.secondary_model_used,
                 "secondary_overall_score": response.secondary_overall_score,
+                "tertiary_model_used": response.tertiary_model_used,
+                "tertiary_overall_score": response.tertiary_overall_score,
                 "model_disagreement": response.model_disagreement,
                 "model_disagreement_reason": response.model_disagreement_reason,
+                "knowledge_sources": response.knowledge_sources,
             },
             metadata={
                 "task_id": request.task_id,

@@ -17,6 +17,7 @@ from app.core.config import get_settings
 from app.core.database import get_pool
 from app.core.logging import logger
 from app.models.assess import AssessRequest, AssessResponse
+from app.services.anchoring import anchor_credential
 from app.services.audit import append_audit_log
 from app.services.consistency import compute_consistency
 from app.services.did import did_to_verification_method
@@ -166,6 +167,7 @@ async def issue_credential(
             logger.warning("credentials.unsigned", reason="ISSUER_PRIVATE_KEY_B64 not set")
             vc_document = unsigned_vc
 
+        anchor = await anchor_credential(vc_document, credential_id)
         # ── Persist ───────────────────────────────────────────────────────────
         async with pool.acquire() as conn:
             await conn.execute(
@@ -175,13 +177,15 @@ async def issue_credential(
                      skill_path_id, level, level_label, score, percentile,
                      verified_by_human, zk_proof_available,
                      score_commitment, consistency_score, consistency_rating,
-                     attempt_count, vc_document)
+                     attempt_count, vc_document,
+                     content_hash, ipfs_cid, anchor_provider, anchor_status, anchor_url)
                 VALUES
                     ($1::uuid, $2::uuid, $3::uuid, $4::uuid, $5,
                      $6::uuid, $7, $8, $9, $10,
                      false, $11,
                      $12, $13, $14,
-                     $15, $16::jsonb)
+                     $15, $16::jsonb,
+                     $17, $18, $19, $20, $21)
                 """,
                 credential_id,
                 request.user_id,
@@ -199,6 +203,11 @@ async def issue_credential(
                 consistency["consistency_rating"],
                 consistency["attempt_count"],
                 json.dumps(vc_document),
+                anchor.content_hash,
+                anchor.ipfs_cid,
+                anchor.provider,
+                anchor.status,
+                anchor.anchor_url,
             )
 
         # Recompute trust score — new credential raises vouching eligibility
@@ -216,6 +225,8 @@ async def issue_credential(
             score=response.overall_score,
             percentile=percentile,
             consistency_rating=consistency["consistency_rating"],
+            anchor_status=anchor.status,
+            ipfs_cid=anchor.ipfs_cid,
         )
         await append_audit_log(
             action="credential.issued",
@@ -232,6 +243,11 @@ async def issue_credential(
                 "score": response.overall_score,
                 "percentile": percentile,
                 "verified_by_human": False,
+                "content_hash": anchor.content_hash,
+                "ipfs_cid": anchor.ipfs_cid,
+                "anchor_provider": anchor.provider,
+                "anchor_status": anchor.status,
+                "anchor_url": anchor.anchor_url,
             },
             metadata={
                 "rubric_id": request.rubric_id,

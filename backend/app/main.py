@@ -15,7 +15,7 @@ from app.core.logging import configure_logging, logger
 from app.core.observability import init_observability
 from app.core.database import init_pool, close_pool
 from app.core.limiter import limiter
-from app.api.routes import admin, assess, auth, credentials, health, identity, learn_path, reviews, skill_paths, submissions, users, wallet
+from app.api.routes import admin, assess, auth, community, credentials, health, identity, knowledge, learn_path, reviews, skill_paths, submissions, users, wallet
 
 try:
     import sentry_sdk
@@ -101,6 +101,8 @@ def create_app() -> FastAPI:
     app.include_router(reviews.router)
     app.include_router(wallet.router)
     app.include_router(identity.router)
+    app.include_router(knowledge.router)
+    app.include_router(community.router)
 
     return app
 

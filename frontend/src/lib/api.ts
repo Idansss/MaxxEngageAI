@@ -80,8 +80,11 @@ export interface AssessResponse {
   credential_id: string | null;
   secondary_model_used?: string | null;
   secondary_overall_score?: number | null;
+  tertiary_model_used?: string | null;
+  tertiary_overall_score?: number | null;
   model_disagreement?: boolean;
   model_disagreement_reason?: string | null;
+  knowledge_sources?: KnowledgeSource[];
 }
 
 export interface AssessRequest {

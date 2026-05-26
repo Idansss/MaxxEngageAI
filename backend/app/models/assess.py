@@ -66,8 +66,11 @@ class AssessResponse(BaseModel):
     credential_id: str | None = Field(None, description="Issued W3C VC credential ID; null when not eligible.")
     secondary_model_used: str | None = None
     secondary_overall_score: float | None = Field(None, ge=0, le=100)
+    tertiary_model_used: str | None = None
+    tertiary_overall_score: float | None = Field(None, ge=0, le=100)
     model_disagreement: bool = False
     model_disagreement_reason: str | None = None
+    knowledge_sources: list[dict[str, Any]] = []
 
 
 class AssessmentJobStatus(str, Enum):

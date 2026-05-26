@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Award, CheckCircle, ShieldCheck } from "lucide-react";
+import { Award, CheckCircle, ExternalLink, ShieldCheck } from "lucide-react";
 
 export default async function CredentialPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -79,6 +79,38 @@ export default async function CredentialPage({ params }: { params: Promise<{ id:
               />
               <Row label="Issuer" value={<span className="font-semibold">Maxx Engage</span>} />
               <Row label="Standard" value="W3C Verifiable Credentials 2.0" />
+              {"content_hash" in credential && (
+                <Row
+                  label="Content hash"
+                  value={<code className="text-xs font-mono break-all">{String(credential.content_hash)}</code>}
+                />
+              )}
+              {"anchor_status" in credential && (
+                <Row
+                  label="Anchor"
+                  value={
+                    <span className="inline-flex items-center gap-2">
+                      <Badge variant="outline">{String(credential.anchor_status)}</Badge>
+                      {credential.anchor_url ? (
+                        <a
+                          href={String(credential.anchor_url)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-primary inline-flex items-center gap-1 text-xs hover:underline"
+                        >
+                          Open <ExternalLink className="h-3 w-3" />
+                        </a>
+                      ) : null}
+                    </span>
+                  }
+                />
+              )}
+              {Boolean(credential.ipfs_cid) && (
+                <Row
+                  label="IPFS CID"
+                  value={<code className="text-xs font-mono break-all">{String(credential.ipfs_cid)}</code>}
+                />
+              )}
             </CardContent>
           </Card>
 

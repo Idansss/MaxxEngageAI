@@ -8,9 +8,12 @@ class Settings(BaseSettings):
     # AI providers
     anthropic_api_key: str = ""
     openai_api_key: str = ""
+    google_api_key: str = ""
     primary_grading_model: str = "claude-sonnet-4-6"
     secondary_grading_model: str = "gpt-4o"
+    tertiary_grading_model: str = "gemini-1.5-pro"
     model_disagreement_score_threshold: float = 10.0
+    model_crosscheck_enabled: bool = True
 
     # Database — direct Postgres (Neon) + Supabase for auth/realtime
     database_url: str = ""
@@ -47,6 +50,24 @@ class Settings(BaseSettings):
     # GitHub API token (optional — increases rate limit from 60 to 5000 req/hr)
     # Create at https://github.com/settings/tokens (no scopes needed for public API)
     github_token: str = ""
+    github_repo_owner: str = "Idansss"
+    github_repo_name: str = "MaxxEngageAI"
+
+    # Public community links surfaced in the app.
+    discord_invite_url: str = ""
+    public_github_url: str = "https://github.com/Idansss/MaxxEngageAI"
+
+    # Knowledge retrieval. Start with trusted public sources only.
+    knowledge_retrieval_enabled: bool = True
+    wikipedia_api_url: str = "https://en.wikipedia.org/api/rest_v1"
+    wikipedia_action_api_url: str = "https://en.wikipedia.org/w/api.php"
+    wikidata_api_url: str = "https://www.wikidata.org/w/api.php"
+    knowledge_max_sources: int = 4
+
+    # Optional IPFS pinning. If unset, credentials still get a deterministic
+    # SHA-256 content anchor but are not pinned to a public network.
+    ipfs_pinata_jwt: str = ""
+    ipfs_gateway_url: str = "https://gateway.pinata.cloud/ipfs"
 
     # Outbound webhooks — optional; fires on key events (see app/services/webhook.py)
     webhook_url: str = ""       # e.g. https://your-lms.io/hooks/maxx-engage

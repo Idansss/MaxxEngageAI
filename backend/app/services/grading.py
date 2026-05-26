@@ -9,12 +9,14 @@ import uuid
 from pathlib import Path
 
 import anthropic
+import httpx
 from openai import OpenAI
 from json_repair import repair_json
 from app.core.config import get_settings
 from app.core.logging import logger
 from app.core.tracing import start_langsmith_run
 from app.models.assess import AssessRequest, AssessResponse, DimensionScore, ReviewFeedback
+from app.services.knowledge import format_knowledge_context, retrieve_public_knowledge
 
 RUBRICS_DIR = Path(__file__).parent.parent.parent.parent / "rubrics"
 
@@ -54,6 +56,8 @@ Submission type: {submission_type}
 {prior_scores_section}
 ## Rubric
 {rubric_json}
+
+{knowledge_context}
 
 ## User Submission
 ```
@@ -168,6 +172,26 @@ def _build_prior_scores_section(prior_scores: list[float]) -> str:
     )
 
 
+async def _call_gemini_json(api_key: str, model: str, system_prompt: str, user_prompt: str) -> str:
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    payload = {
+        "systemInstruction": {"parts": [{"text": system_prompt}]},
+        "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
+        "generationConfig": {
+            "temperature": 0.1,
+            "responseMimeType": "application/json",
+        },
+    }
+    async with httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=10.0)) as client:
+        resp = await client.post(url, params={"key": api_key}, json=payload)
+        resp.raise_for_status()
+        data = resp.json()
+    try:
+        return data["candidates"][0]["content"]["parts"][0]["text"]
+    except (KeyError, IndexError, TypeError) as exc:
+        raise ValueError("Gemini response did not contain text content.") from exc
+
+
 async def grade_submission(
     request: AssessRequest,
     prior_scores: list[float] | None = None,
@@ -175,6 +199,12 @@ async def grade_submission(
     settings = get_settings()
 
     rubric = _load_rubric(request.rubric_id)
+    knowledge_sources = await retrieve_public_knowledge(
+        request.skill_path_slug,
+        rubric,
+        request.content,
+    )
+    knowledge_context = format_knowledge_context(knowledge_sources)
 
     prior_section = _build_prior_scores_section(prior_scores or [])
 
@@ -185,6 +215,7 @@ async def grade_submission(
         submission_type=request.submission_type,
         prior_scores_section=prior_section,
         rubric_json=json.dumps(rubric, indent=2),
+        knowledge_context=knowledge_context,
         content=request.content,
     )
     prompt_hash = _compute_prompt_hash(SYSTEM_PROMPT + grading_prompt)
@@ -209,6 +240,7 @@ async def grade_submission(
             "task_id": request.task_id,
             "model": settings.primary_grading_model,
             "prompt_hash": prompt_hash,
+            "knowledge_source_count": len(knowledge_sources),
         },
     )
 
@@ -241,10 +273,13 @@ async def grade_submission(
     credential_eligible = passed and not human_review_requested
 
     secondary_overall_score: float | None = None
+    tertiary_overall_score: float | None = None
     model_disagreement = False
     model_disagreement_reason: str | None = None
 
-    should_crosscheck = confidence < settings.ai_confidence_threshold or human_review_requested
+    should_crosscheck = settings.model_crosscheck_enabled and (
+        confidence < settings.ai_confidence_threshold or human_review_requested
+    )
 
     if should_crosscheck and settings.openai_api_key and settings.secondary_grading_model:
         secondary_trace = start_langsmith_run(
@@ -308,6 +343,70 @@ async def grade_submission(
             )
             secondary_trace.finish(error=str(e))
 
+    if should_crosscheck and settings.google_api_key and settings.tertiary_grading_model:
+        tertiary_trace = start_langsmith_run(
+            name="grade_submission_tertiary",
+            run_type="llm",
+            inputs={
+                "skill_path_slug": request.skill_path_slug,
+                "level": request.level,
+                "rubric_id": request.rubric_id,
+                "submission_type": request.submission_type,
+                "content_preview": request.content[:4000],
+            },
+            metadata={
+                "task_id": request.task_id,
+                "model": settings.tertiary_grading_model,
+                "prompt_hash": prompt_hash,
+            },
+        )
+        try:
+            tertiary_raw = await _call_gemini_json(
+                settings.google_api_key,
+                settings.tertiary_grading_model,
+                SYSTEM_PROMPT,
+                grading_prompt,
+            )
+            tertiary_result = _extract_json(tertiary_raw)
+            _, tertiary_score, tertiary_confidence, _ = _coerce_result(tertiary_result)
+            tertiary_overall_score = round(tertiary_score, 2)
+            tertiary_passed = tertiary_score >= settings.pass_score_threshold
+            score_delta = abs(overall_score - tertiary_score)
+            pass_disagreement = passed != tertiary_passed
+            if score_delta >= settings.model_disagreement_score_threshold or pass_disagreement:
+                model_disagreement = True
+                reason = (
+                    f"Primary score {overall_score:.1f}, Gemini score {tertiary_score:.1f}; "
+                    f"delta {score_delta:.1f}."
+                )
+                model_disagreement_reason = (
+                    f"{model_disagreement_reason} {reason}".strip()
+                    if model_disagreement_reason
+                    else reason
+                )
+                human_review_requested = True
+                credential_eligible = False
+                confidence = min(confidence, tertiary_confidence, 0.6)
+                if "requires human review" not in feedback.summary.lower():
+                    feedback.summary = (
+                        f"{feedback.summary} Gemini disagreed enough that this submission "
+                        "requires human review before any credential is issued."
+                    )
+            tertiary_trace.finish(
+                outputs={
+                    "overall_score": tertiary_overall_score,
+                    "confidence": round(tertiary_confidence, 3),
+                    "model_disagreement": model_disagreement,
+                }
+            )
+        except Exception as e:
+            logger.warning(
+                "grading.tertiary_failed",
+                model=settings.tertiary_grading_model,
+                error=str(e),
+            )
+            tertiary_trace.finish(error=str(e))
+
     review_id = str(uuid.uuid4())
 
     log.info(
@@ -318,6 +417,8 @@ async def grade_submission(
         human_review_requested=human_review_requested,
         secondary_model=settings.secondary_grading_model if secondary_overall_score is not None else None,
         secondary_overall_score=secondary_overall_score,
+        tertiary_model=settings.tertiary_grading_model if tertiary_overall_score is not None else None,
+        tertiary_overall_score=tertiary_overall_score,
         model_disagreement=model_disagreement,
     )
     trace_run.finish(
@@ -329,7 +430,10 @@ async def grade_submission(
             "human_review_requested": human_review_requested,
             "secondary_model": settings.secondary_grading_model if secondary_overall_score is not None else None,
             "secondary_overall_score": secondary_overall_score,
+            "tertiary_model": settings.tertiary_grading_model if tertiary_overall_score is not None else None,
+            "tertiary_overall_score": tertiary_overall_score,
             "model_disagreement": model_disagreement,
+            "knowledge_sources": [s.as_dict() for s in knowledge_sources],
         }
     )
 
@@ -348,6 +452,9 @@ async def grade_submission(
         review_id=review_id,
         secondary_model_used=settings.secondary_grading_model if secondary_overall_score is not None else None,
         secondary_overall_score=secondary_overall_score,
+        tertiary_model_used=settings.tertiary_grading_model if tertiary_overall_score is not None else None,
+        tertiary_overall_score=tertiary_overall_score,
         model_disagreement=model_disagreement,
         model_disagreement_reason=model_disagreement_reason,
+        knowledge_sources=[s.as_dict() for s in knowledge_sources],
     )

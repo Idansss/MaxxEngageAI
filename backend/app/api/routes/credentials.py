@@ -107,6 +107,7 @@ async def get_credential(
         SELECT c.id, c.holder_did, c.level, c.level_label, c.score, c.percentile,
                c.verified_by_human, c.zk_proof_available, c.score_commitment,
                c.consistency_score, c.consistency_rating, c.attempt_count,
+               c.content_hash, c.ipfs_cid, c.anchor_provider, c.anchor_status, c.anchor_url,
                c.vc_document, c.valid_from, c.valid_until, c.created_at, c.is_public,
                c.user_id,
                sp.slug  AS skill_path_slug,
