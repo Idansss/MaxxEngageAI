@@ -78,8 +78,15 @@ export default function IdentityPage() {
     enabled: !!session,
   });
 
+  function parseGithubUsername(raw: string): string {
+    const trimmed = raw.trim();
+    // Accept full URLs like https://github.com/username
+    const match = trimmed.match(/github\.com\/([^/?#]+)/);
+    return match ? match[1] : trimmed;
+  }
+
   const githubMutation = useMutation({
-    mutationFn: () => api.identity.stampGitHub(githubUsername.trim()),
+    mutationFn: () => api.identity.stampGitHub(parseGithubUsername(githubUsername)),
     onSuccess: (data) => {
       setGithubMsg({ ok: true, text: data.message });
       qc.invalidateQueries({ queryKey: ["my-humanity-score"] });
@@ -237,7 +244,7 @@ export default function IdentityPage() {
               <div className="flex gap-2">
                 <input
                   className="input-base flex-1"
-                  placeholder="your-github-username"
+                  placeholder="username or https://github.com/username"
                   value={githubUsername}
                   onChange={(e) => { setGithubUsername(e.target.value); setGithubMsg(null); }}
                   disabled={githubMutation.isPending}

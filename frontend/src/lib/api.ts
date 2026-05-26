@@ -9,17 +9,28 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
     token = data.session?.access_token;
   }
 
-  const res = await fetch(`${BASE}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init?.headers,
-    },
-    ...init,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...init?.headers,
+      },
+      ...init,
+    });
+  } catch {
+    throw new Error(
+      "Cannot reach the Maxx Engage server. If you are the site owner, make sure CORS_ORIGINS includes this domain in your backend environment variables."
+    );
+  }
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail ?? "Request failed");
+    const detail = err.detail;
+    const msg = Array.isArray(detail)
+      ? detail.map((d: { msg?: string }) => d.msg ?? String(d)).join("; ")
+      : String(detail ?? "Request failed");
+    throw new Error(msg);
   }
   return res.json();
 }
