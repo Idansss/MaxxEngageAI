@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { CheckCircle, Award, BookOpen, Zap, ArrowRight, Globe, Lock, Wifi } from "lucide-react";
 import { cn } from "@/lib/utils";
+import AuthRedirect from "@/components/auth-redirect";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <AuthRedirect />
       <main className="flex-1">
 
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
