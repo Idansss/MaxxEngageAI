@@ -4,61 +4,87 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
-import { api } from "@/lib/api";
-import { Badge } from "@/components/ui/badge";
+import { api, type Stamp } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import {
   ShieldCheck, GitBranch, CheckCircle, XCircle, Loader2,
-  AlertCircle, ExternalLink, Clock, Zap,
+  AlertCircle, ExternalLink, Clock, Zap, Mail, Phone,
 } from "lucide-react";
 
-const STAMP_META: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  email: {
-    label: "Email",
-    icon: <CheckCircle className="h-4 w-4" />,
-    color: "bg-primary/10 text-primary",
-  },
-  github: {
-    label: "GitHub",
-    icon: <GitBranch className="h-4 w-4" />,
-    color: "bg-muted text-muted-foreground",
-  },
-  gitcoin_passport: {
-    label: "Gitcoin Passport",
-    icon: <ShieldCheck className="h-4 w-4" />,
-    color: "bg-violet-100 text-violet-700",
-  },
-  phone: {
-    label: "Phone",
-    icon: <Zap className="h-4 w-4" />,
-    color: "bg-success-bg text-success",
-  },
-};
+/* ── Stamp card definitions ─────────────────────────────────────────────── */
 
-function StampBadge({ type, active }: { type: string; active: boolean }) {
-  const meta = STAMP_META[type] ?? { label: type, icon: null, color: "bg-muted text-muted-foreground" };
-  return (
-    <div className={cn(
-      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium",
-      meta.color,
-      !active && "opacity-40 line-through"
-    )}>
-      {meta.icon}
-      {meta.label}
-    </div>
-  );
+interface StampDef {
+  type: string;
+  label: string;
+  pts: string;
+  ptsMax: number;
+  icon: React.ReactNode;
+  iconBg: string;
+  ptsBadge: string;
+  description: string;
+  inputType?: "github" | "gitcoin";
+  comingSoon?: boolean;
+  externalLink?: string;
 }
+
+const STAMPS: StampDef[] = [
+  {
+    type: "email",
+    label: "Email",
+    pts: "+10",
+    ptsMax: 10,
+    icon: <Mail className="h-7 w-7" />,
+    iconBg: "bg-indigo-100 text-indigo-600",
+    ptsBadge: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    description: "Verified automatically when you sign in via magic link.",
+  },
+  {
+    type: "github",
+    label: "GitHub",
+    pts: "up to +35",
+    ptsMax: 35,
+    icon: <GitBranch className="h-7 w-7" />,
+    iconBg: "bg-gray-100 text-gray-700",
+    ptsBadge: "bg-gray-50 text-gray-700 border-gray-200",
+    description: "Account ≥ 6 months with at least 1 repo. Senior tier (+35) needs 2 yrs & 10 repos.",
+    inputType: "github",
+  },
+  {
+    type: "gitcoin_passport",
+    label: "Gitcoin Passport",
+    pts: "up to +35",
+    ptsMax: 35,
+    icon: <ShieldCheck className="h-7 w-7" />,
+    iconBg: "bg-violet-100 text-violet-600",
+    ptsBadge: "bg-violet-50 text-violet-700 border-violet-200",
+    description: "Connect Web2 + Web3 stamps via your Ethereum wallet. Score ≥ 1 to qualify.",
+    inputType: "gitcoin",
+    externalLink: "https://app.passport.xyz",
+  },
+  {
+    type: "phone",
+    label: "Phone",
+    pts: "+20",
+    ptsMax: 20,
+    icon: <Phone className="h-7 w-7" />,
+    iconBg: "bg-emerald-100 text-emerald-600",
+    ptsBadge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    description: "SMS OTP verification. Great for learners without GitHub or ETH wallet.",
+    comingSoon: true,
+  },
+];
+
+/* ── Main page ──────────────────────────────────────────────────────────── */
 
 export default function IdentityPage() {
   const router = useRouter();
   const { session, loading } = useAuth();
   const qc = useQueryClient();
 
-  const [githubUsername, setGithubUsername] = useState("");
-  const [ethAddress, setEthAddress] = useState("");
+  const [githubInput, setGithubInput] = useState("");
+  const [gitcoinInput, setGitcoinInput] = useState("");
   const [githubMsg, setGithubMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [gitcoinMsg, setGitcoinMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -66,7 +92,7 @@ export default function IdentityPage() {
     if (!loading && !session) router.replace("/login");
   }, [loading, session, router]);
 
-  const { data: scoreData, isLoading: scoreLoading } = useQuery({
+  const { data: scoreData } = useQuery({
     queryKey: ["my-humanity-score"],
     queryFn: () => api.identity.myScore(),
     enabled: !!session,
@@ -79,14 +105,12 @@ export default function IdentityPage() {
   });
 
   function parseGithubUsername(raw: string): string {
-    const trimmed = raw.trim();
-    // Accept full URLs like https://github.com/username
-    const match = trimmed.match(/github\.com\/([^/?#]+)/);
-    return match ? match[1] : trimmed;
+    const match = raw.trim().match(/github\.com\/([^/?#]+)/);
+    return match ? match[1] : raw.trim();
   }
 
   const githubMutation = useMutation({
-    mutationFn: () => api.identity.stampGitHub(parseGithubUsername(githubUsername)),
+    mutationFn: () => api.identity.stampGitHub(parseGithubUsername(githubInput)),
     onSuccess: (data) => {
       setGithubMsg({ ok: true, text: data.message });
       qc.invalidateQueries({ queryKey: ["my-humanity-score"] });
@@ -96,7 +120,7 @@ export default function IdentityPage() {
   });
 
   const gitcoinMutation = useMutation({
-    mutationFn: () => api.identity.stampGitcoin(ethAddress.trim()),
+    mutationFn: () => api.identity.stampGitcoin(gitcoinInput.trim()),
     onSuccess: (data) => {
       setGitcoinMsg({ ok: true, text: data.message });
       qc.invalidateQueries({ queryKey: ["my-humanity-score"] });
@@ -117,259 +141,279 @@ export default function IdentityPage() {
   const fullWeight = scoreData?.full_weight_achieved ?? false;
   const stamps = stampsData?.stamps ?? [];
   const earnedTypes = new Set(stamps.filter((s) => s.active).map((s) => s.stamp_type));
+  const pointsNeeded = Math.max(0, 50 - score);
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-10 space-y-6">
+    <main className="max-w-4xl mx-auto px-4 py-10">
 
-      <div>
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <div className="mb-8">
         <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Proof of personhood</p>
-        <h1 className="text-3xl font-extrabold flex items-center gap-2">
-          <ShieldCheck className="h-7 w-7 text-primary" />
-          Identity verification
-        </h1>
-        <p className="text-muted-foreground text-sm mt-2 leading-relaxed max-w-lg">
-          Collect stamps to prove you&apos;re a real person. A humanity score of 50+ gives your credentials full public weight.
+        <h1 className="text-3xl font-extrabold">Identity verification</h1>
+        <p className="text-muted-foreground text-sm mt-2 max-w-lg leading-relaxed">
+          Collect stamps to prove you&apos;re a real person. Reach 50 points to give your credentials full public weight.
         </p>
       </div>
 
-      {/* Humanity score card */}
-      <Card className={cn("overflow-hidden", fullWeight ? "ring-1 ring-(--success)/30" : "ring-1 ring-amber-300/30")}>
-        <div className={cn("h-1.5 w-full", fullWeight ? "bg-success" : "bg-gold")} />
-        <CardContent className="pt-6 pb-5 space-y-4">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold text-muted-foreground">Humanity score</p>
-              <p className="text-4xl font-black mt-0.5">
-                {score.toFixed(0)}
-                <span className="text-base font-normal text-muted-foreground">/100</span>
-              </p>
-            </div>
+      {/* ── Score banner ───────────────────────────────────────────────── */}
+      <div className={cn(
+        "rounded-2xl border p-6 mb-8 flex flex-col sm:flex-row sm:items-center gap-6",
+        fullWeight ? "bg-success-bg border-success/20" : "bg-amber-50 border-amber-200/60"
+      )}>
+        {/* Score display */}
+        <div className="flex items-center gap-5 flex-1">
+          <div className={cn(
+            "w-20 h-20 rounded-2xl flex flex-col items-center justify-center shrink-0 shadow-sm",
+            fullWeight ? "bg-success text-white" : "bg-gold text-white"
+          )}>
+            <span className="text-3xl font-black leading-none">{score.toFixed(0)}</span>
+            <span className="text-xs font-medium opacity-80">/ 100</span>
+          </div>
+          <div>
+            <p className="font-bold text-lg leading-tight">Unique Humanity Score</p>
             {fullWeight ? (
-              <div className="flex items-center gap-1.5 text-success bg-success-bg rounded-full px-4 py-1.5 text-sm font-semibold">
-                <CheckCircle className="h-4 w-4" /> Full weight
-              </div>
+              <p className="text-sm text-success font-medium mt-1 flex items-center gap-1.5">
+                <CheckCircle className="h-4 w-4" /> Full credential weight achieved
+              </p>
             ) : (
-              <div className="flex items-center gap-1.5 text-amber-700 bg-amber-100 rounded-full px-4 py-1.5 text-sm font-semibold">
-                <AlertCircle className="h-4 w-4" /> Incomplete
-              </div>
+              <p className="text-sm text-amber-700 mt-1">
+                {pointsNeeded} more points to reach full weight
+              </p>
             )}
+            <div className="mt-3 w-48">
+              <Progress value={score} className="h-2" />
+            </div>
           </div>
+        </div>
 
-          <Progress value={score} className="h-2.5" />
-
+        {/* Earned stamps */}
+        {earnedTypes.size > 0 && (
           <div className="flex flex-wrap gap-2">
-            {scoreLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            ) : stamps.length > 0 ? (
-              stamps.map((s) => <StampBadge key={s.stamp_type} type={s.stamp_type} active={s.active} />)
-            ) : (
-              <p className="text-xs text-muted-foreground">No stamps yet — earn your first one below.</p>
-            )}
+            {stamps.filter(s => s.active).map((s) => {
+              const def = STAMPS.find(d => d.type === s.stamp_type);
+              return (
+                <div key={s.stamp_type} className={cn(
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border",
+                  def?.ptsBadge ?? "bg-muted text-muted-foreground border-border"
+                )}>
+                  <CheckCircle className="h-3 w-3" />
+                  {def?.label ?? s.stamp_type}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Stamp cards grid ───────────────────────────────────────────── */}
+      <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">Add Stamps</p>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        {STAMPS.map((def) => {
+          const earned = earnedTypes.has(def.type);
+          const stamp = stamps.find(s => s.stamp_type === def.type);
+          const meta = stamp?.metadata as Record<string, unknown> | undefined;
+
+          return (
+            <StampCard
+              key={def.type}
+              def={def}
+              earned={earned}
+              stamp={stamp}
+              meta={meta}
+              stampsLoading={stampsLoading}
+              /* GitHub props */
+              githubInput={githubInput}
+              onGithubInput={(v) => { setGithubInput(v); setGithubMsg(null); }}
+              githubPending={githubMutation.isPending}
+              onGithubVerify={() => githubMutation.mutate()}
+              githubMsg={githubMsg}
+              /* Gitcoin props */
+              gitcoinInput={gitcoinInput}
+              onGitcoinInput={(v) => { setGitcoinInput(v); setGitcoinMsg(null); }}
+              gitcoinPending={gitcoinMutation.isPending}
+              onGitcoinVerify={() => gitcoinMutation.mutate()}
+              gitcoinMsg={gitcoinMsg}
+            />
+          );
+        })}
+      </div>
+    </main>
+  );
+}
+
+/* ── Stamp card component ───────────────────────────────────────────────── */
+
+function StampCard({
+  def, earned, stamp, meta, stampsLoading,
+  githubInput, onGithubInput, githubPending, onGithubVerify, githubMsg,
+  gitcoinInput, onGitcoinInput, gitcoinPending, onGitcoinVerify, gitcoinMsg,
+}: {
+  def: StampDef;
+  earned: boolean;
+  stamp: Stamp | undefined;
+  meta: Record<string, unknown> | undefined;
+  stampsLoading: boolean;
+  githubInput: string; onGithubInput: (v: string) => void;
+  githubPending: boolean; onGithubVerify: () => void;
+  githubMsg: { ok: boolean; text: string } | null;
+  gitcoinInput: string; onGitcoinInput: (v: string) => void;
+  gitcoinPending: boolean; onGitcoinVerify: () => void;
+  gitcoinMsg: { ok: boolean; text: string } | null;
+}) {
+  return (
+    <div className={cn(
+      "rounded-2xl border bg-card flex flex-col overflow-hidden transition-shadow hover:shadow-md",
+      earned && "ring-1 ring-success/30",
+      def.comingSoon && "opacity-60"
+    )}>
+      {/* Card top */}
+      <div className="p-5 flex-1">
+        <div className="flex items-start justify-between mb-4">
+          {/* Icon */}
+          <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center", def.iconBg)}>
+            {def.icon}
           </div>
 
-          {!fullWeight && (
-            <p className="text-xs text-muted-foreground">
-              Need {Math.max(0, 50 - score).toFixed(0)} more points to reach full credential weight.
-            </p>
+          {/* Points badge */}
+          <div className={cn(
+            "flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border",
+            earned ? "bg-success-bg text-success border-success/20" : def.ptsBadge
+          )}>
+            <ShieldCheck className="h-3.5 w-3.5" />
+            {earned ? `+${stamp?.score_contribution?.toFixed(0) ?? def.pts.replace("up to ", "")}` : def.pts}
+          </div>
+        </div>
+
+        <h3 className="font-bold text-base mb-1 flex items-center gap-2">
+          {def.label}
+          {earned && <CheckCircle className="h-4 w-4 text-success" />}
+          {def.comingSoon && (
+            <span className="text-xs font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Coming soon</span>
           )}
-        </CardContent>
-      </Card>
+        </h3>
+        <p className="text-sm text-muted-foreground leading-relaxed">{def.description}</p>
 
-      {/* Email stamp */}
-      <Card className={cn("overflow-hidden", earnedTypes.has("email") && "ring-1 ring-(--success)/20")}>
-        {earnedTypes.has("email") && <div className="h-0.5 bg-success" />}
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-primary" />
-              Email verification
-              <Badge className="bg-primary/10 text-primary text-xs">+10 pts</Badge>
-            </span>
-            {earnedTypes.has("email") && (
-              <span className="text-xs font-semibold text-success flex items-center gap-1">
-                <CheckCircle className="h-3.5 w-3.5" /> Earned
-              </span>
+        {/* Earned details */}
+        {earned && stamp && !stampsLoading && (
+          <div className="mt-3 bg-success-bg rounded-xl px-3 py-2.5 text-xs text-success space-y-1">
+            {def.type === "github" && (
+              <>
+                <p className="font-semibold">{String(meta?.github_username ?? "")}</p>
+                <p className="text-success/70">{String(meta?.account_age_days ?? "")} days · {String(meta?.public_repos ?? "")} repos · {String(meta?.tier ?? "")} tier</p>
+              </>
             )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Automatically awarded when you sign in via magic link — your email address is verified.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* GitHub stamp */}
-      <Card className={cn("overflow-hidden", earnedTypes.has("github") && "ring-1 ring-(--success)/20")}>
-        {earnedTypes.has("github") && <div className="h-0.5 bg-success" />}
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <GitBranch className="h-4 w-4" />
-              GitHub account
-              <Badge variant="secondary" className="text-xs">up to +35 pts</Badge>
-            </span>
-            {earnedTypes.has("github") && (
-              <span className="text-xs font-semibold text-success flex items-center gap-1">
-                <CheckCircle className="h-3.5 w-3.5" /> Earned
-              </span>
+            {def.type === "gitcoin_passport" && (
+              <p className="font-semibold">Score {String(meta?.gitcoin_score ?? "")} · {String(meta?.tier ?? "")} tier</p>
             )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="text-xs text-muted-foreground space-y-0.5 leading-relaxed">
-            <p>Standard (+25): account ≥ 6 months old, at least 1 public repo or follower</p>
-            <p>Senior (+35): account ≥ 2 years old AND ≥ 10 public repos</p>
+            {def.type === "email" && (
+              <p className="font-semibold">Email verified via magic link</p>
+            )}
+            {stamp.expires_at && (
+              <p className="flex items-center gap-1 text-success/70">
+                <Clock className="h-3 w-3" />
+                Expires {new Date(stamp.expires_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
+              </p>
+            )}
           </div>
+        )}
 
-          {!stampsLoading && (
+        {/* External link */}
+        {def.externalLink && !earned && (
+          <a
+            href={def.externalLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs text-primary hover:underline underline-offset-2 font-medium mt-3"
+          >
+            Create/manage your passport <ExternalLink className="h-3 w-3" />
+          </a>
+        )}
+      </div>
+
+      {/* Card bottom — action area */}
+      {!def.comingSoon && !stampsLoading && (
+        <div className="px-5 pb-5 space-y-2.5">
+          {def.inputType === "github" && (
             <>
-              {earnedTypes.has("github") && (() => {
-                const s = stamps.find((x) => x.stamp_type === "github");
-                const meta = s?.metadata as Record<string, unknown> | undefined;
-                return s ? (
-                  <div className="bg-muted rounded-xl px-3 py-2.5 text-xs text-muted-foreground space-y-0.5">
-                    <p>Username: <strong className="text-foreground">{String(meta?.github_username ?? "")}</strong></p>
-                    <p>{String(meta?.account_age_days ?? "")} days old &middot; {String(meta?.public_repos ?? "")} repos &middot; Tier: {String(meta?.tier ?? "")}</p>
-                    {s.expires_at && (
-                      <p className="flex items-center gap-1 mt-1">
-                        <Clock className="h-3 w-3" />
-                        Expires {new Date(s.expires_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
-                      </p>
-                    )}
-                  </div>
-                ) : null;
-              })()}
-
-              <div className="flex gap-2">
-                <input
-                  className="input-base flex-1"
-                  placeholder="username or https://github.com/username"
-                  value={githubUsername}
-                  onChange={(e) => { setGithubUsername(e.target.value); setGithubMsg(null); }}
-                  disabled={githubMutation.isPending}
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={earnedTypes.has("github") ? "outline" : "default"}
-                  disabled={!githubUsername.trim() || githubMutation.isPending}
-                  onClick={() => githubMutation.mutate()}
-                  className="gap-1.5 shrink-0"
-                >
-                  {githubMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <GitBranch className="h-3.5 w-3.5" />}
-                  {earnedTypes.has("github") ? "Re-verify" : "Verify"}
-                </Button>
-              </div>
-
+              <input
+                className="input-base w-full text-sm"
+                placeholder="username or https://github.com/username"
+                value={githubInput}
+                onChange={(e) => onGithubInput(e.target.value)}
+                disabled={githubPending}
+              />
               {githubMsg && (
                 <p className={cn("text-xs flex items-start gap-1.5", githubMsg.ok ? "text-success" : "text-destructive")}>
                   {githubMsg.ok ? <CheckCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" /> : <XCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />}
                   {githubMsg.text}
                 </p>
               )}
+              <Button
+                type="button"
+                className="w-full"
+                variant={earned ? "outline" : "default"}
+                disabled={!githubInput.trim() || githubPending}
+                onClick={onGithubVerify}
+              >
+                {githubPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <GitBranch className="h-4 w-4 mr-2" />}
+                {earned ? "Re-verify" : "Connect GitHub"}
+              </Button>
             </>
           )}
-        </CardContent>
-      </Card>
 
-      {/* Gitcoin stamp */}
-      <Card className={cn("overflow-hidden", earnedTypes.has("gitcoin_passport") && "ring-1 ring-(--success)/20")}>
-        {earnedTypes.has("gitcoin_passport") && <div className="h-0.5 bg-success" />}
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-violet-600" />
-              Gitcoin Passport
-              <Badge variant="secondary" className="text-xs">up to +35 pts</Badge>
-            </span>
-            {earnedTypes.has("gitcoin_passport") && (
-              <span className="text-xs font-semibold text-success flex items-center gap-1">
-                <CheckCircle className="h-3.5 w-3.5" /> Earned
-              </span>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="text-xs text-muted-foreground space-y-0.5 leading-relaxed">
-            <p>Connects Web2 + Web3 stamps. Requires an Ethereum wallet address.</p>
-            <p>Tiers: score 1–9 → +5, 10–19 → +15, 20–49 → +25, 50+ → +35. Expires after 90 days.</p>
-          </div>
-
-          <a
-            href="https://passport.gitcoin.co"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-primary hover:underline underline-offset-2 font-medium"
-          >
-            Create/manage your passport <ExternalLink className="h-3 w-3" />
-          </a>
-
-          {!stampsLoading && (
+          {def.inputType === "gitcoin" && (
             <>
-              {earnedTypes.has("gitcoin_passport") && (() => {
-                const s = stamps.find((x) => x.stamp_type === "gitcoin_passport");
-                const meta = s?.metadata as Record<string, unknown> | undefined;
-                return s ? (
-                  <div className="bg-violet-50 rounded-xl px-3 py-2.5 text-xs text-muted-foreground space-y-0.5">
-                    <p>Gitcoin score: <strong>{String(meta?.gitcoin_score ?? "")}</strong> &middot; Tier: {String(meta?.tier ?? "")}</p>
-                    {s.expires_at && (
-                      <p className="flex items-center gap-1 mt-1">
-                        <Clock className="h-3 w-3" />
-                        Expires {new Date(s.expires_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
-                      </p>
-                    )}
-                  </div>
-                ) : null;
-              })()}
-
-              <div className="flex gap-2">
-                <input
-                  className="input-base flex-1 font-mono text-xs"
-                  placeholder="0x..."
-                  value={ethAddress}
-                  onChange={(e) => { setEthAddress(e.target.value); setGitcoinMsg(null); }}
-                  disabled={gitcoinMutation.isPending}
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={earnedTypes.has("gitcoin_passport") ? "outline" : "default"}
-                  disabled={!ethAddress.trim() || gitcoinMutation.isPending}
-                  onClick={() => gitcoinMutation.mutate()}
-                  className="gap-1.5 shrink-0"
-                >
-                  {gitcoinMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5" />}
-                  {earnedTypes.has("gitcoin_passport") ? "Refresh" : "Verify"}
-                </Button>
-              </div>
-
+              <input
+                className="input-base w-full text-sm font-mono"
+                placeholder="0x..."
+                value={gitcoinInput}
+                onChange={(e) => onGitcoinInput(e.target.value)}
+                disabled={gitcoinPending}
+              />
               {gitcoinMsg && (
                 <p className={cn("text-xs flex items-start gap-1.5", gitcoinMsg.ok ? "text-success" : "text-destructive")}>
                   {gitcoinMsg.ok ? <CheckCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" /> : <XCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />}
                   {gitcoinMsg.text}
                 </p>
               )}
+              <Button
+                type="button"
+                className="w-full"
+                variant={earned ? "outline" : "default"}
+                disabled={!gitcoinInput.trim() || gitcoinPending}
+                onClick={onGitcoinVerify}
+              >
+                {gitcoinPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <ShieldCheck className="h-4 w-4 mr-2" />}
+                {earned ? "Refresh" : "Connect Passport"}
+              </Button>
             </>
           )}
-        </CardContent>
-      </Card>
 
-      {/* Phone — coming soon */}
-      <Card className="opacity-50">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Zap className="h-4 w-4 text-success" />
-            Phone number
-            <Badge variant="outline" className="text-xs">+20 pts — Coming soon</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            SMS OTP verification. Particularly useful for learners without GitHub or ETH wallet.
-          </p>
-        </CardContent>
-      </Card>
-    </main>
+          {def.type === "email" && (
+            <div className={cn(
+              "w-full h-10 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold",
+              earned
+                ? "bg-success-bg text-success"
+                : "bg-muted text-muted-foreground"
+            )}>
+              {earned ? (
+                <><CheckCircle className="h-4 w-4" /> Verified automatically</>
+              ) : (
+                <><AlertCircle className="h-4 w-4" /> Sign in via magic link to earn</>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {def.comingSoon && (
+        <div className="px-5 pb-5">
+          <div className="w-full h-10 rounded-xl bg-muted flex items-center justify-center text-sm text-muted-foreground font-medium">
+            <Zap className="h-4 w-4 mr-2" /> Coming soon
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

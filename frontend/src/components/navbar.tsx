@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Loader2, LogOut, User, ShieldAlert, LayoutDashboard,
-  ShieldCheck, Target, WalletCards, Zap,
+  ShieldCheck, Target, WalletCards, Zap, GitBranch,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -64,6 +64,7 @@ export function Navbar() {
               {navLink("/onboarding", "Start", <Target className="h-3.5 w-3.5" />)}
               {navLink("/identity", "Identity", <ShieldCheck className="h-3.5 w-3.5" />)}
               {navLink("/wallet", "Wallet", <WalletCards className="h-3.5 w-3.5" />)}
+              {navLink("/community", "Community", <GitBranch className="h-3.5 w-3.5" />)}
 
               {isAdmin && (
                 <Link
