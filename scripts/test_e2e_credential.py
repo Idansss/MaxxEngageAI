@@ -177,12 +177,18 @@ async def run():
         print(f"reviews row: score={rev['overall_score']}, credential_eligible={rev['credential_eligible']}")
 
         if result["credential_id"]:
+            assert result["credential_id"].startswith("cred_"), "Credential ID must use public cred_ prefix"
             cred = await conn.fetchrow(
-                "SELECT level_label, score, vc_document FROM public.credentials WHERE id = $1::uuid",
+                """
+                SELECT public_id, level_label, score, vc_document
+                FROM public.credentials
+                WHERE public_id = $1 OR id::text = $1
+                """,
                 result["credential_id"],
             )
             assert cred, "Credential not found in DB"
             vc = cred["vc_document"] if isinstance(cred["vc_document"], dict) else json.loads(cred["vc_document"])
+            print(f"credentials row: public_id={cred['public_id']}")
             print(f"credentials row: level_label={cred['level_label']}, score={cred['score']}")
             print(f"VC type: {vc.get('type')}")
             print(f"VC issuer: {vc.get('issuer', {}).get('id')}")

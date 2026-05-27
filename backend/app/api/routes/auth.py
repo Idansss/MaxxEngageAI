@@ -22,7 +22,7 @@ async def me(auth_user: dict = Depends(get_current_user)) -> UserResponse:
 
     row = await pool.fetchrow(
         "SELECT id, did, display_name, bio, country_code, preferred_language, "
-        "avatar_url, public_profile, overall_score, created_at "
+        "avatar_url, public_profile, overall_score, created_at, location, username, proof_page_visibility "
         "FROM public.users WHERE auth_id = $1::uuid",
         auth_id,
     )
@@ -41,10 +41,11 @@ async def me(auth_user: dict = Depends(get_current_user)) -> UserResponse:
             """
             INSERT INTO public.users
                 (auth_id, did, public_key_multibase, private_key_b64,
-                 display_name, country_code, preferred_language, email_verified)
-            VALUES ($1::uuid, $2, $3, $4, $5, 'NG', 'en', true)
+                 display_name, country_code, preferred_language, email_verified, public_profile)
+            VALUES ($1::uuid, $2, $3, $4, $5, 'NG', 'en', true, true)
             RETURNING id, did, display_name, bio, country_code, preferred_language,
-                      avatar_url, public_profile, overall_score, created_at
+                      avatar_url, public_profile, overall_score, created_at, location,
+                      username, proof_page_visibility
             """,
             auth_id, did, pub_multibase, priv_b64, display_name,
         )

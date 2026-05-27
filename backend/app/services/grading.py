@@ -134,9 +134,9 @@ def _extract_json(raw: str) -> dict:
 
 
 def _needs_human_review(
-    overall_score: float, confidence: float, settings
+    overall_score: float, confidence: float, settings, pass_threshold: float
 ) -> bool:
-    near_threshold = abs(overall_score - settings.pass_score_threshold) <= settings.human_review_score_band
+    near_threshold = abs(overall_score - pass_threshold) <= settings.human_review_score_band
     low_confidence = confidence < settings.ai_confidence_threshold
     return near_threshold or low_confidence
 
@@ -199,6 +199,7 @@ async def grade_submission(
     settings = get_settings()
 
     rubric = _load_rubric(request.rubric_id)
+    pass_threshold = float(rubric.get("pass_threshold", settings.pass_score_threshold))
     knowledge_sources = await retrieve_public_knowledge(
         request.skill_path_slug,
         rubric,
@@ -268,9 +269,15 @@ async def grade_submission(
 
     scores, overall_score, confidence, feedback = _coerce_result(result)
 
-    passed = overall_score >= settings.pass_score_threshold
-    human_review_requested = _needs_human_review(overall_score, confidence, settings)
+    passed = overall_score >= pass_threshold
+    human_review_requested = _needs_human_review(overall_score, confidence, settings, pass_threshold)
     credential_eligible = passed and not human_review_requested
+
+    # Rubric-level override: some rubrics (e.g. translation) require human review
+    # for every submission until the grader is calibrated against enough examples.
+    if rubric.get("force_human_review"):
+        human_review_requested = True
+        credential_eligible = False
 
     secondary_overall_score: float | None = None
     tertiary_overall_score: float | None = None
@@ -312,7 +319,7 @@ async def grade_submission(
             secondary_result = _extract_json(secondary_raw)
             _, secondary_score, secondary_confidence, _ = _coerce_result(secondary_result)
             secondary_overall_score = round(secondary_score, 2)
-            secondary_passed = secondary_score >= settings.pass_score_threshold
+            secondary_passed = secondary_score >= pass_threshold
             score_delta = abs(overall_score - secondary_score)
             pass_disagreement = passed != secondary_passed
             if score_delta >= settings.model_disagreement_score_threshold or pass_disagreement:
@@ -370,7 +377,7 @@ async def grade_submission(
             tertiary_result = _extract_json(tertiary_raw)
             _, tertiary_score, tertiary_confidence, _ = _coerce_result(tertiary_result)
             tertiary_overall_score = round(tertiary_score, 2)
-            tertiary_passed = tertiary_score >= settings.pass_score_threshold
+            tertiary_passed = tertiary_score >= pass_threshold
             score_delta = abs(overall_score - tertiary_score)
             pass_disagreement = passed != tertiary_passed
             if score_delta >= settings.model_disagreement_score_threshold or pass_disagreement:
@@ -440,7 +447,7 @@ async def grade_submission(
     return AssessResponse(
         task_id=request.task_id,
         overall_score=round(overall_score, 2),
-        pass_threshold=settings.pass_score_threshold,
+        pass_threshold=int(pass_threshold),
         passed=passed,
         confidence=round(confidence, 3),
         scores=scores,

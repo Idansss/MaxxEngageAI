@@ -15,7 +15,7 @@ from app.core.logging import configure_logging, logger
 from app.core.observability import init_observability
 from app.core.database import init_pool, close_pool
 from app.core.limiter import limiter
-from app.api.routes import admin, assess, auth, community, credentials, health, identity, knowledge, learn_path, reviews, skill_paths, submissions, users, wallet
+from app.api.routes import admin, assess, auth, community, credentials, did_doc, health, identity, knowledge, learn_path, leaderboard, notifications, referrals, reviews, search, skill_paths, submissions, talent, users, verify, wallet
 
 try:
     import sentry_sdk
@@ -90,6 +90,7 @@ def create_app() -> FastAPI:
         return response
 
     app.include_router(health.router)
+    app.include_router(did_doc.router)
     app.include_router(auth.router)
     app.include_router(admin.router)
     app.include_router(users.router)
@@ -97,12 +98,18 @@ def create_app() -> FastAPI:
     app.include_router(learn_path.router)
     app.include_router(skill_paths.router)
     app.include_router(credentials.router)
+    app.include_router(verify.router)
     app.include_router(submissions.router)
     app.include_router(reviews.router)
     app.include_router(wallet.router)
     app.include_router(identity.router)
     app.include_router(knowledge.router)
     app.include_router(community.router)
+    app.include_router(leaderboard.router)
+    app.include_router(talent.router)
+    app.include_router(notifications.router)
+    app.include_router(referrals.router)
+    app.include_router(search.router)
 
     return app
 

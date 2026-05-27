@@ -64,7 +64,7 @@ async def run():
             print(f"  SKIP  {filename} (already applied)")
             continue
 
-        sql = path.read_text(encoding="utf-8")
+        sql = path.read_text(encoding="utf-8-sig")
         print(f"  APPLY {filename} ...", end=" ")
         try:
             await conn.execute(sql)

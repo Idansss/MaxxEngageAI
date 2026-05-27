@@ -5,6 +5,7 @@ Human reviewers use these to triage flagged submissions and view calibration dat
 
 import json
 import uuid
+from datetime import date, timedelta
 from typing import Literal, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -12,7 +13,9 @@ from pydantic import BaseModel, Field
 from app.api.deps import get_admin_user
 from app.core.database import get_pool
 from app.core.logging import logger
+from app.models.assess import AssessRequest, AssessResponse, DimensionScore, ReviewFeedback
 from app.services.audit import append_audit_log
+from app.services.credentials import issue_credential
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -94,6 +97,61 @@ class DecisionRequest(BaseModel):
     note: str = ""
 
 
+def _json_value(value):
+    if isinstance(value, str):
+        return json.loads(value)
+    return value
+
+
+def _pass_threshold_for_rubric(rubric_id: str) -> int:
+    return 75 if rubric_id == "translate-yo-en-001" else 70
+
+
+def _submission_content_parts(content) -> tuple[str, str]:
+    parsed = _json_value(content) or {}
+    return str(parsed.get("type") or "text"), str(parsed.get("body") or "")
+
+
+def _admin_issue_payloads(row) -> tuple[AssessRequest, AssessResponse] | None:
+    rubric_id = row["rubric_id"]
+    threshold = _pass_threshold_for_rubric(rubric_id)
+    overall_score = float(row["overall_score"])
+    if overall_score < threshold:
+        return None
+
+    submission_type, body = _submission_content_parts(row["submission_content"])
+    request = AssessRequest(
+        task_id=str(row["task_id"]),
+        skill_path_slug=row["skill_path_slug"],
+        level=int(row["level"] or 1),
+        submission_type=submission_type,
+        content=body,
+        rubric_id=rubric_id,
+        user_id=str(row["user_id"]),
+    )
+    response = AssessResponse(
+        task_id=str(row["task_id"]),
+        overall_score=overall_score,
+        pass_threshold=threshold,
+        passed=True,
+        confidence=float(row["confidence"]) if row["confidence"] is not None else 1.0,
+        scores=[DimensionScore(**score) for score in (_json_value(row["scores"]) or [])],
+        feedback=ReviewFeedback(**(_json_value(row["feedback"]) or {
+            "summary": "Approved by a human reviewer.",
+            "strengths": [],
+            "improvements": [],
+            "next_steps": [],
+        })),
+        credential_eligible=True,
+        human_review_requested=False,
+        model_used=row["model_version"] or "human-review",
+        prompt_hash=row["prompt_hash"] or "human-review",
+        review_id=str(row["review_id"]),
+        submission_id=str(row["submission_id"]),
+    )
+    return request, response
+
+
 @router.post("/reviews/{review_id}/decide", summary="Approve or reject a flagged submission")
 async def decide(
     review_id: str,
@@ -112,12 +170,20 @@ async def decide(
             r.human_review_requested,
             r.rubric_id,
             r.confidence,
+            r.scores,
+            r.feedback,
+            r.model_version,
+            r.prompt_hash,
             s.id              AS submission_id,
+            s.task_id,
+            s.content         AS submission_content,
             s.status          AS submission_status,
             s.user_id,
             t.level,
             sp.id             AS skill_path_id,
             sp.slug           AS skill_path_slug,
+            sp.name           AS skill_path_name,
+            sp.domain         AS skill_path_domain,
             sp.levels,
             u.did             AS holder_did,
             EXISTS (
@@ -147,6 +213,7 @@ async def decide(
         "confidence": float(row["confidence"]) if row["confidence"] is not None else None,
     }
     issued_credential_id: str | None = None
+    should_issue_credential = False
 
     async with pool.acquire() as conn:
         if body.decision == "approve":
@@ -155,6 +222,12 @@ async def decide(
                 "UPDATE public.submissions SET status = 'human_reviewed' WHERE id = $1::uuid",
                 submission_id,
             )
+            await conn.execute(
+                "UPDATE public.reviews SET credential_eligible = ($2 >= $3), human_review_requested = false WHERE id = $1::uuid",
+                review_id,
+                float(row["overall_score"]),
+                _pass_threshold_for_rubric(row["rubric_id"]),
+            )
 
             if row["credential_issued"]:
                 # Credential already exists — mark it human-verified
@@ -162,6 +235,8 @@ async def decide(
                     """
                     UPDATE public.credentials
                     SET verified_by_human = true,
+                        graded_by = 'ai+human',
+                        human_reviewer_id = $2::uuid,
                         vc_document = jsonb_set(
                             vc_document,
                             '{credentialSubject,verifiedByHuman}',
@@ -170,62 +245,21 @@ async def decide(
                     WHERE submission_id = $1::uuid
                     """,
                     submission_id,
+                    admin.get("id"),
                 )
                 logger.info("admin.approved.credential_upgraded",
                             review_id=review_id, admin=admin["email"])
             else:
-                # No credential yet (score was near threshold) — issue one now
-                import uuid, json as _json
-                from datetime import datetime, timezone
-
-                levels = row["levels"] if isinstance(row["levels"], list) else json.loads(str(row["levels"]))
-                level = row["level"] or 1
-                level_label = next((lv["label"] for lv in levels if lv.get("level") == level), f"Level {level}")
-
-                credential_id = str(uuid.uuid4())
-                issued_credential_id = credential_id
-                now = datetime.now(timezone.utc).isoformat()
-                vc_document = {
-                    "@context": ["https://www.w3.org/ns/credentials/v2"],
-                    "id": f"urn:uuid:{credential_id}",
-                    "type": ["VerifiableCredential", "MaxxEngageCompetenceCredential"],
-                    "issuer": {"id": "did:web:maxx-engage.io", "name": "Maxx Engage"},
-                    "validFrom": now,
-                    "credentialSubject": {
-                        "id": row["holder_did"],
-                        "skillPath": row["skill_path_slug"],
-                        "level": level,
-                        "levelLabel": level_label,
-                        "score": float(row["overall_score"]),
-                        "rubricId": row["rubric_id"],
-                        "reviewId": review_id,
-                        "submissionId": submission_id,
-                        "verifiedByHuman": True,
-                        "zkProofAvailable": False,
-                    },
-                }
-                await conn.execute(
-                    """
-                    INSERT INTO public.credentials
-                        (id, user_id, submission_id, review_id, holder_did,
-                         skill_path_id, level, level_label, score,
-                         verified_by_human, zk_proof_available, vc_document)
-                    VALUES
-                        ($1::uuid, $2::uuid, $3::uuid, $4::uuid, $5,
-                         $6::uuid, $7, $8, $9, true, false, $10::jsonb)
-                    """,
-                    credential_id, user_id, submission_id, review_id,
-                    row["holder_did"], str(row["skill_path_id"]),
-                    level, level_label, float(row["overall_score"]),
-                    _json.dumps(vc_document),
-                )
-                logger.info("admin.approved.credential_issued",
-                            review_id=review_id, credential_id=credential_id, admin=admin["email"])
+                should_issue_credential = True
 
         else:  # reject
             await conn.execute(
                 "UPDATE public.submissions SET status = 'human_reviewed' WHERE id = $1::uuid",
                 submission_id,
+            )
+            await conn.execute(
+                "UPDATE public.reviews SET credential_eligible = false, human_review_requested = false WHERE id = $1::uuid",
+                review_id,
             )
             if body.note:
                 await conn.execute(
@@ -234,6 +268,34 @@ async def decide(
                     review_id,
                 )
             logger.info("admin.rejected", review_id=review_id, admin=admin["email"], note=body.note)
+
+    if should_issue_credential:
+        payloads = _admin_issue_payloads(row)
+        if payloads:
+            issue_request, issue_response = payloads
+            issued_credential_id = await issue_credential(
+                issue_request,
+                issue_response,
+                submission_id,
+                graded_by="ai+human",
+                verified_by_human=True,
+                human_reviewer_id=admin.get("id"),
+                flagged_for_review=False,
+                flag_reason=None,
+            )
+            logger.info(
+                "admin.approved.credential_issued",
+                review_id=review_id,
+                credential_id=issued_credential_id,
+                admin=admin["email"],
+            )
+        else:
+            logger.info(
+                "admin.approved.no_credential_below_threshold",
+                review_id=review_id,
+                score=float(row["overall_score"]),
+                rubric_id=row["rubric_id"],
+            )
 
     await append_audit_log(
         action="review.admin_decision",
@@ -279,6 +341,37 @@ async def decide(
         decision=body.decision,
         admin_email=admin.get("email", "admin"),
     ))
+
+    # Push in-app notification to the learner
+    from app.services.notifications import push as push_notif
+    if body.decision == "approve":
+        if issued_credential_id:
+            asyncio.ensure_future(push_notif(
+                user_id=user_id,
+                type="credential_earned",
+                title="You earned a credential!",
+                body="Your human-reviewed submission has been approved and a credential was issued.",
+                href="/wallet",
+                metadata={"credential_id": issued_credential_id, "review_id": review_id},
+            ))
+        else:
+            asyncio.ensure_future(push_notif(
+                user_id=user_id,
+                type="human_review_done",
+                title="Human review approved",
+                body="Your submission was approved and your credential is now human-verified.",
+                href="/wallet",
+                metadata={"review_id": review_id},
+            ))
+    else:
+        asyncio.ensure_future(push_notif(
+            user_id=user_id,
+            type="human_review_done",
+            title="Human review complete",
+            body="Your submission was reviewed. Check your wallet for details.",
+            href="/wallet",
+            metadata={"review_id": review_id, "decision": "rejected"},
+        ))
 
     return {"ok": True, "decision": body.decision, "review_id": review_id}
 
@@ -555,3 +648,120 @@ async def audit_log(
         }
         for r in rows
     ]
+
+
+# ── GET /admin/analytics ──────────────────────────────────────────────────────
+
+@router.get("/analytics", summary="Platform analytics for admin dashboard")
+async def analytics(_admin: dict = Depends(get_admin_user)):
+    pool = get_pool()
+
+    # Submission volume last 30 days
+    vol_rows = await pool.fetch(
+        """
+        SELECT
+            DATE(s.submitted_at)                                          AS day,
+            COUNT(s.id)                                                   AS total,
+            COUNT(r.id) FILTER (WHERE r.credential_eligible = true)       AS passed
+        FROM public.submissions s
+        LEFT JOIN public.reviews r ON r.submission_id = s.id
+        WHERE s.submitted_at >= NOW() - INTERVAL '30 days'
+        GROUP BY DATE(s.submitted_at)
+        ORDER BY day
+        """
+    )
+    vol_by_day: dict[date, dict] = {row["day"]: row for row in vol_rows}
+    today = date.today()
+    submissions_by_day = [
+        {
+            "date": (today - timedelta(days=i)).isoformat(),
+            "total": int(vol_by_day.get(today - timedelta(days=i), {}).get("total", 0)),
+            "passed": int(vol_by_day.get(today - timedelta(days=i), {}).get("passed", 0)),
+        }
+        for i in range(29, -1, -1)
+    ]
+
+    # Pass rate by skill path (last 30 days, top 10 by volume)
+    path_rows = await pool.fetch(
+        """
+        SELECT
+            sp.slug,
+            sp.name,
+            COUNT(s.id)                                               AS total,
+            COUNT(r.id) FILTER (WHERE r.credential_eligible = true)  AS passed
+        FROM public.submissions s
+        LEFT JOIN public.reviews r  ON r.submission_id = s.id
+        JOIN public.tasks t         ON t.id = s.task_id
+        JOIN public.skill_paths sp  ON sp.id = t.skill_path_id
+        WHERE s.submitted_at >= NOW() - INTERVAL '30 days'
+        GROUP BY sp.slug, sp.name
+        ORDER BY total DESC
+        LIMIT 10
+        """
+    )
+    pass_rate_by_path = [
+        {
+            "slug": r["slug"],
+            "name": r["name"],
+            "total": int(r["total"]),
+            "passed": int(r["passed"]),
+            "pass_rate": round(float(r["passed"]) / float(r["total"]), 3) if r["total"] else 0.0,
+        }
+        for r in path_rows
+    ]
+
+    # Top countries by submission count (last 30 days)
+    country_rows = await pool.fetch(
+        """
+        SELECT
+            COALESCE(u.country_code, 'XX')  AS country_code,
+            COUNT(s.id)                      AS submission_count,
+            COUNT(DISTINCT u.id)             AS user_count
+        FROM public.submissions s
+        JOIN public.users u ON u.id = s.user_id
+        WHERE s.submitted_at >= NOW() - INTERVAL '30 days'
+        GROUP BY u.country_code
+        ORDER BY submission_count DESC
+        LIMIT 10
+        """
+    )
+    top_countries = [
+        {
+            "country_code": r["country_code"],
+            "submission_count": int(r["submission_count"]),
+            "user_count": int(r["user_count"]),
+        }
+        for r in country_rows
+    ]
+
+    # 30-day totals
+    totals_row = await pool.fetchrow(
+        """
+        SELECT
+            (SELECT COUNT(*) FROM public.submissions
+             WHERE submitted_at >= NOW() - INTERVAL '30 days')              AS submissions_30d,
+            (SELECT COUNT(*) FROM public.credentials
+             WHERE created_at  >= NOW() - INTERVAL '30 days')              AS credentials_30d,
+            (SELECT COUNT(DISTINCT user_id) FROM public.submissions
+             WHERE submitted_at >= NOW() - INTERVAL '30 days')             AS active_users_30d,
+            (SELECT COUNT(*) FROM public.reviews r
+             WHERE r.human_review_requested = true
+               AND EXISTS (
+                   SELECT 1 FROM public.submissions s
+                   WHERE s.id = r.submission_id
+                     AND s.status NOT IN ('human_reviewed', 'final')
+               ))                                                           AS queue_depth
+        """
+    )
+
+    return {
+        "submissions_by_day": submissions_by_day,
+        "pass_rate_by_path": pass_rate_by_path,
+        "top_countries": top_countries,
+        "totals": {
+            "submissions_30d": int(totals_row["submissions_30d"]),
+            "credentials_30d": int(totals_row["credentials_30d"]),
+            "active_users_30d": int(totals_row["active_users_30d"]),
+            "queue_depth": int(totals_row["queue_depth"]),
+        },
+    }

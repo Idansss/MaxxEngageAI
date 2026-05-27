@@ -14,7 +14,6 @@ move key generation to the browser so the private key never touches our servers.
 """
 
 import json
-import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.responses import JSONResponse
@@ -42,11 +41,6 @@ async def export_credential(
     The returned JSON is portable — import it into any VC-compatible wallet
     (Spruce DIDKit, Walt.id, Trinsic, etc.).
     """
-    try:
-        uuid.UUID(credential_id)
-    except ValueError:
-        raise HTTPException(status_code=422, detail="credential_id must be a valid UUID.")
-
     pool = get_pool()
 
     user_row = await pool.fetchrow(
@@ -56,7 +50,7 @@ async def export_credential(
         raise HTTPException(status_code=404, detail="User profile not found.")
 
     row = await pool.fetchrow(
-        "SELECT vc_document, user_id FROM public.credentials WHERE id = $1::uuid",
+        "SELECT vc_document, user_id FROM public.credentials WHERE public_id = $1 OR id::text = $1",
         credential_id,
     )
     if not row:

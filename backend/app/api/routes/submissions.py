@@ -47,7 +47,7 @@ async def my_submissions(
             r.credential_eligible,
             r.human_review_requested,
             r.id     AS review_id,
-            c.id     AS credential_id
+            COALESCE(c.public_id, c.id::text) AS credential_id
         FROM public.submissions s
         JOIN public.tasks t          ON t.id = s.task_id
         JOIN public.skill_paths sp   ON sp.id = t.skill_path_id

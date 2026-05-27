@@ -1,0 +1,98 @@
+{
+  "$schema": "https://maxx-engage.io/schemas/rubric.json",
+  "id": "backend-api-001",
+  "version": "1.0.0",
+  "skill_path_slug": "backend-api",
+  "level": 1,
+  "level_label": "Foundations",
+  "title": "Backend Development Foundations — REST Task Tracker API",
+  "description": "Assesses whether the candidate can design and implement a correct, well-structured REST API with proper HTTP semantics, input validation, and error handling.",
+  "pass_threshold": 70,
+  "pass_label": "Foundations Certified",
+  "authored_by": "human_curated",
+  "created_at": "2026-05-26",
+
+  "task_prompt": {
+    "text": "Build a small REST API for a 'task tracker' with the following endpoints:\n- POST /tasks — create a task (fields: title, description, status, dueDate)\n- GET /tasks — list all tasks, support ?status= filter\n- GET /tasks/:id — get one task\n- PATCH /tasks/:id — update a task's status or fields\n- DELETE /tasks/:id — delete a task\n\nRequirements:\n- Use Node.js + Express, Python + FastAPI, or Python + Flask. Your choice.\n- Validate input. Return correct HTTP status codes (200, 201, 400, 404).\n- Handle errors gracefully — no stack traces leaked to clients.\n- Use an in-memory store (array or dict) — no database needed.\n- Include a short README inside a comment at the top: how to run, sample curl commands.\n\nPaste your complete code below. Work at your own pace — time is not scored.",
+    "expected_output_format": "code",
+    "time_limit_minutes": 90
+  },
+
+  "dimensions": [
+    {
+      "id": "api_correctness",
+      "name": "API Correctness",
+      "description": "Does each endpoint work as specified (correct routes, HTTP methods, and response shapes)?",
+      "weight": 0.30,
+      "max_score": 30,
+      "scoring_guide": {
+        "25-30": "All five endpoints implemented with correct HTTP methods. POST creates with all required fields. GET /tasks supports ?status= filter. GET /tasks/:id, PATCH, and DELETE all work correctly. Response shapes include expected fields.",
+        "17-24": "Four of five endpoints correct, or one has a minor issue (e.g., filter not implemented, or PATCH does a full replace instead of partial update).",
+        "9-16": "Two to three endpoints correct. POST and GET work but PATCH/DELETE are missing or broken.",
+        "0-8": "Fewer than two endpoints correct, or the API routes are entirely wrong."
+      }
+    },
+    {
+      "id": "validation_error_handling",
+      "name": "Input Validation & Error Handling",
+      "description": "Are inputs validated? Are errors returned gracefully without leaking internals?",
+      "weight": 0.20,
+      "max_score": 20,
+      "scoring_guide": {
+        "17-20": "Missing required fields return 400 with a clear message. Non-existent IDs return 404. No stack traces in responses. Error messages are user-readable, not raw exception text.",
+        "12-16": "Most validation present but one gap: e.g., missing fields accepted silently, or 500 returned instead of 404 for a missing ID.",
+        "6-11": "Some error handling but notable gaps: no validation of required fields, or stack traces visible in error responses.",
+        "0-5": "No meaningful validation or error handling. Crashes or exposes stack traces."
+      }
+    },
+    {
+      "id": "status_codes",
+      "name": "HTTP Status Code Accuracy",
+      "description": "Are the correct HTTP status codes used for each scenario?",
+      "weight": 0.15,
+      "max_score": 15,
+      "scoring_guide": {
+        "13-15": "POST returns 201. Successful reads and updates return 200. Not found returns 404. Bad input returns 400. Delete returns 200 or 204. No 200 used where a more specific code is appropriate.",
+        "8-12": "Mostly correct but one or two wrong: e.g., POST returns 200 instead of 201, or delete returns 204 incorrectly.",
+        "4-7": "Status codes are approximate but wrong in several cases: 200 for everything, or 500 for validation errors.",
+        "0-3": "Status codes are arbitrary or entirely wrong."
+      }
+    },
+    {
+      "id": "code_quality",
+      "name": "Code Quality",
+      "description": "Is the code readable, well-named, and structured logically?",
+      "weight": 0.20,
+      "max_score": 20,
+      "scoring_guide": {
+        "17-20": "Clear variable and function names. Routes are logically organised. Helper functions used where appropriate. No duplicated logic. Framework idioms used correctly.",
+        "12-16": "Mostly readable but some issues: generic variable names (data, x, temp), or logic duplicated across routes.",
+        "6-11": "Functional but hard to read: long functions with no separation, poor naming, or anti-patterns for the chosen framework.",
+        "0-5": "Very difficult to follow due to naming, structure, or framework misuse."
+      }
+    },
+    {
+      "id": "documentation",
+      "name": "Documentation",
+      "description": "Is the README comment clear enough for someone to run the server and test it?",
+      "weight": 0.15,
+      "max_score": 15,
+      "scoring_guide": {
+        "13-15": "README comment includes: how to install dependencies, how to start the server, and at least 3 sample curl commands covering different endpoints.",
+        "8-12": "README present but incomplete: missing install steps, or only one sample command.",
+        "4-7": "Minimal README: just a one-line start command with no install instructions or examples.",
+        "0-3": "No README comment, or comment is too vague to be useful."
+      }
+    }
+  ],
+
+  "weighting_note": "Weights sum to 1.0. Overall score = sum(dimension.score / dimension.max_score * dimension.weight) * 100.",
+
+  "calibration_history": [
+    {
+      "date": "2026-05-26",
+      "version": "1.0.0",
+      "note": "Initial rubric — not yet calibrated against human graders."
+    }
+  ]
+}

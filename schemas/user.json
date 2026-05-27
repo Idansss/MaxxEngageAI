@@ -25,7 +25,12 @@
       "required": ["display_name", "country_code"],
       "properties": {
         "display_name": { "type": "string", "maxLength": 80 },
-        "bio": { "type": "string", "maxLength": 500 },
+        "bio": { "type": "string", "maxLength": 140 },
+        "location": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "Optional user-controlled city/country label for proof pages."
+        },
         "country_code": {
           "type": "string",
           "pattern": "^[A-Z]{2}$",
@@ -38,8 +43,14 @@
         "avatar_url": { "type": "string", "format": "uri" },
         "public_profile": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "User controls visibility of their proof page."
+        },
+        "proof_page_visibility": {
+          "type": "string",
+          "enum": ["public", "unlisted", "private"],
+          "default": "public",
+          "description": "Public allows indexing, unlisted works by link only, private hides the proof page."
         }
       }
     },

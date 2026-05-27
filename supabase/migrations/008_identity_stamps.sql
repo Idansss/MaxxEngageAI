@@ -46,6 +46,10 @@ CREATE INDEX IF NOT EXISTS idx_stamps_type      ON public.stamps(stamp_type);
 
 ALTER TABLE public.stamps ENABLE ROW LEVEL SECURITY;
 DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'auth') THEN
+    RETURN;
+  END IF;
+
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
     WHERE schemaname = 'public' AND tablename = 'stamps' AND policyname = 'stamps_owner_read'

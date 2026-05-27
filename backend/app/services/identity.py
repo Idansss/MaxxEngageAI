@@ -38,6 +38,7 @@ STAMP_WEIGHTS = {
     "phone": 20,
     "github": 25,
     "github_senior": 35,   # internal tier, stored as stamp_type='github'
+    "referral": 15,        # earned when referrer reaches 3 successful referrals
     "gitcoin_passport": {  # tiered by score
         "low":    (1,  9,  5),
         "medium": (10, 19, 15),

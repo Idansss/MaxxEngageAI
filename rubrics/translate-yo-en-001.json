@@ -1,0 +1,89 @@
+{
+  "$schema": "https://maxx-engage.io/schemas/rubric.json",
+  "id": "translate-yo-en-001",
+  "version": "1.0.0",
+  "skill_path_slug": "translation-yo-en",
+  "level": 1,
+  "level_label": "Foundations",
+  "title": "Translation Foundations — English to Yoruba",
+  "description": "Assesses whether the candidate can translate English passages into natural, register-appropriate Yoruba, demonstrating awareness of tone, audience, and linguistic nuance.",
+  "pass_threshold": 75,
+  "pass_label": "Foundations Certified",
+  "force_human_review": true,
+  "force_human_review_reason": "Translation grading requires Yoruba-fluent human review. Automatic credential issuance is disabled until at least 30 human-calibrated submissions exist.",
+  "authored_by": "human_curated",
+  "created_at": "2026-05-26",
+
+  "task_prompt": {
+    "text": "Translate the following three passages from English to Yoruba. Preserve meaning, tone, and register. Do not transliterate — translate. If a concept has no direct Yoruba equivalent, render it naturally.\n\nPassage 1 (formal — health notice):\n\"The Lagos State Ministry of Health advises all residents to receive the annual flu vaccine before the rainy season begins. The vaccine is free at all public health centers.\"\n\nPassage 2 (casual — text message):\n\"Hey! I'm running late, the bus is taking forever. Can we push the meeting to 4pm? Sorry for the trouble.\"\n\nPassage 3 (commercial — product description):\n\"This skincare cream is made with natural shea butter and aloe vera. It moisturizes deeply, fights dryness, and is safe for sensitive skin. Apply twice daily for best results.\"\n\nPaste all three translations clearly labeled. Then in one short paragraph (English, 50 words max), explain one translation choice you made and why.",
+    "expected_output_format": "text",
+    "time_limit_minutes": 45
+  },
+
+  "dimensions": [
+    {
+      "id": "accuracy",
+      "name": "Accuracy of Meaning",
+      "description": "Are all key facts, concepts, and information preserved accurately across all three passages?",
+      "weight": 0.30,
+      "max_score": 30,
+      "scoring_guide": {
+        "25-30": "All three passages accurately convey the full meaning of the original. No factual distortions, omissions of key information, or additions not in the source text.",
+        "17-24": "Two passages accurate; one has a minor meaning shift (e.g., a specific noun changed, or a sentence condensed in a way that loses some information).",
+        "9-16": "One passage accurate; others have notable meaning shifts, omissions, or errors that would mislead a reader.",
+        "0-8": "Most passages significantly distort the original meaning, or passages are missing."
+      }
+    },
+    {
+      "id": "register_tone",
+      "name": "Register & Tone",
+      "description": "Does each passage maintain the correct register (formal, casual, commercial)?",
+      "weight": 0.25,
+      "max_score": 25,
+      "scoring_guide": {
+        "21-25": "Passage 1 uses formal Yoruba appropriate for official health communications. Passage 2 uses everyday spoken Yoruba (casual greetings, code-mixing acceptable). Passage 3 uses clear, persuasive commercial language. No mixing of registers.",
+        "14-20": "Two registers correct; one passage has a mismatch (e.g., Passage 2 sounds overly formal, or Passage 1 sounds too casual).",
+        "7-13": "One register correct; the others show clear register confusion.",
+        "0-6": "All three passages use the same register regardless of source tone, or register is inappropriate throughout."
+      }
+    },
+    {
+      "id": "naturalness",
+      "name": "Natural Yoruba",
+      "description": "Does the Yoruba read as something a native speaker would say, rather than a word-for-word translation?",
+      "weight": 0.25,
+      "max_score": 25,
+      "scoring_guide": {
+        "21-25": "Phrases and idioms are adapted for natural Yoruba expression. Sentence structure follows Yoruba grammar, not English word order. Concepts without direct equivalents are rendered in culturally appropriate ways.",
+        "14-20": "Mostly natural but two to three phrases feel like direct transliterations or awkward borrowings.",
+        "7-13": "Noticeable transliteration throughout. Reads like machine-translated output: technically intelligible but unnatural to a native speaker.",
+        "0-6": "Heavily transliterated or machine-translated without human polish. A native speaker would find it difficult or unnatural to read."
+      }
+    },
+    {
+      "id": "translator_note",
+      "name": "Translator's Note",
+      "description": "Does the translator's note demonstrate genuine linguistic awareness and a considered choice?",
+      "weight": 0.20,
+      "max_score": 20,
+      "scoring_guide": {
+        "17-20": "The note identifies a specific word or phrase, explains the Yoruba equivalent chosen, and gives a clear reason for the choice (cultural, linguistic, or contextual). Shows genuine thought.",
+        "12-16": "Note is present and relevant but the reasoning is surface-level (e.g., 'I chose this word because it sounds natural' without explaining why).",
+        "6-11": "Note is too vague to be useful, or addresses an obvious choice rather than a genuinely interesting translation decision.",
+        "0-5": "Note is missing, extremely brief, or demonstrates no linguistic awareness."
+      }
+    }
+  ],
+
+  "weighting_note": "Weights sum to 1.0. Overall score = sum(dimension.score / dimension.max_score * dimension.weight) * 100.",
+
+  "grading_note": "Use a Yoruba-fluent reasoning approach. Pay special attention to register: Passage 1 needs formal Yoruba, Passage 2 needs everyday spoken Yoruba (code-mixing is acceptable), Passage 3 needs clear commercial language. Penalise Google-Translate-style output that ignores tone. This rubric has force_human_review=true — all submissions must be flagged for human review regardless of AI score.",
+
+  "calibration_history": [
+    {
+      "date": "2026-05-26",
+      "version": "1.0.0",
+      "note": "Initial rubric — not yet calibrated. All passing submissions require human review until at least 30 calibration samples exist."
+    }
+  ]
+}

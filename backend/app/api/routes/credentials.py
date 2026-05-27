@@ -1,4 +1,3 @@
-import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
@@ -38,7 +37,8 @@ async def my_decay_status(auth_user: dict = Depends(get_current_user)):
 
     rows = await pool.fetch(
         """
-        SELECT c.id, c.level, c.level_label, c.score, c.is_public,
+        SELECT COALESCE(c.public_id, c.id::text) AS public_id,
+               c.id AS internal_id, c.level, c.level_label, c.score, c.is_public,
                c.valid_from, c.valid_until, c.created_at,
                sp.slug AS skill_path_slug, sp.name AS skill_path_name, sp.domain,
                sp.decay_half_life_months, sp.decay_refresh_months
@@ -59,7 +59,8 @@ async def my_decay_status(auth_user: dict = Depends(get_current_user)):
             refresh_months=r.get("decay_refresh_months"),
         )
         items.append({
-            "id": str(r["id"]),
+            "id": r["public_id"],
+            "internal_id": str(r["internal_id"]),
             "skill_path_name": r["skill_path_name"],
             "skill_path_slug": r["skill_path_slug"],
             "domain": r["domain"],
@@ -96,27 +97,27 @@ async def get_credential(
 
     Public credentials are visible to anyone. Private credentials are only visible to their owner.
     """
-    try:
-        uuid.UUID(credential_id)
-    except ValueError:
-        raise HTTPException(status_code=422, detail="credential_id must be a valid UUID.")
-
     pool = get_pool()
     row = await pool.fetchrow(
         """
-        SELECT c.id, c.holder_did, c.level, c.level_label, c.score, c.percentile,
+        SELECT COALESCE(c.public_id, c.id::text) AS public_id,
+               c.id AS internal_id, c.holder_did, c.level, c.level_label, c.score, c.percentile,
                c.verified_by_human, c.zk_proof_available, c.score_commitment,
                c.consistency_score, c.consistency_rating, c.attempt_count,
                c.content_hash, c.ipfs_cid, c.anchor_provider, c.anchor_status, c.anchor_url,
                c.vc_document, c.valid_from, c.valid_until, c.created_at, c.is_public,
-               c.user_id,
+               c.public_visible, c.revoked, c.revoked_at, c.revoked_reason,
+               c.rubric_id, c.rubric_version, c.skill_name, c.category, c.max_score,
+               c.pass_threshold, c.scores_by_category, c.submission_hash, c.graded_by,
+               c.flagged_for_review, c.flag_reason, c.user_id,
                sp.slug  AS skill_path_slug,
                sp.name  AS skill_path_name,
+               sp.domain AS domain,
                sp.decay_half_life_months,
                sp.decay_refresh_months
         FROM public.credentials c
         JOIN public.skill_paths sp ON sp.id = c.skill_path_id
-        WHERE c.id = $1::uuid
+        WHERE c.public_id = $1 OR c.id::text = $1
         """,
         credential_id,
     )
@@ -126,7 +127,7 @@ async def get_credential(
         )
 
     # Private credentials are only accessible to their owner.
-    if not row["is_public"]:
+    if not row["is_public"] or not row["public_visible"]:
         owner_id = None
         if auth_user:
             owner_row = await pool.fetchrow(
@@ -138,7 +139,8 @@ async def get_credential(
             raise HTTPException(status_code=404, detail=f"Credential '{credential_id}' not found.")
 
     data = dict(row)
-    data["id"] = str(data["id"])
+    data["id"] = data.pop("public_id")
+    data["internal_id"] = str(data["internal_id"])
 
     # Decay enrichment
     if data.get("valid_from"):
@@ -190,11 +192,6 @@ async def set_visibility(
 
     Your profile's overall public/private toggle still applies on top of this.
     """
-    try:
-        uuid.UUID(credential_id)
-    except ValueError:
-        raise HTTPException(status_code=422, detail="credential_id must be a valid UUID.")
-
     pool = get_pool()
     user_row = await pool.fetchrow(
         "SELECT id FROM public.users WHERE auth_id = $1::uuid", auth_user["id"]
@@ -204,9 +201,9 @@ async def set_visibility(
 
     old_row = await pool.fetchrow(
         """
-        SELECT id, is_public
+        SELECT id, COALESCE(public_id, id::text) AS public_id, is_public, public_visible
         FROM public.credentials
-        WHERE id = $1::uuid AND user_id = $2::uuid
+        WHERE (public_id = $1 OR id::text = $1) AND user_id = $2::uuid
         """,
         credential_id,
         str(user_row["id"]),
@@ -220,9 +217,10 @@ async def set_visibility(
     result = await pool.fetchrow(
         """
         UPDATE public.credentials
-        SET is_public = $1
-        WHERE id = $2::uuid AND user_id = $3::uuid
-        RETURNING id, is_public
+        SET is_public = $1,
+            public_visible = $1
+        WHERE (public_id = $2 OR id::text = $2) AND user_id = $3::uuid
+        RETURNING COALESCE(public_id, id::text) AS public_id, is_public
         """,
         body.is_public,
         credential_id,
@@ -231,7 +229,7 @@ async def set_visibility(
 
     logger.info(
         "credential.visibility_changed",
-        credential_id=credential_id,
+        credential_id=result["public_id"],
         is_public=body.is_public,
     )
     await append_audit_log(
@@ -239,13 +237,13 @@ async def set_visibility(
         actor_type="user",
         actor_id=str(user_row["id"]),
         entity_type="credential",
-        entity_id=credential_id,
+            entity_id=result["public_id"],
         old_values={"is_public": old_row["is_public"]},
         new_values={"is_public": result["is_public"]},
     )
     return {
         "ok": True,
-        "credential_id": credential_id,
+        "credential_id": result["public_id"],
         "is_public": result["is_public"],
         "message": (
             "Credential is now public — visible on your profile and to verifiers."
@@ -267,25 +265,20 @@ async def verify_percentile(credential_id: str, signature: str, percentile_band:
     The holder provides (credential_id, percentile_band, signature);
     the verifier calls this endpoint to check authenticity.
     """
-    try:
-        uuid.UUID(credential_id)
-    except ValueError:
-        raise HTTPException(status_code=422, detail="credential_id must be a valid UUID.")
-
     pool = get_pool()
     row = await pool.fetchrow(
         """
-        SELECT c.percentile, c.level, c.is_public,
+        SELECT c.percentile, c.level, c.is_public, c.public_visible,
                sp.slug AS skill_path_slug
         FROM public.credentials c
         JOIN public.skill_paths sp ON sp.id = c.skill_path_id
-        WHERE c.id = $1::uuid
+        WHERE c.public_id = $1 OR c.id::text = $1
         """,
         credential_id,
     )
     if not row:
         raise HTTPException(status_code=404, detail="Credential not found.")
-    if not row["is_public"]:
+    if not row["is_public"] or not row["public_visible"]:
         raise HTTPException(status_code=404, detail="Credential not found.")
 
     settings = get_settings()

@@ -10,10 +10,31 @@ COMMENT ON COLUMN public.users.auth_id IS 'Supabase auth.users.id — links the 
 CREATE INDEX IF NOT EXISTS users_auth_id_idx ON public.users (auth_id);
 
 -- RLS: let authenticated users read and update their own row via auth_id
-CREATE POLICY IF NOT EXISTS "users: own row select"
-    ON public.users FOR SELECT
-    USING (auth_id = auth.uid());
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'auth') THEN
+        RETURN;
+    END IF;
 
-CREATE POLICY IF NOT EXISTS "users: own row update"
-    ON public.users FOR UPDATE
-    USING (auth_id = auth.uid());
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE schemaname = 'public'
+          AND tablename = 'users'
+          AND policyname = 'users: own row select'
+    ) THEN
+        EXECUTE 'CREATE POLICY "users: own row select"
+            ON public.users FOR SELECT
+            USING (auth_id = auth.uid())';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE schemaname = 'public'
+          AND tablename = 'users'
+          AND policyname = 'users: own row update'
+    ) THEN
+        EXECUTE 'CREATE POLICY "users: own row update"
+            ON public.users FOR UPDATE
+            USING (auth_id = auth.uid())';
+    END IF;
+END $$;

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://maxx-engage.io/schemas/rubric.json",
+  "id": "copy-en-001",
+  "version": "1.0.0",
+  "skill_path_slug": "copywriting-en",
+  "level": 1,
+  "level_label": "Foundations",
+  "title": "Copywriting Foundations — FarmConnect Landing Page",
+  "description": "Assesses whether the candidate can write clear, audience-appropriate, persuasive landing-page copy from a creative brief.",
+  "pass_threshold": 70,
+  "pass_label": "Foundations Certified",
+  "authored_by": "human_curated",
+  "created_at": "2026-05-26",
+
+  "task_prompt": {
+    "text": "Write landing-page copy for a fictional product: 'FarmConnect' — a mobile app that helps small-scale Nigerian farmers sell directly to restaurants in their city, skipping middlemen.\n\nDeliver:\n1. A headline (max 12 words)\n2. A subheadline (max 25 words)\n3. Three feature bullets (each: 4-word title + one-sentence description)\n4. A call-to-action button label (max 4 words)\n5. A 60-word 'Why FarmConnect' paragraph\n\nWrite for the farmer, not the investor. Clear, specific, no jargon. Paste your copy below.",
+    "expected_output_format": "text",
+    "time_limit_minutes": 45
+  },
+
+  "dimensions": [
+    {
+      "id": "clarity",
+      "name": "Clarity",
+      "description": "Is the copy easy to scan and free of jargon?",
+      "weight": 0.20,
+      "max_score": 20,
+      "scoring_guide": {
+        "17-20": "Every sentence is immediately understandable to a farmer with no tech background. No buzzwords, acronyms, or abstract marketing language. Bullet points are scannable and distinct.",
+        "12-16": "Mostly clear, but one or two phrases that require explanation (e.g., 'digital ecosystem', 'seamless integration').",
+        "6-11": "Several jargon-heavy phrases that would confuse the target audience. Copy is wordy or padded.",
+        "0-5": "Dense with jargon, corporate-speak, or technical terms. A farmer would not understand it."
+      }
+    },
+    {
+      "id": "specificity",
+      "name": "Specificity",
+      "description": "Does the copy use concrete benefits rather than vague claims?",
+      "weight": 0.25,
+      "max_score": 25,
+      "scoring_guide": {
+        "21-25": "Copy names specific outcomes (e.g., 'Sell to restaurants in your city today', not 'Grow your business'). Feature bullets name concrete capabilities. 'Why FarmConnect' paragraph gives a specific reason to trust the product.",
+        "14-20": "Mostly specific but one section is vague (e.g., 'helps you succeed' in the paragraph, or a bullet with no concrete capability).",
+        "7-13": "Multiple vague claims: 'makes farming easier', 'connects you with buyers', 'great for farmers'. No specific outcomes.",
+        "0-6": "Entirely generic. Could apply to any product targeting any audience."
+      }
+    },
+    {
+      "id": "audience_fit",
+      "name": "Audience Fit",
+      "description": "Does the copy sound like it was written for a Nigerian small-scale farmer, not an investor or tech user?",
+      "weight": 0.20,
+      "max_score": 20,
+      "scoring_guide": {
+        "17-20": "Tone is warm, grounded, and respectful. Avoids condescension. Acknowledges the farmer's reality (mobile-first, relationship-driven, cash flow sensitive). Does not assume tech familiarity.",
+        "12-16": "Mostly appropriate tone but one section sounds like it was written for investors or tech users (e.g., 'Scale your agricultural business').",
+        "6-11": "Tone is generic or inconsistent. Reads like standard SaaS marketing, not a product designed for farmers.",
+        "0-5": "Patronising, irrelevant, or written for the wrong audience entirely."
+      }
+    },
+    {
+      "id": "structure",
+      "name": "Structure",
+      "description": "Does the copy follow the brief exactly (headline, subheadline, 3 bullets, CTA, paragraph)?",
+      "weight": 0.15,
+      "max_score": 15,
+      "scoring_guide": {
+        "13-15": "All five deliverables present and correctly formatted. Headline within 12 words. Subheadline within 25 words. Bullets have 4-word titles. CTA within 4 words. Paragraph within 60 words.",
+        "8-12": "Four of five deliverables correct. One has a minor format violation (e.g., headline at 14 words, or missing the 4-word bullet title format).",
+        "4-7": "Two or three deliverables missing or seriously violating the format.",
+        "0-3": "Brief largely not followed. Multiple deliverables missing."
+      }
+    },
+    {
+      "id": "persuasiveness",
+      "name": "Persuasiveness",
+      "description": "Would a Nigerian farmer actually want to try this product after reading this copy?",
+      "weight": 0.20,
+      "max_score": 20,
+      "scoring_guide": {
+        "17-20": "The copy creates a clear value proposition the reader would recognise from their own experience. The CTA is action-driving. The 'Why FarmConnect' paragraph addresses a real pain point convincingly.",
+        "12-16": "Value proposition is present but not compelling. Reader understands the product but feels no urgency.",
+        "6-11": "Copy describes the product but does not create desire. No emotional hook or relevant pain point addressed.",
+        "0-5": "Copy does not persuade. The reader would not know why this product is for them."
+      }
+    }
+  ],
+
+  "weighting_note": "Weights sum to 1.0. Overall score = sum(dimension.score / dimension.max_score * dimension.weight) * 100.",
+
+  "calibration_history": [
+    {
+      "date": "2026-05-26",
+      "version": "1.0.0",
+      "note": "Initial rubric — not yet calibrated against human graders."
+    }
+  ]
+}

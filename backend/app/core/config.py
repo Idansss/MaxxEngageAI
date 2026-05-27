@@ -73,6 +73,11 @@ class Settings(BaseSettings):
     webhook_url: str = ""       # e.g. https://your-lms.io/hooks/maxx-engage
     webhook_secret: str = ""    # HMAC-SHA256 signing secret
 
+    # Transactional email via Resend (https://resend.com)
+    resend_api_key: str = ""
+    email_from: str = "Maxx Engage <noreply@maxx-engage.io>"
+    site_url: str = "https://maxx-engage-ai.vercel.app"
+
     # Observability
     sentry_dsn: str = ""
     sentry_traces_sample_rate: float = 0.10
