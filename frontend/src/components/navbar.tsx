@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Loader2, LogOut, Menu, Settings, User, ShieldAlert, LayoutDashboard,
-  ShieldCheck, Target, WalletCards, Zap, GitBranch,
+  ShieldCheck, Target, WalletCards, Zap, GitBranch, UserCheck, FolderOpen,
 } from "lucide-react";
 import { NotificationBell } from "@/components/notification-bell";
 import { SearchModal } from "@/components/search-modal";
@@ -78,6 +78,8 @@ export function Navbar() {
               {navLink("/identity", "Identity", <ShieldCheck className="h-3.5 w-3.5" />)}
               {navLink("/wallet", "Wallet", <WalletCards className="h-3.5 w-3.5" />)}
               {navLink("/community", "Community", <GitBranch className="h-3.5 w-3.5" />)}
+              {navLink("/projects", "Projects", <FolderOpen className="h-3.5 w-3.5" />)}
+              {navLink("/review-queue", "Review", <UserCheck className="h-3.5 w-3.5" />)}
               {isAdmin && (
                 <Link
                   href="/admin"

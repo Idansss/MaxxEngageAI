@@ -549,6 +549,97 @@ export interface PlatformStats {
   skill_path_count: number;
 }
 
+export interface ProjectDeliverable {
+  title: string;
+  description: string;
+  required: boolean;
+}
+
+// ── Peer Review ───────────────────────────────────────────────────────────────
+
+export interface PeerReviewQueueItem {
+  id: string;
+  user_id: string;
+  submission_id: string | null;
+  review_id: string | null;
+  skill_path_slug: string;
+  rubric_id: string;
+  ai_score: number | null;
+  status: "pending" | "claimed" | "approved" | "rejected" | "expired";
+  claimed_by: string | null;
+  claimed_at: string | null;
+  claim_expires_at: string | null;
+  verdict: "approve" | "reject" | null;
+  verdict_notes: string | null;
+  completed_at: string | null;
+  credential_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClaimResponse {
+  id: string;
+  status: string;
+  claim_expires_at: string;
+  message: string;
+}
+
+export interface VerdictRequest {
+  verdict: "approve" | "reject";
+  verdict_notes?: string;
+}
+
+export interface VerdictResponse {
+  id: string;
+  verdict: string;
+  credential_id: string | null;
+  message: string;
+}
+
+export interface ReviewerReputation {
+  reviewer_id: string;
+  reviews_completed: number;
+  reviews_approved: number;
+  reviews_rejected: number;
+  last_active_at: string | null;
+}
+
+export interface ProjectBriefSummary {
+  id: string;
+  slug: string;
+  skill_path_slug: string;
+  skill_path_name: string;
+  skill_path_domain: string;
+  title: string;
+  summary: string;
+  deliverables: ProjectDeliverable[];
+  rubric_id: string;
+  level: number;
+  estimated_days: number;
+  pass_threshold: number;
+}
+
+export interface ProjectBrief extends ProjectBriefSummary {
+  task_id: string | null;
+  brief_markdown: string;
+}
+
+export interface ProjectFile {
+  filename: string;
+  content: string;
+}
+
+export interface ProjectSubmitRequest {
+  files: ProjectFile[];
+  notes?: string;
+}
+
+export interface ProjectSubmitResponse {
+  job_id: string;
+  status: string;
+  message: string;
+}
+
 export const api = {
   search: (q: string) => apiFetch<SearchResult>(`/search?q=${encodeURIComponent(q)}`),
   platform: {
@@ -573,6 +664,23 @@ export const api = {
   },
   learnPath: (body: LearnPathRequest) =>
     apiFetch<LearnPathResponse>("/learn-path", { method: "POST", body: JSON.stringify(body) }),
+  projects: {
+    list: () => apiFetch<ProjectBriefSummary[]>("/projects"),
+    get: (slug: string) => apiFetch<ProjectBrief>(`/projects/${slug}`),
+    submit: (slug: string, body: ProjectSubmitRequest) =>
+      apiFetch<ProjectSubmitResponse>(`/projects/${slug}/submit`, { method: "POST", body: JSON.stringify(body) }),
+    pollJob: (jobId: string) => apiFetch<AssessmentJob>(`/projects/submissions/${jobId}`),
+  },
+  peerReview: {
+    listQueue: () => apiFetch<PeerReviewQueueItem[]>("/peer-review/queue"),
+    myClaims: () => apiFetch<PeerReviewQueueItem[]>("/peer-review/my-claims"),
+    myItems: () => apiFetch<PeerReviewQueueItem[]>("/peer-review/my-items"),
+    myReputation: () => apiFetch<ReviewerReputation>("/peer-review/my-reputation"),
+    claim: (itemId: string) => apiFetch<ClaimResponse>(`/peer-review/queue/${itemId}/claim`, { method: "POST" }),
+    release: (itemId: string) => apiFetch<{ id: string; status: string; message: string }>(`/peer-review/queue/${itemId}/release`, { method: "POST" }),
+    submitVerdict: (itemId: string, body: VerdictRequest) =>
+      apiFetch<VerdictResponse>(`/peer-review/queue/${itemId}/verdict`, { method: "POST", body: JSON.stringify(body) }),
+  },
   users: {
     create: (body: { display_name: string; country_code: string; bio?: string; location?: string }) =>
       apiFetch<UserResponse>("/users", { method: "POST", body: JSON.stringify(body) }),

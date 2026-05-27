@@ -38,8 +38,8 @@ function LoadingState() {
   return (
     <div className="flex flex-col items-center justify-center py-24 gap-6 text-center px-4">
       <div className="relative h-16 w-16">
-        <div className="absolute inset-0 rounded-full border-4 border-blue-100" />
-        <div className="absolute inset-0 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
+        <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+        <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />
       </div>
       <div>
         <p className="font-semibold text-lg mb-1">Building your learning path</p>
@@ -67,7 +67,7 @@ function ResourceCard({ r }: { r: Resource }) {
       href={r.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-start gap-3 p-3 rounded-lg border bg-white hover:bg-gray-50 transition-colors group"
+      className="flex items-start gap-3 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors group"
     >
       <div className="mt-0.5 shrink-0">
         {r.low_bandwidth_friendly ? (
@@ -77,7 +77,7 @@ function ResourceCard({ r }: { r: Resource }) {
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium group-hover:text-blue-600 transition-colors leading-snug">{r.title}</p>
+        <p className="text-sm font-medium group-hover:text-primary transition-colors leading-snug">{r.title}</p>
         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
           <span className={`text-xs border rounded-full px-2 py-0.5 ${TYPE_STYLES[r.type] ?? TYPE_STYLES.reference}`}>
             {r.type}
@@ -110,7 +110,7 @@ function WeekCard({
   return (
     <div className="relative">
       {/* Timeline connector */}
-      <div className="absolute left-5 top-12 bottom-0 w-px bg-gray-200 z-0" aria-hidden />
+      <div className="absolute left-5 top-12 bottom-0 w-px bg-border z-0" aria-hidden />
 
       <div className="relative">
         {/* Week header row */}
@@ -121,10 +121,10 @@ function WeekCard({
           aria-expanded={open ? "true" : "false"}
         >
           {/* Circle indicator */}
-          <div className={`shrink-0 h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm z-10 bg-white
+          <div className={`shrink-0 h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm z-10 bg-background
             ${week.is_assessment_week
-              ? "border-blue-500 text-blue-600"
-              : "border-gray-300 text-gray-500 group-hover:border-gray-400"}`}
+              ? "border-primary text-primary"
+              : "border-border text-muted-foreground group-hover:border-muted-foreground"}`}
           >
             {week.is_assessment_week ? <Flag className="h-4 w-4" /> : week.week}
           </div>
@@ -133,7 +133,7 @@ function WeekCard({
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-semibold text-sm leading-tight">{week.theme}</span>
               {week.is_assessment_week && (
-                <Badge className="bg-blue-600 text-white text-xs">Assessment week</Badge>
+                <Badge className="text-xs">Assessment week</Badge>
               )}
               {milestoneAfterWeek && !week.is_assessment_week && (
                 <Badge variant="outline" className="text-xs border-amber-300 text-amber-700">Checkpoint</Badge>
@@ -187,9 +187,9 @@ function MilestonesBar({ milestones }: { milestones: MilestoneAssessment[]; tota
   return (
     <div className="space-y-3">
       {milestones.map((m) => (
-        <div key={m.after_week} className="flex gap-4 items-start p-3 rounded-lg border bg-white">
-          <div className="shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-            <CheckCircle className="h-4 w-4 text-blue-600" />
+        <div key={m.after_week} className="flex gap-4 items-start p-3 rounded-lg border bg-card">
+          <div className="shrink-0 h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <CheckCircle className="h-4 w-4 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
@@ -251,7 +251,7 @@ function SetupForm({
         </div>
       )}
 
-      <div className="bg-white border rounded-xl p-6 space-y-4">
+      <div className="bg-card border rounded-xl p-6 space-y-4">
         <div className="flex justify-between items-center text-sm mb-1">
           <span className="text-muted-foreground">Hours per week</span>
           <span className="font-bold text-lg">{hours}h</span>
@@ -319,12 +319,12 @@ function PathView({ data }: { data: LearnPathResponse }) {
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { icon: <Target className="h-4 w-4 text-blue-600" />, label: "Current score", value: `${data.diagnostic_score}/100` },
+          { icon: <Target className="h-4 w-4 text-primary" />, label: "Current score", value: `${data.diagnostic_score}/100` },
           { icon: <BarChart3 className="h-4 w-4 text-amber-500" />, label: "Gap to pass", value: data.score_gap_to_pass > 0 ? `+${data.score_gap_to_pass} pts` : "Already passing!" },
           { icon: <Calendar className="h-4 w-4 text-green-600" />, label: "Duration", value: `${data.duration_weeks} weeks` },
           { icon: <Clock className="h-4 w-4 text-purple-600" />, label: "Total hours", value: `~${data.total_estimated_hours}h` },
         ].map((s) => (
-          <div key={s.label} className="bg-white border rounded-lg p-3 text-center space-y-1">
+          <div key={s.label} className="bg-card border rounded-lg p-3 text-center space-y-1">
             <div className="flex justify-center">{s.icon}</div>
             <p className="text-xs text-muted-foreground">{s.label}</p>
             <p className="text-sm font-semibold">{s.value}</p>
@@ -333,7 +333,7 @@ function PathView({ data }: { data: LearnPathResponse }) {
       </div>
 
       {/* Score progress */}
-      <div className="bg-white border rounded-lg p-4 space-y-2">
+      <div className="bg-card border rounded-lg p-4 space-y-2">
         <div className="flex justify-between text-xs text-muted-foreground mb-1">
           <span>Your score: {data.diagnostic_score}</span>
           <span>Pass threshold: 70</span>
@@ -343,8 +343,8 @@ function PathView({ data }: { data: LearnPathResponse }) {
       </div>
 
       {/* First assessment date */}
-      <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 text-sm">
-        <Calendar className="h-4 w-4 text-blue-600 shrink-0" />
+      <div className="flex items-center gap-3 bg-primary/5 border border-primary/15 rounded-lg px-4 py-3 text-sm">
+        <Calendar className="h-4 w-4 text-primary shrink-0" />
         <p>
           <span className="font-medium">First checkpoint: </span>
           <span className="text-muted-foreground">
@@ -380,7 +380,7 @@ function PathView({ data }: { data: LearnPathResponse }) {
       )}
 
       {/* CTA */}
-      <div className="rounded-xl border-2 border-blue-100 bg-blue-50 p-6 text-center space-y-3">
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 text-center space-y-3">
         <h3 className="font-semibold">Studied the material? Ready to prove it?</h3>
         <p className="text-sm text-muted-foreground">
           Take the assessment when you feel confident. Your score and any earned credential are
@@ -414,25 +414,19 @@ function LearnPageContent({ slug }: { slug: string }) {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white sticky top-0 z-50">
-        <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-4">
-          <Link href="/" className="font-bold tracking-tight shrink-0">
-            Proof<span className="text-blue-600">OS</span>
-          </Link>
-          <Separator orientation="vertical" className="h-5" />
-          <Link
-            href={`/assess/${slug}`}
-            className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to assessment
-          </Link>
-        </nav>
-      </header>
+    <div className="min-h-[calc(100vh-3.5rem)] bg-background">
+      <div className="max-w-2xl mx-auto px-4 pt-6">
+        <Link
+          href={`/assess/${slug}`}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Back to assessment
+        </Link>
+      </div>
 
       {error && (
-        <div className="max-w-lg mx-auto mt-6 px-4">
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="max-w-lg mx-auto px-4">
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
             {error.message}. Please try again.
           </div>
         </div>
@@ -464,7 +458,7 @@ function LearnPageInner({ params }: { params: Promise<{ slug: string }> }) {
 
   if (!slug) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-[calc(100vh-3.5rem)] bg-background flex items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );

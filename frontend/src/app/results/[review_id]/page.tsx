@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   CheckCircle, XCircle, Award, ArrowRight,
   User, MessageSquare, Loader2, ChevronDown, ChevronUp,
-  ThumbsUp, AlertCircle, BookOpen, Quote,
+  ThumbsUp, AlertCircle, BookOpen, Quote, Clock,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -155,7 +155,9 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
     onSuccess: () => setAppealDone(true),
   });
 
-  const scoreColorClass = score >= 70 ? "text-success" : score >= 50 ? "text-gold" : "text-destructive";
+  const passThreshold = review?.rubric_id === "translate-yo-en-001" ? 75 : 70;
+  const scoreColorClass = score >= passThreshold ? "text-success" : score >= 50 ? "text-gold" : "text-destructive";
+  const pendingHumanReview = passed && !credentialId && (review?.human_review_requested ?? false);
 
   const weakestDim = review && review.scores.length > 0
     ? review.scores.reduce((min, d) => {
@@ -188,7 +190,7 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
           <div>
             <p className="text-sm text-muted-foreground mb-1">Overall score</p>
             <p className={cn("text-6xl font-black leading-none", scoreColorClass)}>{score.toFixed(1)}</p>
-            <p className="text-sm text-muted-foreground mt-2">out of 100 &middot; pass threshold: 70</p>
+            <p className="text-sm text-muted-foreground mt-2">out of 100 &middot; pass threshold: {passThreshold}</p>
           </div>
 
           <Progress value={score} className="h-2 max-w-xs mx-auto" />
@@ -248,6 +250,42 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
                 Copy share link
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Pending human review card — shown for translation passes before credential is issued */}
+      {pendingHumanReview && (
+        <Card className="overflow-hidden ring-1 ring-amber-300/40">
+          <div className="h-1 bg-amber-400" />
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Clock className="h-5 w-5 text-amber-600" /> Credential pending human review
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Your submission passed the AI review. Because translation accuracy requires
+              expert judgment, a human translator will review it within{" "}
+              <strong className="text-foreground font-semibold">48 hours</strong>.
+              Your credential will be issued automatically once the review is complete —
+              you&apos;ll receive an email notification.
+            </p>
+            {profile?.username ? (
+              <Link
+                href={`/u/${profile.username}`}
+                className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-1.5")}
+              >
+                <User className="h-3.5 w-3.5" /> View my proof page
+              </Link>
+            ) : (
+              <Link
+                href="/identity"
+                className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-1.5")}
+              >
+                <User className="h-3.5 w-3.5" /> Set up your proof page
+              </Link>
+            )}
           </CardContent>
         </Card>
       )}
@@ -341,7 +379,18 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
           <CardTitle className="text-base font-bold">What&apos;s next?</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {passed ? (
+          {passed && pendingHumanReview ? (
+            <>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Your translation is with a human reviewer. While you wait, explore other skill paths.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Link href="/assess" className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}>
+                  Explore other assessments <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </>
+          ) : passed ? (
             <>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 You passed Level {review?.level ?? 1}. Ready to push further?
@@ -375,18 +424,21 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
                 </div>
               )}
               <p className="text-sm text-muted-foreground leading-relaxed">
-                A score of {score.toFixed(1)} means there&apos;s room to grow. Review the feedback,
-                improve the weak areas, and try the assessment again.
+                A score of {score.toFixed(1)} means there&apos;s room to grow. Get a personalised
+                week-by-week learning path, then come back when you&apos;re ready.
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
                 <Link
-                  href={`/assess/${skillSlug}`}
+                  href={`/learn/${skillSlug}?score=${score.toFixed(1)}${weakestDim ? `&focus=${encodeURIComponent(weakestDim.dimension)}` : ""}`}
                   className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}
                 >
-                  Retake assessment <ArrowRight className="h-3.5 w-3.5" />
+                  <BookOpen className="h-3.5 w-3.5" /> Build my learning path
                 </Link>
-                <Link href="/assess" className={cn(buttonVariants({ size: "sm", variant: "outline" }))}>
-                  Explore other assessments
+                <Link
+                  href={`/assess/${skillSlug}`}
+                  className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-1.5")}
+                >
+                  Retake now <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </>

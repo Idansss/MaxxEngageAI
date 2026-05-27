@@ -76,8 +76,9 @@ async def run_assessment(request: AssessRequest) -> AssessResponse:
             },
         )
 
-    if response.human_review_requested and submission_id:
+    if response.human_review_requested and submission_id and request.user_id:
         from app.services import webhook as wh
+        from app.api.routes.peer_review import enqueue_peer_review
 
         asyncio.ensure_future(
             wh.on_human_review_queued(
@@ -86,6 +87,16 @@ async def run_assessment(request: AssessRequest) -> AssessResponse:
                 skill_path=request.skill_path_slug,
                 score=response.overall_score,
                 confidence=response.confidence,
+            )
+        )
+        asyncio.ensure_future(
+            enqueue_peer_review(
+                user_id=request.user_id,
+                submission_id=submission_id,
+                review_id=response.review_id,
+                skill_path_slug=request.skill_path_slug,
+                rubric_id=request.rubric_id,
+                ai_score=response.overall_score,
             )
         )
 

@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import {
   FileText,
+  FolderOpen,
   GitBranch,
   LayoutDashboard,
   LogIn,
@@ -15,6 +16,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Target,
+  UserCheck,
   WalletCards,
   X,
   Zap,
@@ -149,6 +151,8 @@ export function MobileDrawer({ open, onClose }: Props) {
               <DrawerNavLink href="/submissions" label="Submissions" icon={<FileText className="h-4 w-4" />} active={active("/submissions")} />
 
               <SectionLabel label="Explore" />
+              <DrawerNavLink href="/projects"     label="Projects"       icon={<FolderOpen className="h-4 w-4" />} active={active("/projects")} />
+              <DrawerNavLink href="/review-queue" label="Review Queue"   icon={<UserCheck className="h-4 w-4" />} active={active("/review-queue")} />
               <DrawerNavLink href="/skill-paths"  label="Skill Paths"    icon={<Zap className="h-4 w-4" />} active={active("/skill-paths")} />
               <DrawerNavLink href="/community"    label="Community"      icon={<GitBranch className="h-4 w-4" />} active={active("/community")} />
 
