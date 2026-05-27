@@ -25,7 +25,7 @@ function domainChip(domain: string) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function SearchModal() {
+export function SearchModal({ sidebar = false }: { sidebar?: boolean }) {
   const [open, setOpen]       = useState(false);
   const [query, setQuery]     = useState("");
   const [debQ, setDebQ]       = useState("");
@@ -119,6 +119,23 @@ export function SearchModal() {
   // ── Trigger button (when closed) ──────────────────────────────────────────
 
   if (!open) {
+    if (sidebar) {
+      return (
+        <button
+          type="button"
+          onClick={openSearch}
+          className="flex w-full items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          aria-label="Search"
+        >
+          <Search className="h-4 w-4 shrink-0" />
+          <span className="flex-1 text-left">Search</span>
+          <kbd className="text-[10px] font-mono bg-muted border border-border rounded px-1.5 py-0.5 leading-none">
+            ⌘K
+          </kbd>
+        </button>
+      );
+    }
+
     return (
       <button
         type="button"

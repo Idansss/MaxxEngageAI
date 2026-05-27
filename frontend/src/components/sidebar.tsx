@@ -6,12 +6,12 @@ import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import {
-  FolderOpen, GitBranch, LayoutDashboard, LogOut, Settings,
-  ShieldAlert, ShieldCheck, Target, User, UserCheck, WalletCards, Zap,
+  FolderOpen, GitBranch, LayoutDashboard, LogOut, Moon, Settings,
+  ShieldAlert, ShieldCheck, Sun, Target, User, UserCheck, WalletCards, Zap,
 } from "lucide-react";
 import { NotificationBell } from "@/components/notification-bell";
 import { SearchModal } from "@/components/search-modal";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { useTheme } from "@/lib/theme-context";
 
 const ADMIN_EMAILS = new Set(
   (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase())
@@ -45,8 +45,13 @@ function NavLink({
   );
 }
 
+function Divider() {
+  return <div className="my-1 mx-3 h-px bg-border/60" />;
+}
+
 export function Sidebar() {
   const { session, profile, loading, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const isAdmin =
     !!session?.user.email &&
@@ -74,6 +79,14 @@ export function Sidebar() {
             <NavLink href="/community"    label="Community"  icon={<GitBranch className="h-4 w-4" />}       pathname={pathname} />
             <NavLink href="/projects"     label="Projects"   icon={<FolderOpen className="h-4 w-4" />}      pathname={pathname} />
             <NavLink href="/review-queue" label="Review"     icon={<UserCheck className="h-4 w-4" />}       pathname={pathname} />
+
+            <Divider />
+
+            {/* Search */}
+            <SearchModal sidebar />
+
+            {/* Notifications */}
+            <NotificationBell sidebar />
           </>
         ) : !loading ? (
           <>
@@ -86,7 +99,7 @@ export function Sidebar() {
 
       {/* Assess CTA */}
       {session && (
-        <div className="px-3 pb-2">
+        <div className="px-3 pb-3">
           <Link
             href="/assess"
             className={cn(buttonVariants({ size: "sm" }), "w-full justify-center gap-1.5")}
@@ -97,20 +110,10 @@ export function Sidebar() {
         </div>
       )}
 
-      {/* Bottom: search, notifications, profile, settings, sign out */}
+      {/* Footer: profile, settings, admin, theme + sign out */}
       <div className="border-t border-border/60 px-2 py-3 space-y-0.5">
-        <div className="px-1 pb-1">
-          <SearchModal />
-        </div>
-
-        {session && (
+        {session ? (
           <>
-            <div className="flex items-center gap-2 px-3 py-1.5">
-              <NotificationBell />
-              <span className="text-xs text-muted-foreground flex-1">Notifications</span>
-              <ThemeToggle />
-            </div>
-
             {profile?.id && (
               <NavLink
                 href={`/profile/${profile.id}`}
@@ -119,32 +122,50 @@ export function Sidebar() {
                 pathname={pathname}
               />
             )}
-
             <NavLink href="/settings" label="Settings" icon={<Settings className="h-4 w-4" />} pathname={pathname} />
-
             {isAdmin && (
               <NavLink href="/admin" label="Admin" icon={<ShieldAlert className="h-4 w-4 text-amber-500" />} pathname={pathname} />
             )}
 
+            {/* Theme toggle + Sign out row */}
+            <div className="flex items-center gap-1 pt-1">
+              <button
+                type="button"
+                onClick={signOut}
+                className="flex-1 flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign out
+              </button>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                className="flex items-center justify-center h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+            </div>
+          </>
+        ) : !loading ? (
+          <>
             <button
               type="button"
-              onClick={signOut}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="flex w-full items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
-              <LogOut className="h-4 w-4" />
-              Sign out
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {theme === "dark" ? "Light mode" : "Dark mode"}
             </button>
+            <Link
+              href="/login"
+              className={cn(buttonVariants({ size: "sm" }), "w-full justify-center mt-1")}
+            >
+              Sign in
+            </Link>
           </>
-        )}
-
-        {!session && !loading && (
-          <Link
-            href="/login"
-            className={cn(buttonVariants({ size: "sm" }), "w-full justify-center mt-1")}
-          >
-            Sign in
-          </Link>
-        )}
+        ) : null}
       </div>
     </aside>
   );

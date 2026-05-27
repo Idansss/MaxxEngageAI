@@ -56,7 +56,7 @@ function NotifItem({ item, onRead }: { item: AppNotification; onRead: (id: strin
   return content;
 }
 
-export function NotificationBell() {
+export function NotificationBell({ sidebar = false }: { sidebar?: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const qc = useQueryClient();
@@ -91,22 +91,42 @@ export function NotificationBell() {
 
   return (
     <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="relative inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-        aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ""}`}
-      >
-        <Bell className="h-4 w-4" />
-        {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center leading-none">
-            {unread > 9 ? "9+" : unread}
-          </span>
-        )}
-      </button>
+      {sidebar ? (
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="flex w-full items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ""}`}
+        >
+          <Bell className="h-4 w-4 shrink-0" />
+          <span className="flex-1 text-left">Notifications</span>
+          {unread > 0 && (
+            <span className="h-5 min-w-5 px-1 rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center leading-none">
+              {unread > 9 ? "9+" : unread}
+            </span>
+          )}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="relative inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ""}`}
+        >
+          <Bell className="h-4 w-4" />
+          {unread > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary text-[9px] font-bold text-primary-foreground flex items-center justify-center leading-none">
+              {unread > 9 ? "9+" : unread}
+            </span>
+          )}
+        </button>
+      )}
 
       {open && (
-        <div className="absolute right-0 top-10 w-80 bg-background border border-border rounded-xl shadow-lg shadow-black/10 z-50 overflow-hidden">
+        <div className={cn(
+          "absolute w-80 bg-background border border-border rounded-xl shadow-lg shadow-black/10 z-50 overflow-hidden",
+          sidebar ? "left-full top-0 ml-2" : "right-0 top-10"
+        )}>
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-2.5 border-b">
             <p className="text-sm font-semibold">Notifications</p>
