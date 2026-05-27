@@ -12,6 +12,7 @@ interface AuthState {
   loading: boolean;
   signInWithEmail: (email: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -73,8 +74,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(null);
   };
 
+  const refreshProfile = useCallback(async () => {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) await loadProfile(data.session);
+  }, [loadProfile]);
+
   return (
-    <AuthContext.Provider value={{ session, supabaseUser, profile, loading, signInWithEmail, signOut }}>
+    <AuthContext.Provider value={{ session, supabaseUser, profile, loading, signInWithEmail, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

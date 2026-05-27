@@ -1,13 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
-  Loader2, LogOut, User, ShieldAlert, LayoutDashboard,
+  Loader2, LogOut, Menu, Settings, User, ShieldAlert, LayoutDashboard,
   ShieldCheck, Target, WalletCards, Zap, GitBranch,
 } from "lucide-react";
+import { NotificationBell } from "@/components/notification-bell";
+import { SearchModal } from "@/components/search-modal";
+import { MobileDrawer } from "@/components/mobile-drawer";
+import { BottomTabBar } from "@/components/bottom-tab-bar";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 const ADMIN_EMAILS = new Set(
@@ -18,6 +24,7 @@ export function Navbar() {
   const { session, profile, loading, signOut } = useAuth();
   const isAdmin = !!session?.user.email && ADMIN_EMAILS.has(session.user.email.toLowerCase());
   const pathname = usePathname();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   function isActive(href: string) {
     return pathname === href || pathname.startsWith(href + "/");
@@ -42,20 +49,26 @@ export function Navbar() {
   }
 
   return (
-    <header className="glass-nav sticky top-0 z-50 border-b border-border/60 shadow-sm shadow-border/30">
-      <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+    <>
+    <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+    <BottomTabBar />
+    <header className="glass-nav sticky top-0 z-40 border-b border-border/60 shadow-sm shadow-border/30">
+      <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-2">
 
         {/* Logo */}
         <Link
           href="/"
-          className="font-extrabold text-base tracking-tight shrink-0 flex items-center gap-1"
+          className="font-extrabold text-base tracking-tight shrink-0 flex items-center gap-1 mr-1"
         >
           <span className="text-foreground">Maxx</span>
           <span className="text-gradient">Engage</span>
         </Link>
 
-        {/* Nav links + actions */}
-        <div className="flex items-center gap-1">
+        {/* Global search */}
+        <SearchModal />
+
+        {/* Nav links + actions — pushes to the right */}
+        <div className="flex items-center gap-1 ml-auto">
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground mx-2" />
           ) : session ? (
@@ -65,7 +78,6 @@ export function Navbar() {
               {navLink("/identity", "Identity", <ShieldCheck className="h-3.5 w-3.5" />)}
               {navLink("/wallet", "Wallet", <WalletCards className="h-3.5 w-3.5" />)}
               {navLink("/community", "Community", <GitBranch className="h-3.5 w-3.5" />)}
-
               {isAdmin && (
                 <Link
                   href="/admin"
@@ -103,23 +115,60 @@ export function Navbar() {
                 Assess
               </Link>
 
+              <Link
+                href="/settings"
+                className={cn(
+                  "hidden sm:inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors",
+                  isActive("/settings") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+                aria-label="Settings"
+              >
+                <Settings className="h-4 w-4" />
+              </Link>
+
+              <ThemeToggle className="hidden sm:inline-flex" />
+              <NotificationBell />
+
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={signOut}
-                className="gap-1.5 text-muted-foreground hover:text-foreground ml-1"
+                className="gap-1.5 text-muted-foreground hover:text-foreground ml-1 hidden sm:inline-flex"
               >
                 <LogOut className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Sign out</span>
+                Sign out
               </Button>
+
+              {/* Hamburger — mobile only */}
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(true)}
+                className="sm:hidden inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors ml-1 text-muted-foreground hover:text-foreground"
+                aria-label="Open menu"
+              >
+                <Menu className="h-4.5 w-4.5" />
+              </button>
             </>
           ) : (
-            <Link href="/login" className={buttonVariants({ size: "sm" })}>
-              Sign in
-            </Link>
+            <>
+              <Link href="/login" className={cn(buttonVariants({ size: "sm" }), "ml-1 hidden sm:inline-flex")}>
+                Sign in
+              </Link>
+
+              {/* Hamburger for signed-out mobile */}
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(true)}
+                className="sm:hidden inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                aria-label="Open menu"
+              >
+                <Menu className="h-4.5 w-4.5" />
+              </button>
+            </>
           )}
         </div>
       </nav>
     </header>
+    </>
   );
 }

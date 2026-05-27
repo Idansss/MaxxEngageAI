@@ -17,9 +17,10 @@ export default function AuthCallbackPage() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         subscription.unsubscribe();
-        // New users → onboarding; returning users → dashboard
-        const dest = event === "SIGNED_IN" ? "/dashboard" : "/dashboard";
-        router.replace(dest);
+        // New users (account created <2 min ago) → onboarding wizard
+        const createdAt = new Date(session.user.created_at).getTime();
+        const isNew = Date.now() - createdAt < 120_000;
+        router.replace(isNew ? "/onboarding" : "/dashboard");
       }
     });
 
@@ -27,7 +28,9 @@ export default function AuthCallbackPage() {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
         subscription.unsubscribe();
-        router.replace("/dashboard");
+        const createdAt = new Date(data.session.user.created_at).getTime();
+        const isNew = Date.now() - createdAt < 120_000;
+        router.replace(isNew ? "/onboarding" : "/dashboard");
       }
     });
 

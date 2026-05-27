@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
@@ -255,9 +256,9 @@ export default function WalletPage() {
                 <Award className="h-5 w-5 text-muted-foreground/40" />
               </div>
               <p className="text-sm text-muted-foreground">No credentials yet.</p>
-              <a href="/assess" className={cn(buttonVariants({ size: "sm" }))}>
+              <Link href="/assess" className={cn(buttonVariants({ size: "sm" }))}>
                 Take your first assessment
-              </a>
+              </Link>
             </div>
           ) : (
             <ul className="divide-y divide-border/60">

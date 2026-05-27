@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
-import { supabase } from "@/lib/supabase";
+import { api, type AdminQueueItem } from "@/lib/api";
 import { Navbar } from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,81 +14,25 @@ import {
   Loader2, ShieldAlert, Award, User, Clock, MessageSquare
 } from "lucide-react";
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-interface QueueItem {
-  review_id: string;
-  submission_id: string;
-  user_id: string;
-  display_name: string;
-  country_code: string;
-  skill_path_name: string;
-  skill_path_slug: string;
-  overall_score: number;
-  confidence: number;
-  credential_eligible: boolean;
-  credential_issued: boolean;
-  credential_verified_by_human: boolean;
-  reviewed_at: string;
-  submitted_at: string;
-  submission_status: string;
-  appeal_reason: string | null;
-  model_version: string | null;
-  submission_content: { type: string; body: string };
-  feedback: {
-    summary: string;
-    strengths: string[];
-    improvements: string[];
-    next_steps: string[];
-  };
-  scores: {
-    dimension: string;
-    score: number;
-    max_score: number;
-    rationale: string;
-    evidence_quotes: string[];
-  }[];
-}
-
-// ── API helpers ───────────────────────────────────────────────────────────────
-
-async function fetchQueue(): Promise<QueueItem[]> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  const res = await fetch(`${API}/admin/queue`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error((await res.json()).detail ?? "Failed to load queue");
-  return res.json();
-}
-
-async function postDecision(reviewId: string, decision: "approve" | "reject", note: string) {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  const res = await fetch(`${API}/admin/reviews/${reviewId}/decide`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ decision, note }),
-  });
-  if (!res.ok) throw new Error((await res.json()).detail ?? "Action failed");
-  return res.json();
-}
-
 // ── Queue item card ───────────────────────────────────────────────────────────
 
-function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string, d: "approve" | "reject", note: string) => void }) {
+function QueueCard({ item, onDecide }: {
+  item: AdminQueueItem;
+  onDecide: (id: string, d: "approve" | "reject", note: string) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
   const [note, setNote] = useState("");
   const [confirming, setConfirming] = useState<"approve" | "reject" | null>(null);
 
-  const scoreColor = item.overall_score >= 70 ? "text-green-600" : item.overall_score >= 55 ? "text-amber-600" : "text-red-600";
+  const scoreColor = item.overall_score >= 70
+    ? "text-green-600"
+    : item.overall_score >= 55
+    ? "text-amber-600"
+    : "text-red-600";
   const submittedAt = new Date(item.submitted_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
 
   return (
     <Card className="overflow-hidden">
-      {/* Header row */}
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="flex-1 min-w-0">
@@ -125,7 +69,6 @@ function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string,
       </CardHeader>
 
       <CardContent className="space-y-3">
-        {/* Appeal reason — shown prominently so admin can read before deciding */}
         {item.submission_status === "appealed" && item.appeal_reason && (
           <div className="rounded-md border border-orange-200 bg-orange-50 px-3 py-2.5">
             <p className="text-xs font-semibold text-orange-700 mb-1 flex items-center gap-1">
@@ -135,10 +78,8 @@ function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string,
           </div>
         )}
 
-        {/* AI summary */}
         <p className="text-sm text-muted-foreground">{item.feedback.summary}</p>
 
-        {/* Toggle full detail */}
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
@@ -150,7 +91,6 @@ function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string,
 
         {expanded && (
           <div className="space-y-4 border-t pt-4">
-            {/* Submission content */}
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
                 Submission ({item.submission_content.type})
@@ -160,7 +100,6 @@ function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string,
               </pre>
             </div>
 
-            {/* Per-dimension scores */}
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                 Dimension scores
@@ -185,7 +124,6 @@ function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string,
               </div>
             </div>
 
-            {/* Strengths / Improvements */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <p className="text-xs font-semibold text-green-700 mb-1">Strengths</p>
@@ -203,7 +141,6 @@ function QueueCard({ item, onDecide }: { item: QueueItem; onDecide: (id: string,
           </div>
         )}
 
-        {/* Decision actions */}
         {confirming ? (
           <div className="border-t pt-3 space-y-2">
             <p className="text-sm font-medium">
@@ -255,19 +192,23 @@ export default function AdminQueuePage() {
 
   const { data: queue = [], isLoading, error } = useQuery({
     queryKey: ["admin-queue"],
-    queryFn: fetchQueue,
+    queryFn: () => api.admin.queue(),
     enabled: !!session,
     refetchInterval: 30_000,
   });
 
   const { mutate: decide, isPending: deciding } = useMutation({
     mutationFn: ({ reviewId, decision, note }: { reviewId: string; decision: "approve" | "reject"; note: string }) =>
-      postDecision(reviewId, decision, note),
+      api.admin.decide(reviewId, decision, note),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-queue"] }),
   });
 
   if (authLoading) {
-    return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   if (!session) {
@@ -286,13 +227,13 @@ export default function AdminQueuePage() {
       <main className="max-w-4xl mx-auto px-4 py-10">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ShieldAlert className="h-6 w-6 text-amber-500" />
-            Human Review Queue
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Submissions the AI flagged for human judgement. Approve to verify the credential; reject to decline.
-          </p>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <ShieldAlert className="h-6 w-6 text-amber-500" />
+              Human Review Queue
+            </h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              Submissions the AI flagged for human judgement. Approve to verify the credential; reject to decline.
+            </p>
           </div>
           <Link href="/admin" className="text-sm text-blue-600 hover:underline">
             Admin dashboard

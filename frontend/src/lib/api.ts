@@ -154,11 +154,14 @@ export interface UserResponse {
   display_name: string;
   bio: string | null;
   country_code: string;
+  location: string | null;
   preferred_language: string;
   avatar_url: string | null;
   public_profile: boolean;
   overall_score: number;
   created_at: string;
+  username: string | null;
+  proof_page_visibility: "public" | "unlisted" | "private";
 }
 
 export interface UserCredential {
@@ -176,6 +179,18 @@ export interface UserCredential {
   valid_from: string;
   valid_until: string | null;
   created_at: string;
+}
+
+export interface PendingCredential {
+  review_id: string;
+  rubric_id: string;
+  score: number;
+  reviewed_at: string | null;
+  skill_path_name: string;
+  skill_path_slug: string;
+  domain: string;
+  level: number;
+  status: "pending_human_review";
 }
 
 export interface CredentialDecayItem {
@@ -269,6 +284,59 @@ export interface AdminQueueItem {
   submission_status: string;
   appeal_reason: string | null;
   model_version: string | null;
+  submission_content: { type: string; body: string };
+  feedback: {
+    summary: string;
+    strengths: string[];
+    improvements: string[];
+    next_steps: string[];
+  };
+  scores: {
+    dimension: string;
+    score: number;
+    max_score: number;
+    rationale: string;
+    evidence_quotes: string[];
+  }[];
+}
+
+export interface TalentCredential {
+  credential_id: string;
+  skill_path_name: string;
+  domain: string;
+  score: number;
+  verified_by_human: boolean;
+}
+
+export interface TalentProfile {
+  user_id: string;
+  display_name: string;
+  username: string;
+  country_code: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  overall_score: number;
+  top_score: number;
+  credential_count: number;
+  domains: string[];
+  top_credentials: TalentCredential[];
+}
+
+export interface LeaderboardItem {
+  rank: number;
+  credential_id: string;
+  display_name: string;
+  username: string | null;
+  country_code: string | null;
+  skill_path_name: string;
+  skill_path_slug: string;
+  domain: string;
+  level: number;
+  level_label: string;
+  score: number;
+  percentile: number | null;
+  verified_by_human: boolean;
+  issued_at: string | null;
 }
 
 export interface CalibrationLatestItem {
@@ -336,6 +404,87 @@ export interface KnowledgeSource {
   summary: string;
 }
 
+export interface PublicCredential {
+  id: string;
+  internal_id?: string;
+  skill_path_slug: string;
+  skill_path_name: string;
+  domain?: string;
+  category?: string;
+  skill_name?: string;
+  level: number;
+  level_label: string;
+  score: number;
+  max_score?: number;
+  pass_threshold?: number;
+  percentile: number | null;
+  verified_by_human: boolean;
+  is_public: boolean;
+  public_visible?: boolean;
+  valid_from: string;
+  valid_until: string | null;
+  issued_at?: string | null;
+  created_at: string;
+  user_id: string;
+  holder_did: string;
+  rubric_id?: string | null;
+  rubric_version?: string | null;
+  graded_by?: "ai" | "ai+human" | "human";
+  flagged_for_review?: boolean;
+  flag_reason?: string | null;
+  revoked?: boolean;
+  revoked_at?: string | null;
+  revoked_reason?: string | null;
+  content_hash?: string | null;
+  submission_hash?: string | null;
+  vc_document: Record<string, unknown>;
+  decay: {
+    effective_score: number;
+    decay_factor: number;
+    overdue_for_refresh: boolean;
+    reassessment_recommended_at: string | null;
+  } | null;
+}
+
+export type VerifyCredential = {
+  id: string;
+  skill_name: string;
+  skill_path_name: string;
+  skill_path_slug: string;
+  category: string;
+  domain: string;
+  score: number;
+  max_score: number;
+  pass_threshold: number;
+  level: number;
+  level_label: string;
+  rubric_id: string | null;
+  rubric_version: string | null;
+  issued_at: string | null;
+  graded_by: "ai" | "ai+human" | "human";
+  verified_by_human: boolean;
+  flagged_for_review: boolean;
+  flag_reason: string | null;
+  revoked: boolean;
+  revoked_at: string | null;
+  revoked_reason: string | null;
+  content_hash: string | null;
+  submission_hash: string | null;
+  vc_document: Record<string, unknown>;
+};
+
+export type VerifyLookupResponse =
+  | {
+      kind: "credential";
+      credential: VerifyCredential;
+      user: { id: string; display_name: string; username: string | null };
+    }
+  | {
+      kind: "user";
+      user: { id: string; display_name: string; username: string | null };
+      credentials: VerifyCredential[];
+    };
+
 export interface GitHubCommunityStatus {
   repo: {
     name: string;
@@ -363,10 +512,53 @@ export interface GitHubCommunityStatus {
 
 // ── API calls ──────────────────────────────────────────────────────────────
 
+export interface SkillPathStats {
+  credential_count: number;
+  earner_count: number;
+  avg_score: number | null;
+  top_score: number | null;
+  top_performers: {
+    username: string;
+    display_name: string;
+    avatar_url: string | null;
+    score: number;
+    verified_by_human: boolean;
+    level_label: string;
+  }[];
+}
+
+export interface RubricDimension {
+  id: string;
+  name: string;
+  description: string;
+  weight: number;
+  max_score: number;
+}
+
+export interface SkillPathRubric {
+  rubric_id: string;
+  title: string;
+  pass_threshold: number;
+  dimensions: RubricDimension[];
+}
+
+export interface PlatformStats {
+  credential_count: number;
+  user_count: number;
+  country_count: number;
+  skill_path_count: number;
+}
+
 export const api = {
+  search: (q: string) => apiFetch<SearchResult>(`/search?q=${encodeURIComponent(q)}`),
+  platform: {
+    stats: () => apiFetch<PlatformStats>("/stats"),
+  },
   skillPaths: {
     list: () => apiFetch<SkillPath[]>("/skill-paths"),
     get: (slug: string) => apiFetch<SkillPath>(`/skill-paths/${slug}`),
+    stats: (slug: string) => apiFetch<SkillPathStats>(`/skill-paths/${slug}/stats`),
+    rubric: (slug: string, level: number) => apiFetch<SkillPathRubric>(`/skill-paths/${slug}/rubric/${level}`),
   },
   assess: (body: AssessRequest) =>
     apiFetch<AssessResponse>("/assess", { method: "POST", body: JSON.stringify(body) }),
@@ -382,18 +574,38 @@ export const api = {
   learnPath: (body: LearnPathRequest) =>
     apiFetch<LearnPathResponse>("/learn-path", { method: "POST", body: JSON.stringify(body) }),
   users: {
-    create: (body: { display_name: string; country_code: string; bio?: string }) =>
+    create: (body: { display_name: string; country_code: string; bio?: string; location?: string }) =>
       apiFetch<UserResponse>("/users", { method: "POST", body: JSON.stringify(body) }),
     get: (id: string) => apiFetch<UserResponse>(`/users/${id}`),
+    byUsername: (username: string) => apiFetch<UserResponse>(`/users/by-username/${encodeURIComponent(username)}`),
     credentials: (id: string) => apiFetch<UserCredential[]>(`/users/${id}/credentials`),
+    pendingCredentials: (id: string) => apiFetch<PendingCredential[]>(`/users/${id}/pending-credentials`),
+    setUsername: (username: string) =>
+      apiFetch<UserResponse>("/users/me/username", { method: "PATCH", body: JSON.stringify({ username }) }),
+    updateProfile: (body: { display_name?: string; bio?: string; avatar_url?: string; location?: string; country_code?: string; preferred_language?: string }) =>
+      apiFetch<UserResponse>("/users/me", { method: "PATCH", body: JSON.stringify(body) }),
+    setVisibility: (proof_page_visibility: "public" | "unlisted" | "private") =>
+      apiFetch<UserResponse>("/users/me/visibility", { method: "PATCH", body: JSON.stringify({ proof_page_visibility }) }),
+    deleteAccount: () => apiFetch<never>("/users/me", { method: "DELETE" }),
+    submissions: (id: string, limit = 20, offset = 0) =>
+      apiFetch<PublicSubmissionHistory>(`/users/${id}/submissions?limit=${limit}&offset=${offset}`),
+    vouches: (id: string) =>
+      apiFetch<VouchList>(`/users/${id}/vouches`),
+    vouch: (id: string) =>
+      apiFetch<{ ok: boolean; message: string }>(`/users/${id}/vouch`, { method: "POST" }),
   },
   credentials: {
     myDecayStatus: () => apiFetch<CredentialDecayStatus>("/credentials/my/decay-status"),
+    get: (id: string) => apiFetch<PublicCredential>(`/credentials/${id}`),
     setVisibility: (id: string, is_public: boolean) =>
       apiFetch<{ ok: boolean; credential_id: string; is_public: boolean; message: string }>(
         `/credentials/${id}/visibility`,
         { method: "PATCH", body: JSON.stringify({ is_public }) }
       ),
+  },
+  verify: {
+    lookup: (q: string) =>
+      apiFetch<VerifyLookupResponse>(`/verify?q=${encodeURIComponent(q)}`),
   },
   submissions: {
     appeal: (submissionId: string, reason: string) =>
@@ -433,6 +645,11 @@ export const api = {
     exportCredential: (id: string) => `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/wallet/credentials/${id}/export`,
     exportCredentialDocument: (id: string) =>
       apiFetch<Record<string, unknown>>(`/wallet/credentials/${id}/export`),
+    verifyVC: (credential: Record<string, unknown>) =>
+      apiFetch<{ valid: boolean; reason: string; issuer: string | null; subject_did: string | null; credential_id: string | null; valid_from: string | null }>("/wallet/verify", {
+        method: "POST",
+        body: JSON.stringify(credential),
+      }),
   },
   reviews: {
     get: (reviewId: string) => apiFetch<ReviewDetail>(`/reviews/${reviewId}`),
@@ -444,8 +661,121 @@ export const api = {
   community: {
     github: () => apiFetch<GitHubCommunityStatus>("/community/github"),
   },
+  talent: {
+    search: (params?: { domain?: string; country_code?: string; min_score?: number; skill_path_slug?: string; q?: string; limit?: number; offset?: number }) => {
+      const qs = new URLSearchParams();
+      if (params?.domain) qs.set("domain", params.domain);
+      if (params?.country_code) qs.set("country_code", params.country_code);
+      if (params?.min_score != null) qs.set("min_score", String(params.min_score));
+      if (params?.skill_path_slug) qs.set("skill_path_slug", params.skill_path_slug);
+      if (params?.q) qs.set("q", params.q);
+      if (params?.limit != null) qs.set("limit", String(params.limit));
+      if (params?.offset != null) qs.set("offset", String(params.offset));
+      const query = qs.toString() ? `?${qs}` : "";
+      return apiFetch<{ total: number; limit: number; offset: number; items: TalentProfile[] }>(`/talent/search${query}`);
+    },
+  },
+  leaderboard: {
+    get: (params?: { domain?: string; skill_path_slug?: string; limit?: number; offset?: number }) => {
+      const qs = new URLSearchParams();
+      if (params?.domain) qs.set("domain", params.domain);
+      if (params?.skill_path_slug) qs.set("skill_path_slug", params.skill_path_slug);
+      if (params?.limit != null) qs.set("limit", String(params.limit));
+      if (params?.offset != null) qs.set("offset", String(params.offset));
+      const query = qs.toString() ? `?${qs}` : "";
+      return apiFetch<{ total: number; limit: number; offset: number; items: LeaderboardItem[] }>(`/leaderboard${query}`);
+    },
+  },
   admin: {
     queue: () => apiFetch<AdminQueueItem[]>("/admin/queue"),
     calibrationLatest: () => apiFetch<CalibrationLatestItem[]>("/admin/calibration/latest"),
+    decide: (reviewId: string, decision: "approve" | "reject", note: string) =>
+      apiFetch<{ ok: boolean; decision: string; review_id: string }>(`/admin/reviews/${reviewId}/decide`, {
+        method: "POST",
+        body: JSON.stringify({ decision, note }),
+      }),
+    analytics: () => apiFetch<AdminAnalytics>("/admin/analytics"),
+  },
+  notifications: {
+    list: (limit = 20) =>
+      apiFetch<{ unread_count: number; items: AppNotification[] }>(`/notifications/me?limit=${limit}`),
+    markRead: (id: string) =>
+      apiFetch<{ ok: boolean }>(`/notifications/${id}/read`, { method: "PATCH" }),
+    markAllRead: () =>
+      apiFetch<{ ok: boolean }>("/notifications/me/read-all", { method: "POST" }),
+  },
+  referrals: {
+    my: () => apiFetch<ReferralStatus>("/referrals/my"),
+    claim: (code: string) =>
+      apiFetch<{ ok: boolean; already_claimed: boolean; referrer_name: string | null }>(
+        "/referrals/claim",
+        { method: "POST", body: JSON.stringify({ code }) }
+      ),
   },
 };
+
+export interface ReferralStatus {
+  referral_code: string;
+  invite_url: string;
+  referral_count: number;
+  stamp_awarded: boolean;
+  stamp_threshold: number;
+  stamp_points: number;
+}
+
+export interface SearchResult {
+  skill_paths: { slug: string; name: string; domain: string; description: string }[];
+  users: { id: string; username: string; display_name: string; avatar_url: string | null; country_code: string | null; overall_score: number }[];
+}
+
+export interface AdminAnalytics {
+  submissions_by_day: { date: string; total: number; passed: number }[];
+  pass_rate_by_path: { slug: string; name: string; total: number; passed: number; pass_rate: number }[];
+  top_countries: { country_code: string; submission_count: number; user_count: number }[];
+  totals: { submissions_30d: number; credentials_30d: number; active_users_30d: number; queue_depth: number };
+}
+
+export interface PublicSubmissionItem {
+  id: string;
+  status: string;
+  submitted_at: string;
+  reviewed_at: string | null;
+  attempt_number: number;
+  level: number;
+  task_type: string;
+  skill_path_name: string;
+  skill_path_slug: string;
+  domain: string;
+  score: number | null;
+  credential_id: string | null;
+}
+
+export interface PublicSubmissionHistory {
+  user_id: string;
+  total: number;
+  items: PublicSubmissionItem[];
+}
+
+export interface VouchItem {
+  id: string;
+  voucher_name: string;
+  voucher_trust_score: number;
+  created_at: string;
+}
+
+export interface VouchList {
+  user_id: string;
+  vouch_count: number;
+  vouches: VouchItem[];
+}
+
+export interface AppNotification {
+  id: string;
+  type: "credential_earned" | "human_review_done" | "vouch_received";
+  title: string;
+  body: string | null;
+  href: string | null;
+  is_read: boolean;
+  created_at: string;
+  metadata: Record<string, string> | null;
+}

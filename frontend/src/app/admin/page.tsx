@@ -20,6 +20,7 @@ import {
   Loader2,
   MessageSquare,
   ShieldAlert,
+  TrendingUp,
 } from "lucide-react";
 
 export default function AdminHomePage() {
@@ -82,9 +83,14 @@ export default function AdminHomePage() {
               Triage human review, appeals, and scoring health from one place.
             </p>
           </div>
-          <Link href="/admin/queue" className={cn(buttonVariants({ size: "sm" }), "gap-1.5 shrink-0")}>
-            Open queue <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link href="/admin/analytics" className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-1.5")}>
+              <TrendingUp className="h-3.5 w-3.5" /> Analytics
+            </Link>
+            <Link href="/admin/queue" className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}>
+              Open queue <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         </div>
 
         {queueError ? (

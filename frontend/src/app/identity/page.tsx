@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import {
   ShieldCheck, GitBranch, CheckCircle, XCircle, Loader2,
-  AlertCircle, ExternalLink, Clock, Zap, Mail, Phone,
+  AlertCircle, ExternalLink, Clock, Zap, Mail, Phone, AtSign,
 } from "lucide-react";
 
 /* ── Stamp card definitions ─────────────────────────────────────────────── */
@@ -80,13 +80,15 @@ const STAMPS: StampDef[] = [
 
 export default function IdentityPage() {
   const router = useRouter();
-  const { session, loading } = useAuth();
+  const { session, profile, loading, refreshProfile } = useAuth();
   const qc = useQueryClient();
 
   const [githubInput, setGithubInput] = useState("");
   const [gitcoinInput, setGitcoinInput] = useState("");
   const [githubMsg, setGithubMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [gitcoinMsg, setGitcoinMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [usernameInput, setUsernameInput] = useState("");
+  const [usernameMsg, setUsernameMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
     if (!loading && !session) router.replace("/login");
@@ -141,6 +143,16 @@ export default function IdentityPage() {
       qc.invalidateQueries({ queryKey: ["my-stamps"] });
     },
     onError: (e: Error) => setGitcoinMsg({ ok: false, text: e.message }),
+  });
+
+  const usernameMutation = useMutation({
+    mutationFn: () => api.users.setUsername(usernameInput.trim().toLowerCase()),
+    onSuccess: async (data) => {
+      setUsernameMsg({ ok: true, text: `Username set! Your proof page is now live at /u/${data.username}` });
+      setUsernameInput("");
+      await refreshProfile();
+    },
+    onError: (e: Error) => setUsernameMsg({ ok: false, text: e.message }),
   });
 
   if (loading || !session) {
@@ -216,6 +228,67 @@ export default function IdentityPage() {
               );
             })}
           </div>
+        )}
+      </div>
+
+      {/* ── Username / Proof page ──────────────────────────────────────── */}
+      <div className="rounded-2xl border bg-card p-5 mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+            <AtSign className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-base">Public proof page</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Set a username to get your shareable proof page at <span className="font-mono">/u/your-username</span>
+            </p>
+          </div>
+        </div>
+
+        {profile?.username ? (
+          <div className="mb-3 rounded-xl bg-success-bg border border-success/20 px-4 py-3 text-sm text-success font-medium flex items-center gap-2">
+            <CheckCircle className="h-4 w-4" />
+            Your proof page:{" "}
+            <a
+              href={`/u/${profile.username}`}
+              className="underline underline-offset-2 hover:text-success/80"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              /u/{profile.username}
+            </a>
+          </div>
+        ) : null}
+
+        <div className="flex gap-2">
+          <div className="flex-1 relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm select-none">@</span>
+            <input
+              className="input-base w-full pl-7 text-sm font-mono"
+              placeholder={profile?.username ?? "your-username"}
+              value={usernameInput}
+              onChange={(e) => { setUsernameInput(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "")); setUsernameMsg(null); }}
+              disabled={usernameMutation.isPending}
+              maxLength={20}
+              aria-label="Username"
+            />
+          </div>
+          <Button
+            type="button"
+            disabled={!usernameInput.trim() || usernameInput.trim().length < 3 || usernameMutation.isPending}
+            onClick={() => usernameMutation.mutate()}
+            variant={profile?.username ? "outline" : "default"}
+          >
+            {usernameMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : profile?.username ? "Change" : "Set username"}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mt-2">3–20 characters, lowercase letters, numbers, and underscores only.</p>
+
+        {usernameMsg && (
+          <p className={cn("text-xs flex items-start gap-1.5 mt-2", usernameMsg.ok ? "text-success" : "text-destructive")}>
+            {usernameMsg.ok ? <CheckCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" /> : <XCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />}
+            {usernameMsg.text}
+          </p>
         )}
       </div>
 

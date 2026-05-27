@@ -8,7 +8,6 @@ import { api, type LearnPathResponse, type WeekPlan, type MilestoneAssessment, t
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -184,7 +183,7 @@ function WeekCard({
   );
 }
 
-function MilestonesBar({ milestones, totalWeeks }: { milestones: MilestoneAssessment[]; totalWeeks: number }) {
+function MilestonesBar({ milestones }: { milestones: MilestoneAssessment[]; totalWeeks: number }) {
   return (
     <div className="space-y-3">
       {milestones.map((m) => (
@@ -209,13 +208,13 @@ function MilestonesBar({ milestones, totalWeeks }: { milestones: MilestoneAssess
 
 // ── Setup form shown before generating the path ────────────────────────────
 function SetupForm({
-  slug,
   score,
+  focus,
   onGenerate,
   isPending,
 }: {
-  slug: string;
   score: number;
+  focus: string;
   onGenerate: (hours: number) => void;
   isPending: boolean;
 }) {
@@ -239,6 +238,18 @@ function SetupForm({
           <strong>{durationLabel()}</strong> path. How many hours can you commit per week?
         </p>
       </div>
+
+      {focus && (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-left">
+          <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-1">
+            Targeting your weakest area
+          </p>
+          <p className="text-sm font-semibold text-foreground">{focus}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Claude will weight resources and practice tasks toward this dimension.
+          </p>
+        </div>
+      )}
 
       <div className="bg-white border rounded-xl p-6 space-y-4">
         <div className="flex justify-between items-center text-sm mb-1">
@@ -375,7 +386,7 @@ function PathView({ data }: { data: LearnPathResponse }) {
           Take the assessment when you feel confident. Your score and any earned credential are
           stored permanently on Maxx Engage.
         </p>
-        <Link href={`/assess?path=${data.skill_path_slug}`} className={cn(buttonVariants({ size: "lg" }), "mt-2")}>
+        <Link href={`/assess/${data.skill_path_slug}`} className={cn(buttonVariants({ size: "lg" }), "mt-2")}>
           Take the assessment <ArrowRight className="ml-2 h-4 w-4" />
         </Link>
       </div>
@@ -387,6 +398,7 @@ function PathView({ data }: { data: LearnPathResponse }) {
 function LearnPageContent({ slug }: { slug: string }) {
   const params = useSearchParams();
   const score = parseFloat(params.get("score") ?? "0");
+  const focus = params.get("focus") ?? "";
 
   const [generated, setGenerated] = useState<LearnPathResponse | null>(null);
 
@@ -396,6 +408,7 @@ function LearnPageContent({ slug }: { slug: string }) {
         skill_path_slug: slug,
         diagnostic_score: score,
         available_hours_per_week: hours,
+        weak_dimensions: focus ? [focus] : undefined,
       }),
     onSuccess: (data) => setGenerated(data),
   });
@@ -409,7 +422,7 @@ function LearnPageContent({ slug }: { slug: string }) {
           </Link>
           <Separator orientation="vertical" className="h-5" />
           <Link
-            href="/assess"
+            href={`/assess/${slug}`}
             className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back to assessment
@@ -428,7 +441,7 @@ function LearnPageContent({ slug }: { slug: string }) {
       {generated ? (
         <PathView data={generated} />
       ) : (
-        <SetupForm slug={slug} score={score} onGenerate={mutate} isPending={isPending} />
+        <SetupForm score={score} focus={focus} onGenerate={mutate} isPending={isPending} />
       )}
     </div>
   );

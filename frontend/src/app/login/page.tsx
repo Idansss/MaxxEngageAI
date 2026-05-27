@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -13,6 +13,11 @@ function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") ?? "/onboarding";
+  const refCode = params.get("ref");
+
+  useEffect(() => {
+    if (refCode) localStorage.setItem("pending_ref_code", refCode);
+  }, [refCode]);
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);

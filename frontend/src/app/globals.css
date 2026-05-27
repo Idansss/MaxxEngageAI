@@ -197,6 +197,9 @@
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     backdrop-filter: blur(20px) saturate(180%);
   }
+  .dark .glass-nav {
+    background: oklch(0.13 0.03 264 / 0.92);
+  }
 
   /* Card with glow on hover */
   .card-hover {

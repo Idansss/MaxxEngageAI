@@ -11,7 +11,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
-  CheckCircle, XCircle, Award, ArrowRight, RotateCcw,
+  CheckCircle, XCircle, Award, ArrowRight,
   User, MessageSquare, Loader2, ChevronDown, ChevronUp,
   ThumbsUp, AlertCircle, BookOpen, Quote,
 } from "lucide-react";
@@ -137,6 +137,7 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
   const passed = params.get("passed") === "true";
   const credentialId = params.get("credential") ?? "";
   const submissionId = params.get("submission") ?? "";
+  const pathSlug = params.get("path") ?? "";
   const { session, profile } = useAuth();
 
   const [appealReason, setAppealReason] = useState("");
@@ -155,6 +156,16 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
   });
 
   const scoreColorClass = score >= 70 ? "text-success" : score >= 50 ? "text-gold" : "text-destructive";
+
+  const weakestDim = review && review.scores.length > 0
+    ? review.scores.reduce((min, d) => {
+        const ratio = d.max_score > 0 ? d.score / d.max_score : 0;
+        const minRatio = min.max_score > 0 ? min.score / min.max_score : 0;
+        return ratio < minRatio ? d : min;
+      }, review.scores[0])
+    : null;
+
+  const skillSlug = review?.skill_path_slug ?? pathSlug;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
@@ -337,31 +348,45 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
                 <Link
-                  href={`/assess?path=${review?.skill_path_slug ?? "web-dev-frontend"}&level=${(review?.level ?? 1) + 1}`}
+                  href={`/assess/${skillSlug}?level=${(review?.level ?? 1) + 1}`}
                   className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}
                 >
                   Attempt Level {(review?.level ?? 1) + 1} <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
-                <Link href="/" className={cn(buttonVariants({ size: "sm", variant: "outline" }))}>
+                <Link href="/assess" className={cn(buttonVariants({ size: "sm", variant: "outline" }))}>
                   Explore other paths
                 </Link>
               </div>
             </>
           ) : (
             <>
+              {/* Weakest dimension callout */}
+              {weakestDim && (
+                <div className="rounded-xl border border-primary/15 bg-primary/5 p-4">
+                  <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-1">
+                    Focus area
+                  </p>
+                  <p className="text-sm font-semibold text-foreground mb-1">
+                    {weakestDim.dimension} — {weakestDim.score}/{weakestDim.max_score}pts
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
+                    {weakestDim.rationale}
+                  </p>
+                </div>
+              )}
               <p className="text-sm text-muted-foreground leading-relaxed">
-                A score of {score.toFixed(1)} means there&apos;s room to grow. Get a personalised
-                learning path and come back stronger.
+                A score of {score.toFixed(1)} means there&apos;s room to grow. Review the feedback,
+                improve the weak areas, and try the assessment again.
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
                 <Link
-                  href={`/learn/${review?.skill_path_slug ?? "web-dev-frontend"}?score=${score}`}
+                  href={`/assess/${skillSlug}`}
                   className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}
                 >
-                  Get learning path <ArrowRight className="h-3.5 w-3.5" />
+                  Retake assessment <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
-                <Link href="/assess" className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-1.5")}>
-                  <RotateCcw className="h-3.5 w-3.5" /> Try again
+                <Link href="/assess" className={cn(buttonVariants({ size: "sm", variant: "outline" }))}>
+                  Explore other assessments
                 </Link>
               </div>
             </>

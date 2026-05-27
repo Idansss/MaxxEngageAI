@@ -1,8 +1,59 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Award, CheckCircle, ExternalLink, ShieldCheck } from "lucide-react";
+import { Award, CheckCircle, Download, ExternalLink, ShieldCheck } from "lucide-react";
+import { ShareCard } from "@/components/share-card";
+
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+async function fetchCredential(id: string): Promise<Record<string, unknown> | null> {
+  try {
+    const res = await fetch(`${API}/credentials/${id}`, { cache: "no-store" });
+    return res.ok ? res.json() : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const credential = await fetchCredential(id);
+  const cs = credential?.credentialSubject as Record<string, unknown> | undefined;
+
+  const skillPath = (cs?.skillPath as string | undefined) ?? "Skill Assessment";
+  const level = (cs?.levelLabel as string | undefined) ?? "Level 1";
+  const score = typeof cs?.score === "number" ? Math.round(cs.score) : null;
+  const holder = (cs?.holderName as string | undefined) ?? null;
+
+  const title = `${skillPath} · ${level}`;
+  const description = [
+    holder ? `Earned by ${holder}.` : null,
+    score !== null ? `Score: ${score}/100.` : null,
+    `Verified ${skillPath} credential issued by Maxx Engage as a W3C Verifiable Credential.`,
+  ].filter(Boolean).join(" ");
+
+  const ogImage = `/og/credential/${id}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `/credentials/${id}`,
+      type: "article",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function CredentialPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -11,10 +62,7 @@ export default async function CredentialPage({ params }: { params: Promise<{ id:
   let error: string | null = null;
 
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/credentials/${id}`,
-      { cache: "no-store" }
-    );
+    const res = await fetch(`${API}/credentials/${id}`, { cache: "no-store" });
     if (res.ok) {
       credential = await res.json();
     } else if (res.status === 404) {
@@ -25,6 +73,17 @@ export default async function CredentialPage({ params }: { params: Promise<{ id:
   } catch {
     error = "Could not reach the Maxx Engage server.";
   }
+
+  // Build share data from the VC credentialSubject (best-effort)
+  const cs = credential?.credentialSubject as Record<string, unknown> | undefined;
+  const shareData = credential ? {
+    credentialId: id,
+    skillPathName: (cs?.skillPath as string | undefined) ?? "Skill Assessment",
+    levelLabel:   (cs?.levelLabel as string | undefined) ?? "Level 1",
+    domain:       "technology" as const,
+    score:        typeof cs?.score === "number" ? cs.score : 0,
+    verifiedByHuman: cs?.verifiedByHuman === true,
+  } : null;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
@@ -54,10 +113,26 @@ export default async function CredentialPage({ params }: { params: Promise<{ id:
                 This credential was issued by Maxx Engage and is publicly verifiable by anyone.
               </p>
             </div>
+            {shareData && (
+              <div className="flex justify-center pt-2">
+                <ShareCard data={shareData} />
+              </div>
+            )}
+
+            {/* Download certificate */}
+            <div className="flex justify-center pt-1">
+              <Link
+                href={`/credentials/${id}/print`}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <Download className="h-4 w-4" />
+                Download Certificate (PDF)
+              </Link>
+            </div>
           </div>
 
           {/* Verified status */}
-          <Card className="mb-4 ring-1 ring-(--success)/30 overflow-hidden">
+          <Card className="mb-4 ring-1 ring-success/30 overflow-hidden">
             <div className="h-1 bg-success" />
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
