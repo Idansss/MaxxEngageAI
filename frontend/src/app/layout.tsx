@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/lib/providers";
 import { Navbar } from "@/components/navbar";
+import { Sidebar } from "@/components/sidebar";
 import { ServiceWorkerRegistrar } from "@/components/sw-register";
 
 const jakartaSans = Plus_Jakarta_Sans({
@@ -58,10 +59,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {/* Runs before React hydrates — prevents flash of wrong theme */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(t==null&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})();` }} />
       </head>
-      <body className="min-h-full flex flex-col antialiased pb-14 sm:pb-0">
+      <body className="min-h-full antialiased pb-14 sm:pb-0">
         <Providers>
-          <Navbar />
-          {children}
+          <Sidebar />
+          <div className="sm:pl-56">
+            <Navbar />
+            {children}
+          </div>
         </Providers>
         <ServiceWorkerRegistrar />
       </body>

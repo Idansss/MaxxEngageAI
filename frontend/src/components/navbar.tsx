@@ -52,7 +52,7 @@ export function Navbar() {
     <>
     <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     <BottomTabBar />
-    <header className="glass-nav sticky top-0 z-40 border-b border-border/60 shadow-sm shadow-border/30">
+    <header className="glass-nav sticky top-0 z-40 border-b border-border/60 shadow-sm shadow-border/30 sm:hidden">
       <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-2">
 
         {/* Logo */}
