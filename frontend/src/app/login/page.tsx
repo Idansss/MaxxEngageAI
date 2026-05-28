@@ -6,13 +6,13 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Loader2, Mail, CheckCircle, ArrowRight, Award, Zap, ShieldCheck } from "lucide-react";
+import { Loader2, Mail, CheckCircle, ArrowRight, Zap, Award, ShieldCheck } from "lucide-react";
 
 function LoginForm() {
   const { signInWithEmail, session } = useAuth();
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") ?? "/onboarding";
+  const next = params.get("next") ?? "/dashboard";
   const refCode = params.get("ref");
 
   useEffect(() => {
@@ -41,12 +41,12 @@ function LoginForm() {
 
   if (sent) {
     return (
-      <div className="flex flex-col items-center text-center gap-5 py-6">
-        <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
-          <CheckCircle className="h-8 w-8 text-success" />
+      <div className="flex flex-col items-center text-center gap-6 py-4">
+        <div className="w-14 h-14 rounded-2xl bg-foreground/5 border border-border flex items-center justify-center">
+          <CheckCircle className="h-7 w-7 text-foreground" />
         </div>
         <div>
-          <h2 className="text-xl font-bold mb-2">Check your email</h2>
+          <h2 className="text-xl font-bold mb-2">Check your inbox</h2>
           <p className="text-muted-foreground text-sm max-w-xs leading-relaxed">
             We sent a magic link to{" "}
             <strong className="text-foreground">{email}</strong>.
@@ -65,7 +65,7 @@ function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="email" className="block text-sm font-semibold mb-2">
           Email address
@@ -79,6 +79,7 @@ function LoginForm() {
           placeholder="you@example.com"
           disabled={loading}
           className="input-base"
+          autoComplete="email"
         />
       </div>
 
@@ -91,53 +92,56 @@ function LoginForm() {
 
       <Button type="submit" disabled={loading} className="w-full h-11 text-base font-semibold gap-2">
         {loading ? (
-          <><Loader2 className="h-4 w-4 animate-spin" /> Sending link…</>
+          <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</>
         ) : (
           <><Mail className="h-4 w-4" /> Send magic link</>
         )}
       </Button>
 
-      <p className="text-xs text-muted-foreground text-center leading-relaxed">
-        No password needed. We&apos;ll email you a one-click sign-in link.
+      <p className="text-xs text-muted-foreground text-center leading-relaxed pt-1">
+        No password. We&apos;ll email you a one-click sign-in link.
       </p>
     </form>
   );
 }
 
+const FEATURES = [
+  { icon: <Zap className="h-4 w-4" />,        text: "AI-graded in minutes, not weeks" },
+  { icon: <Award className="h-4 w-4" />,       text: "W3C Verifiable Credentials you truly own" },
+  { icon: <ShieldCheck className="h-4 w-4" />, text: "Tamper-proof and shareable anywhere" },
+];
+
 export default function LoginPage() {
   return (
-    <div className="flex-1 flex flex-col lg:flex-row min-h-0">
+    <div className="flex-1 flex flex-col lg:flex-row min-h-screen">
 
-      {/* Left: Brand panel */}
-      <div className="hidden lg:flex lg:w-[45%] hero-bg dot-grid relative overflow-hidden flex-col justify-center p-14">
-        {/* Orbs */}
-        <div className="orb w-80 h-80 top-[-10%] left-[-5%] bg-indigo-600/25" />
-        <div className="orb w-64 h-64 bottom-[-8%] right-[-5%] bg-violet-500/20" />
-        <div className="orb w-48 h-48 top-[50%] left-[60%] bg-amber-500/15" />
+      {/* ── Left: brand panel ──────────────────────────────────────────── */}
+      <div className="hidden lg:flex lg:w-[48%] bg-foreground relative overflow-hidden flex-col justify-between p-12 xl:p-16">
+        {/* Subtle orb */}
+        <div className="orb w-[500px] h-[500px] top-[-15%] right-[-15%] bg-white/4" />
 
-        <div className="relative z-10">
-          <Link href="/" className="font-extrabold text-2xl text-white tracking-tight block mb-12">
-            Maxx<span className="bg-linear-to-r from-indigo-300 via-violet-300 to-amber-300 bg-clip-text text-transparent">Engage</span>
-          </Link>
+        {/* Top: logo */}
+        <Link href="/" className="relative z-10 flex items-center gap-1 font-extrabold text-xl tracking-tight">
+          <span className="text-background">Maxx</span>
+          <span className="text-background/60">Engage</span>
+        </Link>
 
-          <h2 className="text-4xl font-extrabold text-white leading-tight mb-5">
-            Your skills deserve{" "}
-            <span className="bg-linear-to-r from-amber-300 to-amber-200 bg-clip-text text-transparent">
-              real proof.
-            </span>
-          </h2>
-          <p className="text-indigo-200/70 text-base leading-relaxed mb-12 max-w-sm">
-            Sign in to access your verified credentials — credentials that belong to you, not to us.
-          </p>
+        {/* Middle: headline + features */}
+        <div className="relative z-10 space-y-8">
+          <div>
+            <h2 className="text-4xl xl:text-5xl font-extrabold text-background leading-[1.1] mb-4 tracking-tight">
+              Your skills deserve<br />
+              <span className="text-background/60">real proof.</span>
+            </h2>
+            <p className="text-background/45 text-base leading-relaxed max-w-xs">
+              Sign in to access verified credentials that belong to you — not a platform.
+            </p>
+          </div>
 
-          <ul className="space-y-4">
-            {[
-              { icon: <Zap className="h-4 w-4" />, text: "AI-graded in minutes, not weeks" },
-              { icon: <Award className="h-4 w-4" />, text: "W3C Verifiable Credentials you truly own" },
-              { icon: <ShieldCheck className="h-4 w-4" />, text: "Tamper-proof and shareable anywhere" },
-            ].map((f) => (
-              <li key={f.text} className="flex items-center gap-3 text-sm text-indigo-200/80">
-                <div className="w-7 h-7 rounded-lg bg-white/8 flex items-center justify-center text-amber-300 shrink-0">
+          <ul className="space-y-3.5">
+            {FEATURES.map((f) => (
+              <li key={f.text} className="flex items-center gap-3 text-sm text-background/60">
+                <div className="w-8 h-8 rounded-xl bg-background/8 flex items-center justify-center text-background/70 shrink-0">
                   {f.icon}
                 </div>
                 {f.text}
@@ -145,34 +149,49 @@ export default function LoginPage() {
             ))}
           </ul>
         </div>
+
+        {/* Bottom: tagline */}
+        <p className="relative z-10 text-xs text-background/25 tracking-wide uppercase">
+          Engine 1 of Civilization OS
+        </p>
       </div>
 
-      {/* Right: Form panel */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
-        <div className="w-full max-w-sm">
+      {/* ── Right: form panel ──────────────────────────────────────────── */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-10 bg-background">
+        <div className="w-full max-w-[360px]">
+
           {/* Mobile logo */}
-          <div className="lg:hidden mb-10 text-center">
-            <Link href="/" className="font-extrabold text-2xl inline-flex items-center gap-0.5">
-              <span>Maxx</span>
+          <div className="lg:hidden mb-10">
+            <Link href="/" className="font-extrabold text-xl flex items-center gap-0.5">
+              <span className="text-foreground">Maxx</span>
               <span className="text-gradient">Engage</span>
             </Link>
           </div>
 
+          {/* Heading */}
           <div className="mb-8">
-            <h1 className="text-2xl font-extrabold mb-1.5">Welcome back</h1>
-            <p className="text-muted-foreground text-sm">Sign in to access your credentials and assessments.</p>
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1.5">Welcome back</h1>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Sign in to access your credentials and assessments.
+            </p>
           </div>
 
           <Suspense fallback={<Loader2 className="h-5 w-5 animate-spin mx-auto" />}>
             <LoginForm />
           </Suspense>
 
-          <p className="mt-8 text-center text-xs text-muted-foreground">
-            New here?{" "}
-            <Link href="/assess" className="text-primary font-medium hover:underline underline-offset-2 inline-flex items-center gap-0.5">
-              Take a free assessment <ArrowRight className="h-3 w-3" />
-            </Link>
-          </p>
+          {/* Footer link */}
+          <div className="mt-8 pt-6 border-t border-border/60 text-center">
+            <p className="text-xs text-muted-foreground">
+              New here?{" "}
+              <Link
+                href="/assess"
+                className="text-foreground font-semibold hover:underline underline-offset-2 inline-flex items-center gap-0.5"
+              >
+                Take a free assessment <ArrowRight className="h-3 w-3" />
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
