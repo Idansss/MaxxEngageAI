@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, ShieldCheck, Zap, CheckCircle2, Globe, Users, Lock, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 

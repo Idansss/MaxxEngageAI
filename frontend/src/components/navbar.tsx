@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -57,15 +56,12 @@ export function Navbar() {
       <nav className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-2">
 
         {/* Logo */}
-        <Link href="/" className="shrink-0 flex items-center mr-1">
-          <Image
-            src="/logo.png"
-            alt="Maxx Engage"
-            width={40}
-            height={40}
-            className="rounded-lg"
-            style={{ filter: "invert(1)", mixBlendMode: "multiply" }}
-          />
+        <Link
+          href="/"
+          className="font-extrabold text-base tracking-tight shrink-0 flex items-center gap-1 mr-1"
+        >
+          <span className="text-foreground">Maxx</span>
+          <span className="text-gradient">Engage</span>
         </Link>
 
         {/* Global search */}

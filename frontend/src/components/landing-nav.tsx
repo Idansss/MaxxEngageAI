@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useAuth } from "@/lib/auth-context";
 import { ArrowRight } from "lucide-react";
 
@@ -23,17 +22,10 @@ export function LandingNav() {
             "0 4px 28px rgba(99, 102, 241, 0.10), 0 1px 6px rgba(0,0,0,0.06)",
         }}
       >
-        {/* Logo */}
-        <Link href="/" className="flex items-center shrink-0 mr-1">
-          <Image
-            src="/logo.png"
-            alt="Maxx Engage"
-            width={34}
-            height={34}
-            className="rounded-lg"
-            style={{ filter: "invert(1)", mixBlendMode: "multiply" }}
-            priority
-          />
+        {/* Wordmark */}
+        <Link href="/" className="flex items-center shrink-0 px-3 font-extrabold text-base tracking-tight">
+          <span className="text-gray-800">Maxx</span>
+          <span className="text-gradient">Engage</span>
         </Link>
 
         {/* Divider */}
