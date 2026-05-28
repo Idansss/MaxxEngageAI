@@ -8,7 +8,6 @@ import {
   Globe, Lock, ShieldCheck, Wifi, Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import AuthRedirect from "@/components/auth-redirect";
 
 export const dynamic = "force-dynamic";
 
@@ -98,7 +97,6 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <AuthRedirect />
       <main className="flex-1">
 
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
