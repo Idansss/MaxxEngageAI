@@ -3,15 +3,20 @@ import { supabase } from "./supabase";
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  let token: string | undefined;
-  if (typeof window !== "undefined") {
+  async function freshToken(): Promise<string | undefined> {
     const { data } = await supabase.auth.getSession();
-    token = data.session?.access_token;
+    if (!data.session) return undefined;
+    const now = Math.floor(Date.now() / 1000);
+    // If token expires within 5 minutes, proactively refresh
+    if ((data.session.expires_at ?? 0) - now < 300) {
+      const { data: refreshed } = await supabase.auth.refreshSession();
+      return refreshed.session?.access_token;
+    }
+    return data.session.access_token;
   }
 
-  let res: Response;
-  try {
-    res = await fetch(`${BASE}${path}`, {
+  async function doFetch(token?: string) {
+    return fetch(`${BASE}${path}`, {
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -19,11 +24,32 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
       },
       ...init,
     });
+  }
+
+  let token = typeof window !== "undefined" ? await freshToken() : undefined;
+
+  let res: Response;
+  try {
+    res = await doFetch(token);
   } catch {
     throw new Error(
       "Cannot reach the Maxx Engage server. If you are the site owner, make sure CORS_ORIGINS includes this domain in your backend environment variables."
     );
   }
+
+  // On 401, force-refresh the token and retry once
+  if (res.status === 401 && typeof window !== "undefined") {
+    const { data } = await supabase.auth.refreshSession();
+    token = data.session?.access_token;
+    try {
+      res = await doFetch(token);
+    } catch {
+      throw new Error(
+        "Cannot reach the Maxx Engage server. If you are the site owner, make sure CORS_ORIGINS includes this domain in your backend environment variables."
+      );
+    }
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
     const detail = err.detail;
