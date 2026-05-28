@@ -261,10 +261,10 @@ export default function IdentityPage() {
         ) : null}
 
         <div className="flex gap-2">
-          <div className="flex-1 relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm select-none">@</span>
+          <div className="flex-1 flex items-center input-base gap-1 p-0 overflow-hidden">
+            <span className="pl-3 text-muted-foreground text-sm select-none shrink-0">@</span>
             <input
-              className="input-base w-full pl-7 text-sm font-mono"
+              className="flex-1 bg-transparent outline-none py-2 pr-3 text-sm font-mono placeholder:text-muted-foreground"
               placeholder={profile?.username ?? "your-username"}
               value={usernameInput}
               onChange={(e) => { setUsernameInput(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "")); setUsernameMsg(null); }}
