@@ -170,7 +170,7 @@ function ResultsContent({ reviewId }: { reviewId: string }) {
   const skillSlug = review?.skill_path_slug ?? pathSlug;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
+    <div className="max-w-2xl px-6 py-10 space-y-6">
 
       {/* Result hero card */}
       <Card className={cn("overflow-hidden", passed ? "ring-1 ring-success/30" : "ring-1 ring-destructive/20")}>

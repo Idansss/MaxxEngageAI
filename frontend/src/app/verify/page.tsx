@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// ── Types ───────────────────────────────────────────────────────────────────
+// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface SigResult {
   valid: boolean;
@@ -37,7 +37,7 @@ type JsonVerifyState =
   | { kind: "result"; sig: SigResult }
   | { kind: "error"; message: string };
 
-// ── Parsers ─────────────────────────────────────────────────────────────────
+// â”€â”€ Parsers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const CRED_RE = /cred_[A-Za-z0-9_-]{10,32}/;
 const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
@@ -68,7 +68,7 @@ function parseInput(raw: string): { kind: "credential_id"; id: string } | { kind
   return null;
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function scoreColor(score: number) {
   if (score >= 85) return "text-success";
@@ -102,7 +102,7 @@ function domainColor(domain: string) {
   return map[domain] ?? "bg-muted text-muted-foreground";
 }
 
-// ── Signature status badge ──────────────────────────────────────────────────
+// â”€â”€ Signature status badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function SigBadge({ sig }: { sig: SigResult | null }) {
   if (!sig) return null;
@@ -129,7 +129,7 @@ function SigBadge({ sig }: { sig: SigResult | null }) {
   );
 }
 
-// ── Credential card (verified view) ────────────────────────────────────────
+// â”€â”€ Credential card (verified view) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function VerifiedCredentialCard({ cred, user, sig }: {
   cred: VerifyCredential;
@@ -232,14 +232,14 @@ function VerifiedCredentialCard({ cred, user, sig }: {
           <Link href="/" className="text-primary font-medium hover:underline underline-offset-2">
             Maxx Engage
           </Link>{" "}
-          · AI-graded against a transparent rubric
+          Â· AI-graded against a transparent rubric
         </div>
       </CardContent>
     </Card>
   );
 }
 
-// ── Small credential row (for user-level verify) ────────────────────────────
+// â”€â”€ Small credential row (for user-level verify) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function CredentialRow({ cred }: { cred: VerifyCredential }) {
   const earnedOn = cred.issued_at
@@ -252,7 +252,7 @@ function CredentialRow({ cred }: { cred: VerifyCredential }) {
       <div className={cn("h-1.5 w-1.5 rounded-full shrink-0 mt-0.5", domainStripe(cred.domain))} />
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm truncate">{cred.skill_name || cred.skill_path_name}</p>
-        <p className="text-xs text-muted-foreground">{cred.level_label} · Earned {earnedOn}</p>
+        <p className="text-xs text-muted-foreground">{cred.level_label} Â· Earned {earnedOn}</p>
       </div>
       <span className={cn("font-black text-lg shrink-0", scoreColor(cred.score))}>
         {Math.round(cred.score)}
@@ -267,7 +267,7 @@ function CredentialRow({ cred }: { cred: VerifyCredential }) {
   );
 }
 
-// ── Tab: Verify by ID / URL ─────────────────────────────────────────────────
+// â”€â”€ Tab: Verify by ID / URL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function VerifyByIdTab() {
   const router = useRouter();
@@ -302,7 +302,7 @@ function VerifyByIdTab() {
             sig = { valid: result.valid, reason: result.reason, issuer: result.issuer, subject_did: result.subject_did };
           }
         } catch {
-          // ignored — sig stays null
+          // ignored â€” sig stays null
         }
 
         setState({ kind: "credential", data: cred, user, sig });
@@ -372,7 +372,7 @@ function VerifyByIdTab() {
         <div className="flex items-center justify-center py-14">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">Checking…</p>
+            <p className="text-sm text-muted-foreground">Checkingâ€¦</p>
           </div>
         </div>
       )}
@@ -441,7 +441,7 @@ function VerifyByIdTab() {
   );
 }
 
-// ── Tab: Verify by pasting VC JSON ──────────────────────────────────────────
+// â”€â”€ Tab: Verify by pasting VC JSON â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function VerifyByJsonTab() {
   const [jsonText, setJsonText] = useState("");
@@ -455,7 +455,7 @@ function VerifyByJsonTab() {
     try {
       parsed = JSON.parse(jsonText.trim());
     } catch {
-      setVerifyState({ kind: "error", message: "Invalid JSON — paste the full W3C VC JSON-LD document." });
+      setVerifyState({ kind: "error", message: "Invalid JSON â€” paste the full W3C VC JSON-LD document." });
       return;
     }
 
@@ -512,7 +512,7 @@ function VerifyByJsonTab() {
   );
 }
 
-// ── Main verify page ────────────────────────────────────────────────────────
+// â”€â”€ Main verify page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type Tab = "id" | "json";
 
@@ -522,7 +522,7 @@ function VerifyForm() {
   const [tab, setTab] = useState<Tab>(hasInitialQuery ? "id" : "id");
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-16">
+    <main className="max-w-2xl px-6 py-16">
       {/* Header */}
       <div className="text-center mb-10">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-5">

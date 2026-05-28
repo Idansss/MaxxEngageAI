@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -17,7 +17,7 @@ import {
   AlertCircle, ExternalLink, Flame, X,
 } from "lucide-react";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function domainStripe(domain: string) {
   const map: Record<string, string> = {
@@ -66,7 +66,7 @@ function statusBadge(status: string) {
   return <Badge className={cn("text-[10px] px-1.5 py-0", v.cls)}>{v.label}</Badge>;
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// â”€â”€ Sub-components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function StatCard({ accent, icon, label, value, sub }: {
   accent: string; icon: React.ReactNode; label: string; value: string; sub: string;
@@ -85,7 +85,7 @@ function StatCard({ accent, icon, label, value, sub }: {
   );
 }
 
-// ── Activity feed ─────────────────────────────────────────────────────────────
+// â”€â”€ Activity feed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type FeedItem =
   | { kind: "credential"; id: string; name: string; levelLabel: string; score: number; domain: string; date: string }
@@ -105,7 +105,7 @@ function FeedRow({ item }: { item: FeedItem }) {
               {item.domain}
             </Badge>
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">Credential earned · {fmtDate(item.date)}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Credential earned Â· {fmtDate(item.date)}</p>
         </div>
         <div className="text-right shrink-0">
           <p className={cn("text-lg font-black tabular-nums", scoreColor(item.score))}>{item.score.toFixed(0)}</p>
@@ -125,7 +125,7 @@ function FeedRow({ item }: { item: FeedItem }) {
           <p className="text-sm font-medium truncate">{item.name}</p>
           <span className="text-xs text-muted-foreground shrink-0">Lv {item.level}</span>
         </div>
-        <p className="text-xs text-muted-foreground mt-0.5">Submission · {fmtDate(item.date)}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">Submission Â· {fmtDate(item.date)}</p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         {item.score !== null && (
@@ -137,7 +137,7 @@ function FeedRow({ item }: { item: FeedItem }) {
   );
 }
 
-// ── Onboarding banner ─────────────────────────────────────────────────────────
+// â”€â”€ Onboarding banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const BANNER_KEY = "onboarding_banner_dismissed";
 
@@ -200,7 +200,7 @@ function OnboardingBanner({ steps }: { steps: BannerStep[] }) {
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -248,7 +248,7 @@ export default function DashboardPage() {
     );
   }
 
-  // ── Derived data ────────────────────────────────────────────────────────────
+  // â”€â”€ Derived data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const humanityScore   = humanityData?.humanity_score ?? 0;
   const humanityFull    = humanityData?.full_weight_achieved ?? false;
@@ -261,7 +261,7 @@ export default function DashboardPage() {
 
   // Current path (most recent activity)
   const activeSlug    = submItems[0]?.skill_path_slug ?? skillPaths[0]?.slug ?? "";
-  const activePathName = submItems[0]?.skill_path_name ?? skillPaths[0]?.name ?? "—";
+  const activePathName = submItems[0]?.skill_path_name ?? skillPaths[0]?.name ?? "â€”";
   const activeDomain  = submItems[0]?.domain ?? skillPaths[0]?.domain ?? "technology";
   const pathSubmissions = submItems.filter((s) => s.skill_path_slug === activeSlug);
   const bestScore     = pathSubmissions.reduce<number | null>(
@@ -301,7 +301,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-10">
+    <main className="max-w-5xl px-6 py-10">
 
       {/* Welcome */}
       <div className="mb-8">
@@ -351,28 +351,28 @@ export default function DashboardPage() {
           accent="stat-accent-indigo"
           icon={<Award className="h-4 w-4 text-primary" />}
           label="Credentials"
-          value={credsLoading ? "…" : String(credentials.length)}
+          value={credsLoading ? "â€¦" : String(credentials.length)}
           sub="earned"
         />
         <StatCard
           accent="stat-accent-green"
           icon={<CheckCircle className="h-4 w-4 text-success" />}
           label="Submissions"
-          value={subsLoading ? "…" : String(submissions?.total ?? 0)}
+          value={subsLoading ? "â€¦" : String(submissions?.total ?? 0)}
           sub="total"
         />
         <StatCard
           accent="stat-accent-amber"
           icon={<Zap className="h-4 w-4 text-gold" />}
           label="Overall score"
-          value={profile?.overall_score ? profile.overall_score.toFixed(0) : "—"}
+          value={profile?.overall_score ? profile.overall_score.toFixed(0) : "â€”"}
           sub="average"
         />
         <StatCard
           accent="stat-accent-violet"
           icon={<Flame className="h-4 w-4 text-orange-500" />}
           label="Active days"
-          value={streak > 0 ? `${streak}` : "—"}
+          value={streak > 0 ? `${streak}` : "â€”"}
           sub={streak === 1 ? "day this week" : streak > 1 ? "days this week" : "no streak yet"}
         />
       </div>
@@ -561,7 +561,7 @@ export default function DashboardPage() {
                   {profile.did}
                 </code>
                 <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                  Your W3C Decentralized Identifier — lives on your credentials forever.
+                  Your W3C Decentralized Identifier â€” lives on your credentials forever.
                 </p>
               </CardContent>
             </Card>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -41,7 +41,7 @@ const COUNTRIES = [
   { label: "Senegal", value: "SN" },
 ] as const;
 
-// ── Shortlist persistence ─────────────────────────────────────────────────────
+// â”€â”€ Shortlist persistence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface ShortlistEntry {
   user_id: string;
@@ -109,7 +109,7 @@ function useShortlist() {
   return { list, add, remove, has, clear };
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function domainColor(domain: string) {
   const map: Record<string, string> = {
@@ -158,7 +158,7 @@ function exportCsv(list: ShortlistEntry[]) {
   URL.revokeObjectURL(url);
 }
 
-// ── Avatar ────────────────────────────────────────────────────────────────────
+// â”€â”€ Avatar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function Avatar({ name, avatar_url, size = "md" }: { name: string; avatar_url: string | null; size?: "sm" | "md" }) {
   const dim = size === "sm" ? "h-8 w-8 text-xs" : "h-12 w-12 text-sm";
@@ -174,7 +174,7 @@ function Avatar({ name, avatar_url, size = "md" }: { name: string; avatar_url: s
   );
 }
 
-// ── Talent card ───────────────────────────────────────────────────────────────
+// â”€â”€ Talent card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function TalentCard({
   profile,
@@ -271,7 +271,7 @@ function TalentCard({
   );
 }
 
-// ── Shortlist panel ───────────────────────────────────────────────────────────
+// â”€â”€ Shortlist panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function ShortlistPanel({
   list,
@@ -368,7 +368,7 @@ function ShortlistPanel({
   );
 }
 
-// ── Filter bar ────────────────────────────────────────────────────────────────
+// â”€â”€ Filter bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface Filters {
   q: string;
@@ -387,7 +387,7 @@ function FilterBar({ filters, onChange }: { filters: Filters; onChange: (f: Filt
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
         <input
           type="text"
-          placeholder="Name or username…"
+          placeholder="Name or usernameâ€¦"
           value={filters.q}
           onChange={(e) => onChange({ ...filters, q: e.target.value })}
           className="text-sm border border-border rounded-lg pl-8 pr-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 w-44 transition-shadow"
@@ -438,7 +438,7 @@ function FilterBar({ filters, onChange }: { filters: Filters; onChange: (f: Filt
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type Tab = "search" | "shortlist";
 
@@ -474,7 +474,7 @@ export default function EmployersPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-10">
+    <main className="max-w-5xl px-6 py-10">
 
       {/* Hero */}
       <div className="mb-8">
@@ -521,9 +521,9 @@ export default function EmployersPage() {
             <p className="text-xs text-muted-foreground mb-5">
               {total === 0 ? "No results" : `${total} verified professional${total !== 1 ? "s" : ""}`}
               {filters.q ? ` matching "${filters.q}"` : ""}
-              {filters.domain ? ` · ${filters.domain}` : ""}
-              {filters.country ? ` · ${filters.country}` : ""}
-              {filters.minScore ? ` · score ≥ ${filters.minScore}` : ""}
+              {filters.domain ? ` Â· ${filters.domain}` : ""}
+              {filters.country ? ` Â· ${filters.country}` : ""}
+              {filters.minScore ? ` Â· score â‰¥ ${filters.minScore}` : ""}
             </p>
           )}
 

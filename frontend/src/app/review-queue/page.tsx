@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -16,10 +16,10 @@ import {
 import { cn } from "@/lib/utils";
 
 const RUBRIC_LABEL: Record<string, string> = {
-  "translate-yo-en-001": "Yoruba → English Translation",
+  "translate-yo-en-001": "Yoruba â†’ English Translation",
 };
 
-// ── Status badge ─────────────────────────────────────────────────────────────
+// â”€â”€ Status badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function StatusBadge({ status }: { status: PeerReviewQueueItem["status"] }) {
   if (status === "pending")  return <Badge variant="secondary">Pending</Badge>;
@@ -29,7 +29,7 @@ function StatusBadge({ status }: { status: PeerReviewQueueItem["status"] }) {
   return <Badge variant="outline">{status}</Badge>;
 }
 
-// ── Claimable card (queue tab) ────────────────────────────────────────────────
+// â”€â”€ Claimable card (queue tab) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function ClaimableCard({ item }: { item: PeerReviewQueueItem }) {
   const queryClient = useQueryClient();
@@ -70,7 +70,7 @@ function ClaimableCard({ item }: { item: PeerReviewQueueItem }) {
   );
 }
 
-// ── Reviewer verdict card (my claims tab) ────────────────────────────────────
+// â”€â”€ Reviewer verdict card (my claims tab) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function VerdictCard({ item }: { item: PeerReviewQueueItem }) {
   const queryClient = useQueryClient();
@@ -162,7 +162,7 @@ function VerdictCard({ item }: { item: PeerReviewQueueItem }) {
             onChange={(e) => setNotes(e.target.value)}
             placeholder={
               verdict === "reject"
-                ? "Explain why this translation should not be approved…"
+                ? "Explain why this translation should not be approvedâ€¦"
                 : "Optional: any notes for the submitter"
             }
             className="resize-none min-h-[80px] text-sm"
@@ -201,7 +201,7 @@ function VerdictCard({ item }: { item: PeerReviewQueueItem }) {
   );
 }
 
-// ── My submission status card ─────────────────────────────────────────────────
+// â”€â”€ My submission status card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function SubmissionStatusCard({ item }: { item: PeerReviewQueueItem }) {
   return (
@@ -228,8 +228,8 @@ function SubmissionStatusCard({ item }: { item: PeerReviewQueueItem }) {
         {item.status === "approved" && (
           <div className="flex items-center gap-2 text-xs text-green-800">
             <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-            Approved — your credential has been issued.{" "}
-            <Link href="/identity" className="underline underline-offset-2">View credentials →</Link>
+            Approved â€” your credential has been issued.{" "}
+            <Link href="/identity" className="underline underline-offset-2">View credentials â†’</Link>
           </div>
         )}
 
@@ -249,7 +249,7 @@ function SubmissionStatusCard({ item }: { item: PeerReviewQueueItem }) {
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type Tab = "queue" | "reviewing" | "submissions";
 
@@ -292,7 +292,7 @@ export default function ReviewQueuePage() {
 
   if (!session) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-20 text-center">
+      <div className="max-w-xl px-6 py-20 text-center">
         <p className="text-muted-foreground text-sm mb-4">Sign in to access the peer review queue.</p>
         <Link href="/login?next=/review-queue">
           <Button size="sm" className="gap-1.5">Sign in <ArrowRight className="h-3.5 w-3.5" /></Button>
@@ -313,7 +313,7 @@ export default function ReviewQueuePage() {
     subsLoading;
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-10">
+    <main className="max-w-3xl px-6 py-10">
       {/* Header */}
       <div className="mb-6">
         <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Human review</p>
@@ -402,7 +402,7 @@ export default function ReviewQueuePage() {
                   className="text-primary underline underline-offset-2"
                   onClick={() => setTab("queue")}
                 >
-                  Browse the open queue →
+                  Browse the open queue â†’
                 </button>
               </div>
             ) : (

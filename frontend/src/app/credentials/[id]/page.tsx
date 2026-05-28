@@ -86,7 +86,7 @@ export default async function CredentialPage({ params }: { params: Promise<{ id:
   } : null;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
+    <div className="max-w-2xl px-6 py-12">
       {error ? (
         <Card className="ring-1 ring-destructive/20 overflow-hidden">
           <div className="h-1 bg-destructive" />

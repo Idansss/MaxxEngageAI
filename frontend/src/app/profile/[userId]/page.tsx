@@ -288,7 +288,7 @@ export default function ProfilePage() {
 
   if (userError || !user) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-24 text-center">
+      <div className="max-w-2xl px-6 py-24 text-center">
         <p className="text-muted-foreground text-sm">Profile not found.</p>
         <Link href="/" className="text-sm text-primary font-medium hover:underline mt-2 inline-block underline-offset-2">
           Go home
@@ -302,7 +302,7 @@ export default function ProfilePage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-10">
+    <main className="max-w-4xl px-6 py-10">
 
       {/* Profile header */}
       <div className="bg-card rounded-2xl border shadow-sm p-6 mb-6 flex flex-col sm:flex-row items-start gap-5">

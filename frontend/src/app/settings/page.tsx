@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// ── Country / language data ───────────────────────────────────────────────────
+// â”€â”€ Country / language data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const COUNTRIES = [
   { label: "Nigeria",      code: "NG" }, { label: "Ghana",       code: "GH" },
@@ -23,7 +23,7 @@ const COUNTRIES = [
   { label: "Ethiopia",     code: "ET" }, { label: "Egypt",       code: "EG" },
   { label: "Tanzania",     code: "TZ" }, { label: "Rwanda",      code: "RW" },
   { label: "Uganda",       code: "UG" }, { label: "Senegal",     code: "SN" },
-  { label: "Côte d'Ivoire", code: "CI" }, { label: "Cameroon",   code: "CM" },
+  { label: "CÃ´te d'Ivoire", code: "CI" }, { label: "Cameroon",   code: "CM" },
   { label: "Mali",         code: "ML" }, { label: "Zambia",      code: "ZM" },
   { label: "Zimbabwe",     code: "ZW" }, { label: "Mozambique",  code: "MZ" },
   { label: "Angola",       code: "AO" }, { label: "Botswana",    code: "BW" },
@@ -40,7 +40,7 @@ const LANGUAGES = [
   { label: "Arabic",     code: "ar" }, { label: "Portuguese", code: "pt" },
 ];
 
-// ── Primitives ────────────────────────────────────────────────────────────────
+// â”€â”€ Primitives â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function Section({ title, danger, children }: { title: string; danger?: boolean; children: React.ReactNode }) {
   return (
@@ -121,7 +121,7 @@ function StatusBanner({ type, message }: { type: "success" | "error"; message: s
   );
 }
 
-// ── Danger zone: delete confirmation ─────────────────────────────────────────
+// â”€â”€ Danger zone: delete confirmation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function DangerZone({ onDeleted }: { email: string; onDeleted: () => void }) {
   const [open, setOpen] = useState(false);
@@ -189,7 +189,7 @@ function DangerZone({ onDeleted }: { email: string; onDeleted: () => void }) {
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -236,7 +236,7 @@ export default function SettingsPage() {
     );
   }
 
-  // ── Avatar file upload ──────────────────────────────────────────────────────
+  // â”€â”€ Avatar file upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -284,7 +284,7 @@ export default function SettingsPage() {
     }
   }
 
-  // ── Profile save ────────────────────────────────────────────────────────────
+  // â”€â”€ Profile save â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async function saveProfile() {
     setProfileSaving(true);
@@ -340,7 +340,7 @@ export default function SettingsPage() {
   const initials = displayName.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-10">
+    <main className="max-w-2xl px-6 py-10">
 
       <div className="mb-8">
         <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-1">Account</p>
@@ -352,7 +352,7 @@ export default function SettingsPage() {
 
       <div className="space-y-6">
 
-        {/* ── Profile ─────────────────────────────────────────────────────── */}
+        {/* â”€â”€ Profile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Section title="Profile">
 
           {/* Avatar */}
@@ -393,7 +393,7 @@ export default function SettingsPage() {
                 {avatarUploading
                   ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   : <Upload className="h-3.5 w-3.5" />}
-                {avatarUploading ? "Uploading…" : "Upload photo"}
+                {avatarUploading ? "Uploadingâ€¦" : "Upload photo"}
               </button>
             </div>
           </div>
@@ -410,7 +410,7 @@ export default function SettingsPage() {
 
           <Field label="Bio" hint="A short introduction shown on your public profile">
             <Textarea
-              placeholder="I build APIs and love distributed systems…"
+              placeholder="I build APIs and love distributed systemsâ€¦"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={3}
@@ -454,7 +454,7 @@ export default function SettingsPage() {
           </Button>
         </Section>
 
-        {/* ── Proof page ──────────────────────────────────────────────────── */}
+        {/* â”€â”€ Proof page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Section title="Proof page">
 
           <div className="flex items-center justify-between py-1">
@@ -465,7 +465,7 @@ export default function SettingsPage() {
                   maxx-engage.io/u/<span className="font-mono font-semibold text-foreground">{profile.username}</span>
                 </p>
               ) : (
-                <p className="text-xs text-muted-foreground mt-0.5">Not set — set one on your Identity page</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Not set â€” set one on your Identity page</p>
               )}
             </div>
             <Link
@@ -510,7 +510,7 @@ export default function SettingsPage() {
             </div>
             {visibilitySaving && (
               <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                <Loader2 className="h-3 w-3 animate-spin" /> Saving…
+                <Loader2 className="h-3 w-3 animate-spin" /> Savingâ€¦
               </p>
             )}
             {visibilityStatus && !visibilitySaving && (
@@ -519,7 +519,7 @@ export default function SettingsPage() {
           </div>
         </Section>
 
-        {/* ── Account ─────────────────────────────────────────────────────── */}
+        {/* â”€â”€ Account â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Section title="Account">
           <div className="space-y-3">
             <Field label="Email">
@@ -548,7 +548,7 @@ export default function SettingsPage() {
                 <p className="text-xs text-muted-foreground">Composite across all credentials</p>
               </div>
               <Badge variant="secondary" className="text-base font-black px-3 py-1">
-                {profile?.overall_score != null ? profile.overall_score.toFixed(0) : "—"}
+                {profile?.overall_score != null ? profile.overall_score.toFixed(0) : "â€”"}
               </Badge>
             </div>
 
@@ -572,8 +572,8 @@ export default function SettingsPage() {
           </div>
         </Section>
 
-        {/* ── Referral ─────────────────────────────────────────────────────── */}
-        {/* ── Danger zone ──────────────────────────────────────────────────── */}
+        {/* â”€â”€ Referral â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* â”€â”€ Danger zone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <Section title="Danger zone" danger>
           <DangerZone
             email={session?.user.email ?? ""}

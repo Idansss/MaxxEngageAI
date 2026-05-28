@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -13,7 +13,7 @@ import {
   AlertCircle, ExternalLink, Clock, Zap, Mail, Phone, AtSign,
 } from "lucide-react";
 
-/* ── Stamp card definitions ─────────────────────────────────────────────── */
+/* â”€â”€ Stamp card definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 interface StampDef {
   type: string;
@@ -48,7 +48,7 @@ const STAMPS: StampDef[] = [
     icon: <GitBranch className="h-7 w-7" />,
     iconBg: "bg-gray-100 text-gray-700",
     ptsBadge: "bg-gray-50 text-gray-700 border-gray-200",
-    description: "Account ≥ 6 months with at least 1 repo. Senior tier (+35) needs 2 yrs & 10 repos.",
+    description: "Account â‰¥ 6 months with at least 1 repo. Senior tier (+35) needs 2 yrs & 10 repos.",
     inputType: "github",
   },
   {
@@ -59,7 +59,7 @@ const STAMPS: StampDef[] = [
     icon: <ShieldCheck className="h-7 w-7" />,
     iconBg: "bg-violet-100 text-violet-600",
     ptsBadge: "bg-violet-50 text-violet-700 border-violet-200",
-    description: "Connect Web2 + Web3 stamps via your Ethereum wallet. Score ≥ 1 to qualify.",
+    description: "Connect Web2 + Web3 stamps via your Ethereum wallet. Score â‰¥ 1 to qualify.",
     inputType: "gitcoin",
     externalLink: "https://app.passport.xyz",
   },
@@ -76,7 +76,7 @@ const STAMPS: StampDef[] = [
   },
 ];
 
-/* ── Main page ──────────────────────────────────────────────────────────── */
+/* â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export default function IdentityPage() {
   const router = useRouter();
@@ -106,7 +106,7 @@ export default function IdentityPage() {
     enabled: !!session,
   });
 
-  // Auto-claim email stamp — user is already verified by magic link sign-in
+  // Auto-claim email stamp â€” user is already verified by magic link sign-in
   useEffect(() => {
     if (!session || stampsLoading || !stampsData) return;
     const hasEmail = stampsData.stamps.some((s) => s.stamp_type === "email" && s.active);
@@ -170,9 +170,9 @@ export default function IdentityPage() {
   const pointsNeeded = Math.max(0, 50 - score);
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-10">
+    <main className="max-w-4xl px-6 py-10">
 
-      {/* ── Header ─────────────────────────────────────────────────────── */}
+      {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="mb-8">
         <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Proof of personhood</p>
         <h1 className="text-3xl font-extrabold">Identity verification</h1>
@@ -181,7 +181,7 @@ export default function IdentityPage() {
         </p>
       </div>
 
-      {/* ── Score banner ───────────────────────────────────────────────── */}
+      {/* â”€â”€ Score banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className={cn(
         "rounded-2xl border p-6 mb-8 flex flex-col sm:flex-row sm:items-center gap-6",
         fullWeight ? "bg-success-bg border-success/20" : "bg-amber-50 border-amber-200/60"
@@ -231,7 +231,7 @@ export default function IdentityPage() {
         )}
       </div>
 
-      {/* ── Username / Proof page ──────────────────────────────────────── */}
+      {/* â”€â”€ Username / Proof page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="rounded-2xl border bg-card p-5 mb-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
@@ -282,7 +282,7 @@ export default function IdentityPage() {
             {usernameMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : profile?.username ? "Change" : "Set username"}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">3–20 characters, lowercase letters, numbers, and underscores only.</p>
+        <p className="text-xs text-muted-foreground mt-2">3â€“20 characters, lowercase letters, numbers, and underscores only.</p>
 
         {usernameMsg && (
           <p className={cn("text-xs flex items-start gap-1.5 mt-2", usernameMsg.ok ? "text-success" : "text-destructive")}>
@@ -292,7 +292,7 @@ export default function IdentityPage() {
         )}
       </div>
 
-      {/* ── Stamp cards grid ───────────────────────────────────────────── */}
+      {/* â”€â”€ Stamp cards grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">Add Stamps</p>
 
       <div className="grid sm:grid-cols-2 gap-4">
@@ -329,7 +329,7 @@ export default function IdentityPage() {
   );
 }
 
-/* ── Stamp card component ───────────────────────────────────────────────── */
+/* â”€â”€ Stamp card component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 function StampCard({
   def, earned, stamp, meta, stampsLoading,
@@ -387,11 +387,11 @@ function StampCard({
             {def.type === "github" && (
               <>
                 <p className="font-semibold">{String(meta?.github_username ?? "")}</p>
-                <p className="text-success/70">{String(meta?.account_age_days ?? "")} days · {String(meta?.public_repos ?? "")} repos · {String(meta?.tier ?? "")} tier</p>
+                <p className="text-success/70">{String(meta?.account_age_days ?? "")} days Â· {String(meta?.public_repos ?? "")} repos Â· {String(meta?.tier ?? "")} tier</p>
               </>
             )}
             {def.type === "gitcoin_passport" && (
-              <p className="font-semibold">Score {String(meta?.gitcoin_score ?? "")} · {String(meta?.tier ?? "")} tier</p>
+              <p className="font-semibold">Score {String(meta?.gitcoin_score ?? "")} Â· {String(meta?.tier ?? "")} tier</p>
             )}
             {def.type === "email" && (
               <p className="font-semibold">Email verified via magic link</p>
@@ -418,7 +418,7 @@ function StampCard({
         )}
       </div>
 
-      {/* Card bottom — action area */}
+      {/* Card bottom â€” action area */}
       {!def.comingSoon && !stampsLoading && (
         <div className="px-5 pb-5 space-y-2.5">
           {def.inputType === "github" && (

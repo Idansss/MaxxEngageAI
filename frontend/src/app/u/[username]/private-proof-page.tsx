@@ -32,7 +32,7 @@ export function PrivateProofPage({ username }: { username: string }) {
 
   if (authLoading || userLoading || credentialsLoading) {
     return (
-      <main className="max-w-3xl mx-auto px-4 py-16 text-center">
+      <main className="max-w-3xl px-6 py-16 text-center">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mx-auto" />
       </main>
     );
@@ -40,7 +40,7 @@ export function PrivateProofPage({ username }: { username: string }) {
 
   if (!session || error || !user) {
     return (
-      <main className="max-w-xl mx-auto px-4 py-16 text-center">
+      <main className="max-w-xl px-6 py-16 text-center">
         <Lock className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
         <h1 className="text-xl font-bold">Proof page unavailable</h1>
         <p className="text-sm text-muted-foreground mt-2">
@@ -51,7 +51,7 @@ export function PrivateProofPage({ username }: { username: string }) {
   }
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-10">
+    <main className="max-w-3xl px-6 py-10">
       <div className="rounded-2xl border bg-card p-6 mb-8">
         <div className="flex items-start justify-between gap-4">
           <div>

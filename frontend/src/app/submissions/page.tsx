@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -28,7 +28,7 @@ type FilterKey = typeof STATUS_FILTERS[number]["key"];
 
 const APPEALABLE = new Set(["ai_reviewed", "pending_human_review"]);
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function matchesFilter(item: SubmissionHistoryItem, filter: FilterKey) {
   if (filter === "all") return true;
@@ -70,7 +70,7 @@ function domainStripe(domain: string) {
   return map[domain] ?? "bg-muted-foreground/40";
 }
 
-// ── Appeal inline form ────────────────────────────────────────────────────────
+// â”€â”€ Appeal inline form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function AppealForm({ submissionId, onDone }: { submissionId: string; onDone: () => void }) {
   const [reason, setReason] = useState("");
@@ -100,7 +100,7 @@ function AppealForm({ submissionId, onDone }: { submissionId: string; onDone: ()
       <textarea
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        placeholder="Explain why you believe this score is incorrect (min 20 characters)…"
+        placeholder="Explain why you believe this score is incorrect (min 20 characters)â€¦"
         rows={3}
         className="w-full text-xs rounded-lg border bg-background p-2.5 placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none transition-shadow"
       />
@@ -127,7 +127,7 @@ function AppealForm({ submissionId, onDone }: { submissionId: string; onDone: ()
   );
 }
 
-// ── Submission card ───────────────────────────────────────────────────────────
+// â”€â”€ Submission card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function SubmissionCard({ item }: { item: SubmissionHistoryItem }) {
   const queryClient = useQueryClient();
@@ -156,7 +156,7 @@ function SubmissionCard({ item }: { item: SubmissionHistoryItem }) {
               <div className="min-w-0">
                 <p className="text-sm font-semibold">
                   {item.skill_path_name}
-                  <span className="text-muted-foreground font-normal"> · Level {item.level}</span>
+                  <span className="text-muted-foreground font-normal"> Â· Level {item.level}</span>
                 </p>
                 {item.task_title && (
                   <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.task_title}</p>
@@ -242,7 +242,7 @@ function SubmissionCard({ item }: { item: SubmissionHistoryItem }) {
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function SubmissionsPage() {
   const router = useRouter();
@@ -276,7 +276,7 @@ export default function SubmissionsPage() {
   const items = allItems.filter((i) => matchesFilter(i, filter));
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-10">
+    <main className="max-w-4xl px-6 py-10">
 
       {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-4">

@@ -230,7 +230,7 @@ export default async function UserProofPage(
   const proofPageUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://maxx-engage-ai.vercel.app"}/u/${username}`;
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-10">
+    <main className="max-w-3xl px-6 py-10">
 
       {/* Profile header */}
       <div className="bg-card rounded-2xl border shadow-sm p-6 mb-8">

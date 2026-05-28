@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -59,9 +59,9 @@ function scoreColor(score: number) {
 }
 
 function rankMedal(rank: number) {
-  if (rank === 1) return <span className="text-lg" title="1st place">🥇</span>;
-  if (rank === 2) return <span className="text-lg" title="2nd place">🥈</span>;
-  if (rank === 3) return <span className="text-lg" title="3rd place">🥉</span>;
+  if (rank === 1) return <span className="text-lg" title="1st place">ðŸ¥‡</span>;
+  if (rank === 2) return <span className="text-lg" title="2nd place">ðŸ¥ˆ</span>;
+  if (rank === 3) return <span className="text-lg" title="3rd place">ðŸ¥‰</span>;
   return (
     <span className="text-sm font-bold text-muted-foreground tabular-nums w-8 text-center">
       #{rank}
@@ -178,7 +178,7 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-10">
+    <main className="max-w-4xl px-6 py-10">
 
       {/* Header */}
       <div className="mb-8">
@@ -188,7 +188,7 @@ export default function LeaderboardPage() {
           Leaderboard
         </h1>
         <p className="text-muted-foreground text-sm mt-1.5 max-w-lg leading-relaxed">
-          Top scores across all skill assessments. Each person appears once per skill — their best result.
+          Top scores across all skill assessments. Each person appears once per skill â€” their best result.
         </p>
       </div>
 
@@ -215,7 +215,7 @@ export default function LeaderboardPage() {
       {!isLoading && total > 0 && (
         <p className="text-xs text-muted-foreground mb-4">
           {total} credential{total !== 1 ? "s" : ""} on the board
-          {domain ? ` · ${domain} domain` : ""}
+          {domain ? ` Â· ${domain} domain` : ""}
         </p>
       )}
 

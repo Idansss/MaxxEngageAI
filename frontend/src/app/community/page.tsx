@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -39,7 +39,7 @@ export default function CommunityPage() {
   }
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-10">
+    <main className="max-w-5xl px-6 py-10">
       <div className="mb-8">
         <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-1">
           Open collaboration
@@ -70,7 +70,7 @@ export default function CommunityPage() {
                   <div>
                     <p className="font-bold">{data?.repo.name ?? "Idansss/MaxxEngageAI"}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      License {data?.repo.license ?? "AGPL-3.0"} · {data?.repo.open_issues ?? 0} open issues
+                      License {data?.repo.license ?? "AGPL-3.0"} Â· {data?.repo.open_issues ?? 0} open issues
                     </p>
                   </div>
                   <a
