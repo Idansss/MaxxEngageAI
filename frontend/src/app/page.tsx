@@ -33,17 +33,8 @@ function domainStripe(domain: string) {
   return map[domain] ?? "bg-muted-foreground/40";
 }
 
-function domainColor(domain: string) {
-  const map: Record<string, string> = {
-    technology: "bg-primary/10 text-primary",
-    design:     "bg-violet-100 text-violet-700",
-    data:       "bg-emerald-100 text-emerald-700",
-    writing:    "bg-amber-100 text-amber-700",
-    business:   "bg-orange-100 text-orange-700",
-    ops:        "bg-slate-100 text-slate-700",
-    science:    "bg-teal-100 text-teal-700",
-  };
-  return map[domain] ?? "bg-muted text-muted-foreground";
+function domainColor(_domain: string) {
+  return "bg-muted text-muted-foreground";
 }
 
 // ── FAQ data ─────────────────────────────────────────────────────────────────
@@ -112,24 +103,23 @@ export default async function HomePage() {
 
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
         <section className="hero-bg dot-grid relative overflow-hidden py-24 sm:py-32 px-4">
-          <div className="orb w-[520px] h-[520px] top-[-15%] left-[-8%] bg-indigo-600/20" />
-          <div className="orb w-[400px] h-[400px] top-[20%] right-[-8%] bg-violet-500/15" />
-          <div className="orb w-[380px] h-[380px] bottom-[-20%] left-[30%] bg-amber-500/10" />
+          <div className="orb w-[600px] h-[600px] top-[-20%] left-[-10%] bg-white/5" />
+          <div className="orb w-[450px] h-[450px] bottom-[-15%] right-[-5%] bg-white/4" />
 
           <div className="relative max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 mb-7 rounded-full border border-indigo-400/25 bg-indigo-500/10 px-4 py-1.5 text-xs font-semibold text-indigo-200 tracking-wider uppercase">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 mb-7 rounded-full border border-white/20 bg-white/8 px-4 py-1.5 text-xs font-semibold text-white/60 tracking-wider uppercase">
+              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-pulse" />
               Engine 1 of Civilization OS
             </div>
 
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-[1.08] mb-7 tracking-tight">
               Prove What You Know.{" "}
-              <span className="bg-linear-to-r from-indigo-300 via-violet-300 to-amber-300 bg-clip-text text-transparent">
+              <span className="text-white/70">
                 Own Your Credentials.
               </span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-indigo-200/75 mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl text-white/55 mb-10 max-w-2xl mx-auto leading-relaxed">
               AI-graded skill assessments that issue tamper-proof W3C Verifiable Credentials.
               No gatekeeping. No expensive courses. Your work, fairly judged — for every talent on Earth.
             </p>
@@ -137,20 +127,20 @@ export default async function HomePage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/assess"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl bg-gold text-gold-fg font-bold text-base hover:opacity-90 transition-opacity shadow-lg shadow-amber-500/20"
+                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl bg-white text-black font-bold text-base hover:bg-white/90 transition-colors"
               >
                 Start Free Assessment
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl border border-indigo-400/30 text-indigo-200 font-medium text-base hover:bg-indigo-500/10 hover:border-indigo-400/50 transition-all"
+                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl border border-white/25 text-white/75 font-medium text-base hover:bg-white/8 hover:border-white/40 transition-all"
               >
                 See How It Works
               </Link>
             </div>
 
-            <p className="mt-7 text-sm text-indigo-300/45">
+            <p className="mt-7 text-sm text-white/35">
               Free forever for learners &middot; No account required to try
             </p>
           </div>
@@ -287,9 +277,9 @@ export default async function HomePage() {
             </div>
             <div className="grid sm:grid-cols-3 gap-8">
               {[
-                { icon: <Globe className="h-7 w-7 text-gold" />,      title: "Open reasoning",    desc: "Every score comes with the AI's exact reasoning and evidence quotes. No black boxes, ever." },
-                { icon: <Lock className="h-7 w-7 text-gold" />,       title: "You own your data", desc: "Credentials are W3C VC 2.0 — held by you, verifiable by anyone, never locked to our platform." },
-                { icon: <Wifi className="h-7 w-7 text-gold" />,       title: "Works on 3G",       desc: "Designed for Africa's internet reality. Fast, lightweight, no app to install." },
+                { icon: <Globe className="h-7 w-7 text-background/75" />, title: "Open reasoning",    desc: "Every score comes with the AI's exact reasoning and evidence quotes. No black boxes, ever." },
+                { icon: <Lock className="h-7 w-7 text-background/75" />,  title: "You own your data", desc: "Credentials are W3C VC 2.0 — held by you, verifiable by anyone, never locked to our platform." },
+                { icon: <Wifi className="h-7 w-7 text-background/75" />,  title: "Works on 3G",       desc: "Designed for Africa's internet reality. Fast, lightweight, no app to install." },
               ].map((item) => (
                 <div key={item.title} className="flex flex-col gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-white/8 flex items-center justify-center">{item.icon}</div>
@@ -323,7 +313,7 @@ export default async function HomePage() {
                     "Public proof pages for every verified credential",
                   ].map((point) => (
                     <li key={point} className="flex items-start gap-2.5 text-sm">
-                      <ShieldCheck className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                      <ShieldCheck className="h-4 w-4 text-foreground/60 mt-0.5 shrink-0" />
                       {point}
                     </li>
                   ))}
@@ -339,13 +329,13 @@ export default async function HomePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { icon: <ShieldCheck className="h-5 w-5 text-primary" />, stat: "Public", label: "proof pages" },
-                  { icon: <ShieldCheck className="h-5 w-5 text-success" />, stat: "100%",   label: "rubric-graded" },
-                  { icon: <Globe className="h-5 w-5 text-primary" />,       stat: "Global", label: "talent pool" },
-                  { icon: <Award className="h-5 w-5 text-gold" />,          stat: "Free",   label: "to verify" },
+                  { icon: <ShieldCheck className="h-5 w-5 text-foreground/70" />, stat: "Public", label: "proof pages" },
+                  { icon: <ShieldCheck className="h-5 w-5 text-foreground/70" />, stat: "100%",   label: "rubric-graded" },
+                  { icon: <Globe className="h-5 w-5 text-foreground/70" />,       stat: "Global", label: "talent pool" },
+                  { icon: <Award className="h-5 w-5 text-foreground/70" />,       stat: "Free",   label: "to verify" },
                 ].map((item) => (
                   <div key={item.label} className="rounded-2xl border bg-card p-5 space-y-2">
-                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-foreground/6 flex items-center justify-center">
                       {item.icon}
                     </div>
                     <p className="text-xl font-black">{item.stat}</p>
@@ -380,7 +370,7 @@ export default async function HomePage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/assess"
-                className="inline-flex items-center justify-center gap-2 h-12 px-10 rounded-xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity shadow-lg shadow-primary/25"
+                className="inline-flex items-center justify-center gap-2 h-12 px-10 rounded-xl bg-primary text-primary-foreground font-bold text-base hover:opacity-90 transition-opacity shadow-lg shadow-black/15"
               >
                 Start Free — No Account Needed
                 <ArrowRight className="h-4 w-4" />
