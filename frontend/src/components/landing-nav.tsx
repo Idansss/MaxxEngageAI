@@ -81,7 +81,7 @@ export function LandingNav() {
               <>
                 <Link
                   href="/login"
-                  className="h-8 px-4 rounded-full text-sm font-semibold text-gray-600 bg-gray-100/80 hover:bg-gray-200/80 transition-all"
+                  className="inline-flex items-center justify-center h-8 px-4 rounded-full text-sm font-semibold leading-none text-gray-600 bg-gray-100/80 hover:bg-gray-200/80 transition-all"
                 >
                   Sign in
                 </Link>
