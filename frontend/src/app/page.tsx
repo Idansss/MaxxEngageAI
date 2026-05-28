@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { HeroSection } from "@/components/hero-section";
 import { LandingNav } from "@/components/landing-nav";
+import { SectionDivider } from "@/components/section-divider";
 
 export const dynamic = "force-dynamic";
 
@@ -319,27 +320,117 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* ── Scroll divider ──────────────────────────────────────────────── */}
+        <SectionDivider />
+
         {/* ── Trust section ────────────────────────────────────────────────── */}
-        <section className="py-24 px-4 bg-foreground text-background">
-          <div className="max-w-4xl mx-auto">
+        <section
+          className="relative py-28 px-6 overflow-hidden"
+          style={{
+            background: `
+              radial-gradient(ellipse 60% 50% at 15% 25%, rgba(99,102,241,0.18) 0%, transparent 55%),
+              radial-gradient(ellipse 55% 45% at 85% 75%, rgba(139,92,246,0.16) 0%, transparent 55%),
+              radial-gradient(ellipse 40% 50% at 50% 50%, rgba(6,182,212,0.10) 0%, transparent 60%),
+              #0d0b1a
+            `,
+          }}
+        >
+          {/* Grid texture */}
+          <div className="absolute inset-0 pointer-events-none" style={{
+            backgroundImage: "radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)",
+            backgroundSize: "26px 26px",
+          }} />
+
+          <div className="relative max-w-5xl mx-auto">
+            {/* Header */}
             <div className="text-center mb-14">
-              <h2 className="text-3xl sm:text-4xl font-extrabold">Built different, on purpose</h2>
-              <p className="text-background/60 mt-3 max-w-lg mx-auto leading-relaxed">
+              <div className="inline-flex items-center gap-2 mb-5 rounded-full px-4 py-1.5 text-[11px] font-bold tracking-widest uppercase"
+                style={{
+                  background: "rgba(99,102,241,0.14)",
+                  border: "1px solid rgba(99,102,241,0.30)",
+                  color: "#A5B4FC",
+                }}
+              >
+                <ShieldCheck className="h-3 w-3" />
+                First principles
+              </div>
+              <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
+                Built different,{" "}
+                <span style={{
+                  background: "linear-gradient(135deg, #A78BFA 0%, #818CF8 50%, #22D3EE 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}>
+                  on purpose.
+                </span>
+              </h2>
+              <p className="text-white/55 mt-3 max-w-xl mx-auto leading-relaxed text-base">
                 We started from first principles — what does fair, global, open credentialing actually look like?
               </p>
             </div>
-            <div className="grid sm:grid-cols-3 gap-8">
+
+            {/* Glass cards */}
+            <div className="grid sm:grid-cols-3 gap-5">
               {[
-                { icon: <Globe className="h-7 w-7 text-background/75" />, title: "Open reasoning",    desc: "Every score comes with the AI's exact reasoning and evidence quotes. No black boxes, ever." },
-                { icon: <Lock className="h-7 w-7 text-background/75" />,  title: "You own your data", desc: "Credentials are W3C VC 2.0 — held by you, verifiable by anyone, never locked to our platform." },
-                { icon: <Wifi className="h-7 w-7 text-background/75" />,  title: "Works on 3G",       desc: "Designed for Africa's internet reality. Fast, lightweight, no app to install." },
+                {
+                  icon: <Globe className="h-6 w-6" />,
+                  title: "Open reasoning",
+                  desc: "Every score comes with the AI's exact reasoning and evidence quotes. No black boxes, ever.",
+                  glow: "rgba(99,102,241,0.30)",
+                  iconBg: "linear-gradient(135deg, #6366F1, #8B5CF6)",
+                  borderColor: "rgba(99,102,241,0.35)",
+                },
+                {
+                  icon: <Lock className="h-6 w-6" />,
+                  title: "You own your data",
+                  desc: "Credentials are W3C VC 2.0 — held by you, verifiable by anyone, never locked to our platform.",
+                  glow: "rgba(139,92,246,0.30)",
+                  iconBg: "linear-gradient(135deg, #8B5CF6, #7C3AED)",
+                  borderColor: "rgba(139,92,246,0.35)",
+                },
+                {
+                  icon: <Wifi className="h-6 w-6" />,
+                  title: "Works on 3G",
+                  desc: "Designed for Africa's internet reality. Fast, lightweight, no app to install.",
+                  glow: "rgba(6,182,212,0.30)",
+                  iconBg: "linear-gradient(135deg, #06B6D4, #0891B2)",
+                  borderColor: "rgba(6,182,212,0.35)",
+                },
               ].map((item) => (
-                <div key={item.title} className="flex flex-col gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-white/8 flex items-center justify-center">{item.icon}</div>
-                  <div>
-                    <h3 className="font-bold text-lg mb-2">{item.title}</h3>
-                    <p className="text-background/60 text-sm leading-relaxed">{item.desc}</p>
+                <div
+                  key={item.title}
+                  className="relative rounded-3xl p-7 transition-all hover:scale-[1.02] overflow-hidden group"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.10)",
+                    backdropFilter: "blur(20px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                    boxShadow: `0 8px 36px ${item.glow}, inset 0 1px 0 rgba(255,255,255,0.10)`,
+                  }}
+                >
+                  {/* Hover glow */}
+                  <div
+                    className="absolute -top-12 -right-12 w-32 h-32 rounded-full pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity"
+                    style={{ background: item.glow, filter: "blur(40px)" }}
+                  />
+
+                  {/* Top sheen */}
+                  <div
+                    className="absolute inset-x-0 top-0 h-px pointer-events-none"
+                    style={{ background: `linear-gradient(90deg, transparent, ${item.borderColor}, transparent)` }}
+                  />
+
+                  {/* Icon */}
+                  <div
+                    className="relative w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-5 shadow-lg"
+                    style={{ background: item.iconBg, boxShadow: `0 8px 20px ${item.glow}` }}
+                  >
+                    {item.icon}
                   </div>
+
+                  <h3 className="relative font-bold text-white text-lg mb-2">{item.title}</h3>
+                  <p className="relative text-white/55 text-sm leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
