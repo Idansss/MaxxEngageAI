@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/lib/providers";
 import { Navbar } from "@/components/navbar";
 import { Sidebar } from "@/components/sidebar";
+import { ContentWrapper } from "@/components/content-wrapper";
 import { ServiceWorkerRegistrar } from "@/components/sw-register";
 
 const jakartaSans = Plus_Jakarta_Sans({
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#6366f1",
+  themeColor: "#0d0d0d",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -62,10 +63,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-full antialiased pb-14 sm:pb-0">
         <Providers>
           <Sidebar />
-          <div className="sm:pl-56">
+          <ContentWrapper>
             <Navbar />
             {children}
-          </div>
+          </ContentWrapper>
         </Providers>
         <ServiceWorkerRegistrar />
       </body>

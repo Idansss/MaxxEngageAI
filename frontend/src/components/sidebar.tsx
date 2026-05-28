@@ -53,6 +53,9 @@ export function Sidebar() {
   const { session, profile, loading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
+
+  if (pathname === "/") return null;
+
   const isAdmin =
     !!session?.user.email &&
     ADMIN_EMAILS.has(session.user.email.toLowerCase());
