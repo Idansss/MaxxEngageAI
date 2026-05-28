@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useSidebar } from "@/lib/sidebar-context";
@@ -70,12 +71,15 @@ export function Sidebar() {
         collapsed ? "justify-center" : "px-4 justify-between"
       )}>
         {!collapsed && (
-          <Link
-            href="/"
-            className="font-extrabold text-base tracking-tight flex items-center gap-0.5"
-          >
-            <span className="text-foreground">Maxx</span>
-            <span className="text-gradient">Engage</span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo.png"
+              alt="Maxx Engage"
+              width={80}
+              height={80}
+              className="rounded-xl"
+              style={{ filter: "invert(1)", mixBlendMode: "multiply" }}
+            />
           </Link>
         )}
         <button

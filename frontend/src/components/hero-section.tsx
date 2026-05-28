@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, ShieldCheck, Award, Zap, CheckCircle2, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -158,7 +159,20 @@ export function HeroSection() {
       />
 
       {/* Content */}
-      <div className="relative pt-24 pb-16 sm:pt-32 sm:pb-20 px-4">
+      <div className="relative pt-20 pb-16 sm:pt-28 sm:pb-20 px-4">
+
+        {/* Logo */}
+        <div className="flex justify-center mb-8">
+          <Image
+            src="/logo.png"
+            alt="Maxx Engage"
+            width={96}
+            height={96}
+            className="rounded-2xl shadow-lg shadow-black/10"
+            style={{ filter: "invert(1)", mixBlendMode: "multiply" }}
+            priority
+          />
+        </div>
 
         {/* Badge */}
         <div className="flex justify-center mb-8">
@@ -182,7 +196,7 @@ export function HeroSection() {
             >
               {text1}
               {cursor === "line1" && (
-                <span className="inline-block w-[4px] h-[0.85em] bg-foreground align-middle ml-1 animate-pulse" />
+                <span className="inline-block w-1 h-[0.85em] bg-foreground align-middle ml-1 animate-pulse" />
               )}
             </span>
             <span
@@ -193,7 +207,7 @@ export function HeroSection() {
             >
               {text2 || <span className="invisible">placeholder</span>}
               {cursor === "line2" && text2 && (
-                <span className="inline-block w-[4px] h-[0.85em] bg-foreground/45 align-middle ml-1 animate-pulse" />
+                <span className="inline-block w-1 h-[0.85em] bg-foreground/45 align-middle ml-1 animate-pulse" />
               )}
             </span>
           </h1>
