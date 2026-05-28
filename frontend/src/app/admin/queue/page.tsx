@@ -175,7 +175,7 @@ function QueueCard({ item, onDecide }: {
               href={`/profile/${item.user_id}`}
               className="text-xs text-muted-foreground hover:text-foreground ml-auto self-center"
             >
-              View profile â†’
+              View profile →
             </Link>
           </div>
         )}

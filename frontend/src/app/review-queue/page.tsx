@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const RUBRIC_LABEL: Record<string, string> = {
-  "translate-yo-en-001": "Yoruba â†’ English Translation",
+  "translate-yo-en-001": "Yoruba → English Translation",
 };
 
 // â”€â”€ Status badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -229,7 +229,7 @@ function SubmissionStatusCard({ item }: { item: PeerReviewQueueItem }) {
           <div className="flex items-center gap-2 text-xs text-green-800">
             <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
             Approved — your credential has been issued.{" "}
-            <Link href="/identity" className="underline underline-offset-2">View credentials â†’</Link>
+            <Link href="/identity" className="underline underline-offset-2">View credentials →</Link>
           </div>
         )}
 
@@ -402,7 +402,7 @@ export default function ReviewQueuePage() {
                   className="text-primary underline underline-offset-2"
                   onClick={() => setTab("queue")}
                 >
-                  Browse the open queue â†’
+                  Browse the open queue →
                 </button>
               </div>
             ) : (

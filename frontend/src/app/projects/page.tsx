@@ -122,7 +122,7 @@ export default function ProjectsPage() {
         <div className="text-center py-16 text-muted-foreground text-sm">
           No project briefs available yet.{" "}
           <Link href="/assess" className="text-primary underline underline-offset-2">
-            Try a diagnostic instead â†’
+            Try a diagnostic instead →
           </Link>
         </div>
       ) : (
