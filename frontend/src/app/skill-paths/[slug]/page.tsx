@@ -179,7 +179,7 @@ export default async function SkillPathDetailPage({ params }: { params: Promise<
   }
 
   return (
-    <main className="max-w-4xl px-6 py-10">
+    <main className="px-6 py-10">
 
       {/* Breadcrumb */}
       <Link

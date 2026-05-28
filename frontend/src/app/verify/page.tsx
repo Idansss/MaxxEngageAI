@@ -522,7 +522,7 @@ function VerifyForm() {
   const [tab, setTab] = useState<Tab>(hasInitialQuery ? "id" : "id");
 
   return (
-    <main className="max-w-2xl px-6 py-16">
+    <main className="px-6 py-16">
       {/* Header */}
       <div className="text-center mb-10">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-5">

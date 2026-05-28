@@ -340,7 +340,7 @@ export default function SettingsPage() {
   const initials = displayName.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
 
   return (
-    <main className="max-w-2xl px-6 py-10">
+    <main className="px-6 py-10">
 
       <div className="mb-8">
         <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-1">Account</p>

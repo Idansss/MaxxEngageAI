@@ -170,7 +170,7 @@ export default function IdentityPage() {
   const pointsNeeded = Math.max(0, 50 - score);
 
   return (
-    <main className="max-w-4xl px-6 py-10">
+    <main className="px-6 py-10">
 
       {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="mb-8">

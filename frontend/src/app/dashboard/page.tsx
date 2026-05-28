@@ -301,7 +301,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="max-w-5xl px-6 py-10">
+    <main className="px-6 py-10">
 
       {/* Welcome */}
       <div className="mb-8">

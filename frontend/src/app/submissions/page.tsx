@@ -276,7 +276,7 @@ export default function SubmissionsPage() {
   const items = allItems.filter((i) => matchesFilter(i, filter));
 
   return (
-    <main className="max-w-4xl px-6 py-10">
+    <main className="px-6 py-10">
 
       {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-4">

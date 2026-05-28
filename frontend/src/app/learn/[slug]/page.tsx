@@ -229,7 +229,7 @@ function SetupForm({
   };
 
   return (
-    <div className="max-w-lg px-6 py-16 text-center space-y-8">
+    <div className="px-6 py-16 text-center space-y-8">
       <div>
         <Badge variant="secondary" className="mb-3">Personalised learning path</Badge>
         <h1 className="text-2xl font-bold mb-2">One last thing before we start</h1>
@@ -308,7 +308,7 @@ function PathView({ data }: { data: LearnPathResponse }) {
   const milestoneWeeks = new Set(data.milestone_assessments.map((m) => m.after_week));
 
   return (
-    <div className="max-w-2xl px-6 py-10 space-y-8">
+    <div className="px-6 py-10 space-y-8">
       {/* Overview */}
       <div>
         <Badge variant="secondary" className="mb-2">Your personalised path</Badge>

@@ -474,7 +474,7 @@ export default function EmployersPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <main className="max-w-5xl px-6 py-10">
+    <main className="px-6 py-10">
 
       {/* Hero */}
       <div className="mb-8">

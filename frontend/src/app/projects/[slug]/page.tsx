@@ -185,7 +185,7 @@ function ProjectDetailContent({ slug }: { slug: string }) {
 
   if (!brief) {
     return (
-      <div className="max-w-2xl px-6 py-16 text-center text-muted-foreground text-sm">
+      <div className="px-6 py-16 text-center text-muted-foreground text-sm">
         Project not found.{" "}
         <Link href="/projects" className="text-primary underline underline-offset-2">Browse projects →</Link>
       </div>
@@ -193,7 +193,7 @@ function ProjectDetailContent({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="max-w-3xl px-6 py-10">
+    <div className="px-6 py-10">
       <Link
         href="/projects"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"

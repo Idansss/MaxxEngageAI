@@ -213,7 +213,7 @@ export default function AdminQueuePage() {
 
   if (!session) {
     return (
-      <div className="max-w-md px-6 py-20 text-center">
+      <div className="px-6 py-20 text-center">
         <ShieldAlert className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
         <p className="text-muted-foreground">Sign in required.</p>
         <Link href="/login?next=/admin/queue" className="text-sm text-blue-600 hover:underline mt-2 inline-block">Sign in</Link>
@@ -224,7 +224,7 @@ export default function AdminQueuePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="max-w-4xl px-6 py-10">
+      <main className="px-6 py-10">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">

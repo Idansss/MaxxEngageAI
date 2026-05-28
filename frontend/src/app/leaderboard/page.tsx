@@ -178,7 +178,7 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <main className="max-w-4xl px-6 py-10">
+    <main className="px-6 py-10">
 
       {/* Header */}
       <div className="mb-8">

@@ -93,7 +93,7 @@ export default function ProjectsPage() {
   });
 
   return (
-    <main className="max-w-5xl px-6 py-10">
+    <main className="px-6 py-10">
       {/* Header */}
       <div className="mb-8">
         <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">

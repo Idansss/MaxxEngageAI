@@ -197,7 +197,7 @@ function AssessIndex() {
   }
 
   return (
-    <main className="max-w-5xl px-6 py-10">
+    <main className="px-6 py-10">
       {/* Header */}
       <div className="mb-8">
         <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">
@@ -404,7 +404,7 @@ function AssessDetail({ pathSlug }: { pathSlug: string }) {
   const isTranslation   = rubricId === "translate-yo-en-001";
 
   return (
-    <div className="max-w-2xl px-6 py-10">
+    <div className="px-6 py-10">
       <Link
         href="/assess"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
@@ -596,7 +596,7 @@ function AssessForm({ pathSlug }: { pathSlug: string }) {
 
   if (taskError) {
     return (
-      <div className="max-w-3xl px-6 py-10">
+      <div className="px-6 py-10">
         <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-5 text-sm text-destructive flex items-start gap-3">
           <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
           <div>
@@ -624,7 +624,7 @@ function AssessForm({ pathSlug }: { pathSlug: string }) {
   const hasDraft = chars >= 50;
 
   return (
-    <div className="max-w-3xl px-6 py-10">
+    <div className="px-6 py-10">
       <Link
         href={`/assess/${pathSlug}`}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"

@@ -59,7 +59,7 @@ export default function ReferralPage() {
   const pct = Math.round(progress * 100);
 
   return (
-    <main className="max-w-2xl px-6 py-10">
+    <main className="px-6 py-10">
 
       {/* Header */}
       <div className="mb-8">

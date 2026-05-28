@@ -292,7 +292,7 @@ export default function ReviewQueuePage() {
 
   if (!session) {
     return (
-      <div className="max-w-xl px-6 py-20 text-center">
+      <div className="px-6 py-20 text-center">
         <p className="text-muted-foreground text-sm mb-4">Sign in to access the peer review queue.</p>
         <Link href="/login?next=/review-queue">
           <Button size="sm" className="gap-1.5">Sign in <ArrowRight className="h-3.5 w-3.5" /></Button>
@@ -313,7 +313,7 @@ export default function ReviewQueuePage() {
     subsLoading;
 
   return (
-    <main className="max-w-3xl px-6 py-10">
+    <main className="px-6 py-10">
       {/* Header */}
       <div className="mb-6">
         <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Human review</p>
