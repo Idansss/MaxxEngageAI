@@ -3,247 +3,236 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, ShieldCheck, Zap, CheckCircle2, Globe, Users, Award, Lock } from "lucide-react";
+import { ArrowRight, ShieldCheck, Zap, CheckCircle2, Globe, Users, Lock, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const LINE1 = "Prove What You Know.";
+const LINE1 = "Prove What";
+const LINE1B = "You Know.";
 const LINE2 = "Own Your Credentials.";
-const CHAR_DELAY = 46;
+const CHAR_DELAY = 50;
 
-// ── Floating credential card ──────────────────────────────────────────────────
+// ── Concentric-ring visual (inspired by image 1) ─────────────────────────────
 
-function CredentialCard({ visible }: { visible: boolean }) {
+function HeroVisual({ visible }: { visible: boolean }) {
   return (
     <div
       className={cn(
-        "relative w-full transition-all duration-700",
-        visible ? "opacity-100 translate-y-0 animate-float" : "opacity-0 translate-y-10"
+        "relative transition-all duration-700",
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       )}
+      style={{ animation: visible ? "float 7s ease-in-out infinite" : "none" }}
     >
       {/* Ambient glow */}
       <div
-        className="absolute inset-0 rounded-3xl scale-110 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at center, rgba(99,102,241,0.25) 0%, transparent 70%)", filter: "blur(20px)" }}
+        className="absolute inset-0 rounded-3xl pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse at 50% 40%, rgba(99,102,241,0.18) 0%, transparent 70%)",
+          filter: "blur(24px)",
+          transform: "scale(1.15)",
+        }}
       />
 
+      {/* Glass card container */}
       <div
-        className="relative rounded-2xl overflow-hidden"
+        className="relative rounded-3xl overflow-hidden"
         style={{
-          background: "linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          backdropFilter: "blur(32px)",
+          background: "rgba(255,255,255,0.68)",
+          border: "1.5px solid rgba(255,255,255,0.92)",
+          backdropFilter: "blur(28px) saturate(180%)",
+          boxShadow: "0 24px 64px rgba(99,102,241,0.13), 0 4px 20px rgba(0,0,0,0.06)",
         }}
       >
-        {/* Top gradient stripe */}
-        <div className="h-[3px] w-full" style={{ background: "linear-gradient(90deg, #6366F1, #8B5CF6, #06B6D4)" }} />
-
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-5">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: "linear-gradient(135deg, #6366F1, #8B5CF6)" }}
-              >
-                <ShieldCheck className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.35)" }}>
-                  Verified Credential
-                </p>
-                <p className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.80)" }}>
-                  W3C VC 2.0 Standard
-                </p>
-              </div>
-            </div>
-            <span
-              className="flex items-center gap-1 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full"
-              style={{ background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.25)", color: "#34D399" }}
-            >
-              <CheckCircle2 className="h-3 w-3" /> Valid
-            </span>
-          </div>
-
-          {/* Skill */}
-          <div className="mb-5">
-            <h3 className="text-lg font-extrabold text-white leading-tight">
-              Frontend Web Development
-            </h3>
-            <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>
-              Level 1 · Foundations · Technology
-            </p>
-          </div>
-
-          {/* Score */}
-          <div className="flex items-end gap-4 mb-5">
-            <div>
-              <p className="text-[10px] uppercase tracking-wide mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>Score</p>
-              <p
-                className="text-6xl font-black leading-none"
-                style={{ background: "linear-gradient(135deg, #818CF8, #A78BFA)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
-              >
-                87
-              </p>
-            </div>
-            <div className="flex-1 pb-2">
-              <div className="h-1.5 rounded-full overflow-hidden mb-1.5" style={{ background: "rgba(255,255,255,0.08)" }}>
-                <div
-                  className="h-full rounded-full"
-                  style={{ width: "87%", background: "linear-gradient(90deg, #6366F1, #8B5CF6)" }}
-                />
-              </div>
-              <div className="flex justify-between text-[10px]" style={{ color: "rgba(255,255,255,0.28)" }}>
-                <span>0</span>
-                <span style={{ color: "rgba(255,255,255,0.50)" }}>Pass: 70</span>
-                <span>100</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Rubric dims */}
-          <div className="grid grid-cols-3 gap-1.5 mb-5">
-            {[
-              { label: "Semantic HTML", pts: "18", max: "20" },
-              { label: "CSS Quality",   pts: "17", max: "20" },
-              { label: "Responsive",    pts: "22", max: "25" },
-            ].map((d) => (
-              <div
-                key={d.label}
-                className="rounded-xl p-2.5"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
-              >
-                <p className="text-[9px] leading-tight mb-1" style={{ color: "rgba(255,255,255,0.30)" }}>{d.label}</p>
-                <p className="text-sm font-bold text-white">
-                  {d.pts}<span className="text-[10px] font-normal" style={{ color: "rgba(255,255,255,0.35)" }}>/{d.max}</span>
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Footer */}
+        {/* Top visual: concentric rings on soft gradient */}
+        <div
+          className="relative flex items-center justify-center overflow-hidden"
+          style={{
+            height: "220px",
+            background: "linear-gradient(145deg, #EEF2FF 0%, #E0E7FF 40%, #C7D2FE 100%)",
+          }}
+        >
+          {/* Rings */}
+          {[280, 220, 165, 115, 72].map((size, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: size,
+                height: size,
+                background: `rgba(255,255,255,${0.22 + i * 0.08})`,
+                border: `${i === 4 ? "2px" : "1.5px"} solid rgba(255,255,255,${0.5 + i * 0.09})`,
+                boxShadow: i === 4 ? "0 4px 24px rgba(99,102,241,0.28)" : undefined,
+              }}
+            />
+          ))}
+          {/* Center shield */}
           <div
-            className="flex items-center justify-between pt-4"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
+            className="relative z-10 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
+            style={{ background: "linear-gradient(135deg, #6366F1, #8B5CF6)" }}
           >
-            <div className="flex items-center gap-1.5">
-              <Globe className="h-3 w-3" style={{ color: "rgba(255,255,255,0.25)" }} />
-              <span className="text-[10px] font-mono truncate max-w-[180px]" style={{ color: "rgba(255,255,255,0.25)" }}>
-                did:web:maxx-engage-ai.vercel.app
-              </span>
+            <ShieldCheck className="h-8 w-8 text-white" />
+          </div>
+
+          {/* Floating badge */}
+          <div
+            className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold shadow-sm"
+            style={{ background: "rgba(255,255,255,0.85)", color: "#16A34A", border: "1px solid rgba(22,163,74,0.18)" }}
+          >
+            <CheckCircle2 className="h-3 w-3" /> Valid
+          </div>
+
+          {/* Score pill top-left */}
+          <div
+            className="absolute top-3 left-3 rounded-full px-3 py-1 text-[11px] font-black shadow-sm"
+            style={{ background: "rgba(99,102,241,0.12)", color: "#6366F1", border: "1px solid rgba(99,102,241,0.20)" }}
+          >
+            87 / 100
+          </div>
+        </div>
+
+        {/* Info panel */}
+        <div className="px-5 pt-4 pb-5">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h3 className="font-extrabold text-gray-800 text-base">Frontend Development</h3>
+              <p className="text-xs text-gray-400 mt-0.5">Level 1 · Foundations · Technology</p>
             </div>
-            <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.25)" }}>May 2026</span>
+            <div className="text-right">
+              <p className="text-2xl font-black" style={{ background: "linear-gradient(135deg, #6366F1, #8B5CF6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>87</p>
+              <p className="text-[10px] text-gray-400">Passed</p>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-1.5 rounded-full bg-indigo-50 overflow-hidden mb-3">
+            <div
+              className="h-full rounded-full"
+              style={{ width: "87%", background: "linear-gradient(90deg, #6366F1, #8B5CF6)" }}
+            />
+          </div>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { label: "AI Graded",   bg: "bg-indigo-50",  text: "text-indigo-600" },
+              { label: "W3C VC 2.0",  bg: "bg-violet-50",  text: "text-violet-600" },
+              { label: "Shareable",   bg: "bg-sky-50",     text: "text-sky-600" },
+            ].map((t) => (
+              <span key={t.label} className={cn("text-[10px] font-semibold px-2.5 py-0.5 rounded-full border", t.bg, t.text, "border-current/20")}>
+                {t.label}
+              </span>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Mini stat pills below card */}
-      <div className="flex gap-2 mt-3 justify-center">
-        {[
-          { label: "AI Graded", color: "#6366F1" },
-          { label: "Tamper-proof", color: "#8B5CF6" },
-          { label: "Shareable", color: "#06B6D4" },
-        ].map((p) => (
-          <span
-            key={p.label}
-            className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
-            style={{ background: `${p.color}18`, border: `1px solid ${p.color}30`, color: p.color }}
-          >
-            {p.label}
-          </span>
-        ))}
+      {/* Floating pills */}
+      <div
+        className="absolute -top-3 -right-4 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold shadow-lg"
+        style={{ background: "white", color: "#7C3AED", border: "1px solid rgba(124,58,237,0.15)", boxShadow: "0 4px 16px rgba(124,58,237,0.14)" }}
+      >
+        <Star className="h-3 w-3 fill-current" /> Credential Earned
+      </div>
+      <div
+        className="absolute -bottom-3 -left-4 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold shadow-lg"
+        style={{ background: "white", color: "#0EA5E9", border: "1px solid rgba(14,165,233,0.15)", boxShadow: "0 4px 16px rgba(14,165,233,0.12)" }}
+      >
+        <Globe className="h-3 w-3" /> 45+ Countries
       </div>
     </div>
   );
 }
 
-// ── Main hero ─────────────────────────────────────────────────────────────────
+// ── Hero ─────────────────────────────────────────────────────────────────────
 
 export function HeroSection() {
-  const [text1, setText1] = useState("");
-  const [text2, setText2] = useState("");
-  const [cursor, setCursor] = useState<"line1" | "line2" | "done">("line1");
+  const [t1, setT1] = useState("");
+  const [t1b, setT1b] = useState("");
+  const [t2, setT2] = useState("");
+  const [phase, setPhase] = useState<"l1" | "l1b" | "l2" | "done">("l1");
   const [showSub,  setShowSub]  = useState(false);
   const [showCTA,  setShowCTA]  = useState(false);
   const [showCard, setShowCard] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
+    let c = false;
     const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
     async function run() {
-      await delay(400);
-      for (let i = 1; i <= LINE1.length; i++) {
-        if (cancelled) return;
-        setText1(LINE1.slice(0, i));
-        await delay(CHAR_DELAY);
-      }
+      await delay(350);
+      for (let i = 1; i <= LINE1.length;  i++) { if (c) return; setT1(LINE1.slice(0, i));  await delay(CHAR_DELAY); }
+      await delay(120);
+      setPhase("l1b");
+      for (let i = 1; i <= LINE1B.length; i++) { if (c) return; setT1b(LINE1B.slice(0, i)); await delay(CHAR_DELAY); }
       await delay(200);
-      setCursor("line2");
-      for (let i = 1; i <= LINE2.length; i++) {
-        if (cancelled) return;
-        setText2(LINE2.slice(0, i));
-        await delay(CHAR_DELAY);
-      }
-      setCursor("done");
-      await delay(280);
-      if (!cancelled) setShowSub(true);
-      await delay(420);
-      if (!cancelled) setShowCTA(true);
-      await delay(280);
-      if (!cancelled) setShowCard(true);
+      setPhase("l2");
+      for (let i = 1; i <= LINE2.length;  i++) { if (c) return; setT2(LINE2.slice(0, i));  await delay(CHAR_DELAY); }
+      setPhase("done");
+      await delay(280); if (!c) setShowSub(true);
+      await delay(400); if (!c) setShowCTA(true);
+      await delay(280); if (!c) setShowCard(true);
     }
     run();
-    return () => { cancelled = true; };
+    return () => { c = true; };
   }, []);
 
   const fadeUp = (show: boolean, delay = "0ms") => ({
     opacity: show ? 1 : 0,
-    transform: show ? "translateY(0)" : "translateY(20px)",
+    transform: show ? "translateY(0)" : "translateY(18px)",
     transition: `opacity 0.65s ease ${delay}, transform 0.65s ease ${delay}`,
   });
 
+  const cursor = (active: boolean) => active
+    ? <span className="inline-block w-[3px] h-[0.82em] rounded-full bg-current align-middle ml-0.5 animate-pulse" />
+    : null;
+
   return (
-    <section className="relative overflow-hidden hero-bg">
+    <section
+      className="relative overflow-hidden"
+      style={{
+        background: `
+          radial-gradient(ellipse 70% 60% at 10% 40%, rgba(99,102,241,0.10) 0%, transparent 55%),
+          radial-gradient(ellipse 60% 50% at 90% 20%, rgba(139,92,246,0.08) 0%, transparent 55%),
+          radial-gradient(ellipse 50% 60% at 55% 90%, rgba(6,182,212,0.07) 0%, transparent 55%),
+          radial-gradient(ellipse 40% 40% at 80% 75%, rgba(251,191,36,0.06) 0%, transparent 55%),
+          #F8F9FF
+        `,
+      }}
+    >
+      {/* Subtle grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(rgba(99,102,241,0.06) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
 
-      {/* Gradient orbs */}
-      <div className="orb w-[700px] h-[700px] top-[-20%] left-[-12%]"  style={{ background: "radial-gradient(circle, rgba(99,102,241,0.20) 0%, transparent 65%)" }} />
-      <div className="orb w-[600px] h-[600px] top-[5%] right-[-12%]"   style={{ background: "radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 65%)" }} />
-      <div className="orb w-[500px] h-[500px] bottom-[-5%] left-[35%]" style={{ background: "radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 65%)" }} />
-
-      {/* Mesh grid */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
-        backgroundSize: "52px 52px",
-      }} />
-
-      {/* Main content */}
-      <div className="relative pt-20 pb-24 sm:pt-28 sm:pb-32 px-6">
+      <div className="relative pt-16 pb-20 sm:pt-24 sm:pb-28 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-[1fr_420px] gap-12 lg:gap-20 items-center">
+          <div className="grid lg:grid-cols-[1fr_400px] gap-10 lg:gap-16 items-center">
 
-            {/* ── Left column ── */}
+            {/* ── Left ── */}
             <div>
-
               {/* Logo */}
               <div className="flex justify-center lg:justify-start mb-7">
                 <Image
                   src="/logo.png"
                   alt="Maxx Engage"
-                  width={68}
-                  height={68}
+                  width={60}
+                  height={60}
                   className="rounded-xl"
-                  style={{ mixBlendMode: "screen" }}
+                  style={{ filter: "invert(1)", mixBlendMode: "multiply" }}
                   priority
                 />
               </div>
 
-              {/* Badge */}
-              <div className="flex justify-center lg:justify-start mb-6">
+              {/* Pill badge */}
+              <div className="flex justify-center lg:justify-start mb-5">
                 <div
-                  className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-bold tracking-widest uppercase"
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-bold tracking-widest uppercase shadow-sm"
                   style={{
-                    background: "rgba(99,102,241,0.14)",
-                    border: "1px solid rgba(99,102,241,0.35)",
-                    color: "#A5B4FC",
+                    background: "rgba(99,102,241,0.09)",
+                    border: "1px solid rgba(99,102,241,0.22)",
+                    color: "#6366F1",
                   }}
                 >
                   <Zap className="h-3 w-3" />
@@ -251,73 +240,59 @@ export function HeroSection() {
                 </div>
               </div>
 
-              {/* Heading */}
-              <h1
-                className="text-center lg:text-left font-extrabold tracking-tight leading-[1.07] mb-6"
-                style={{
-                  fontSize: "clamp(2.4rem, 5vw, 4rem)",
-                  minHeight: "2.4em",
-                }}
-              >
-                <span className="block text-white">
-                  {text1}
-                  {cursor === "line1" && (
-                    <span className="inline-block w-1 h-[0.82em] bg-white/80 align-middle ml-1 animate-pulse" />
-                  )}
+              {/* Heading — mixed style like image 1 */}
+              <div className="text-center lg:text-left mb-6" style={{ minHeight: "3.6em" }}>
+                {/* Line 1a — regular weight */}
+                <span className="block text-5xl sm:text-6xl lg:text-[68px] font-extrabold tracking-tight leading-[1.07] text-gray-800">
+                  {t1}{cursor(phase === "l1")}
                 </span>
-                {/* Gradient line 2 */}
+                {/* Line 1b — gradient italic-style */}
                 <span
-                  className="block"
+                  className="block text-5xl sm:text-6xl lg:text-[68px] font-extrabold tracking-tight leading-[1.07] italic"
                   style={{
-                    background: "linear-gradient(135deg, #818CF8 0%, #A78BFA 45%, #22D3EE 100%)",
+                    background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 55%, #06B6D4 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
-                    minHeight: "1.1em",
                   }}
                 >
-                  {text2}
-                  {cursor === "line2" && text2 && (
-                    <span
-                      className="inline-block w-1 h-[0.82em] align-middle ml-1 animate-pulse"
-                      style={{ background: "#A78BFA", WebkitTextFillColor: "initial" }}
-                    />
-                  )}
-                  {!text2 && <span className="invisible">Own Your Credentials.</span>}
+                  {t1b || <span className="invisible">You Know.</span>}{cursor(phase === "l1b")}
                 </span>
-              </h1>
+                {/* Line 2 — dark */}
+                <span className="block text-3xl sm:text-4xl lg:text-[42px] font-bold tracking-tight leading-[1.15] text-gray-500 mt-1">
+                  {t2 || <span className="invisible">Own Your Credentials.</span>}{cursor(phase === "l2")}
+                </span>
+              </div>
 
               {/* Subtext */}
               <p
-                className="text-center lg:text-left text-base sm:text-lg leading-relaxed mb-8 max-w-lg"
-                style={{ ...fadeUp(showSub), color: "rgba(255,255,255,0.52)", marginLeft: 0 }}
+                className="text-center lg:text-left text-base sm:text-lg text-gray-500 leading-relaxed mb-8 max-w-md"
+                style={fadeUp(showSub)}
               >
                 AI-graded skill assessments that issue tamper-proof W3C Verifiable
-                Credentials. No gatekeeping. No courses. Your work, fairly judged —
-                for every talent on Earth.
+                Credentials. No gatekeeping. Free for every talent on Earth.
               </p>
 
               {/* CTAs */}
               <div
-                className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8"
-                style={fadeUp(showCTA, "0.08s")}
+                className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-7"
+                style={fadeUp(showCTA, "0.06s")}
               >
                 <Link
                   href="/assess"
-                  className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl font-bold text-base text-white transition-opacity hover:opacity-88"
-                  style={{ background: "linear-gradient(135deg, #6366F1, #8B5CF6)", boxShadow: "0 0 30px rgba(99,102,241,0.40)" }}
+                  className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-2xl font-bold text-base text-white transition-all hover:scale-[1.02] hover:shadow-xl"
+                  style={{
+                    background: "linear-gradient(135deg, #6366F1, #8B5CF6)",
+                    boxShadow: "0 8px 28px rgba(99,102,241,0.35)",
+                  }}
                 >
                   Start Free Assessment
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="#how-it-works"
-                  className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl font-medium text-base transition-all hover:brightness-125"
-                  style={{
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.14)",
-                    color: "rgba(255,255,255,0.72)",
-                  }}
+                  className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-2xl font-semibold text-base text-gray-600 border border-gray-200 bg-white/80 hover:bg-white hover:border-indigo-200 transition-all"
+                  style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
                 >
                   See How It Works
                 </Link>
@@ -325,13 +300,13 @@ export function HeroSection() {
 
               {/* Trust strip */}
               <div
-                className="flex flex-wrap gap-5 justify-center lg:justify-start text-xs"
-                style={{ ...fadeUp(showCTA, "0.18s"), color: "rgba(255,255,255,0.32)" }}
+                className="flex flex-wrap gap-4 justify-center lg:justify-start text-xs text-gray-400"
+                style={fadeUp(showCTA, "0.14s")}
               >
                 {[
                   { icon: <ShieldCheck className="h-3.5 w-3.5" />, label: "Free forever for learners" },
                   { icon: <Lock className="h-3.5 w-3.5" />,        label: "No account to try" },
-                  { icon: <Users className="h-3.5 w-3.5" />,        label: "Every talent on Earth" },
+                  { icon: <Users className="h-3.5 w-3.5" />,        label: "Open to all talent" },
                 ].map((t) => (
                   <span key={t.label} className="flex items-center gap-1.5">
                     {t.icon}{t.label}
@@ -340,27 +315,15 @@ export function HeroSection() {
               </div>
             </div>
 
-            {/* ── Right column: credential card ── */}
-            <div className="flex justify-center lg:justify-end" style={fadeUp(showCard, "0.05s")}>
-              <div className="w-full">
-                <p
-                  className="text-center text-[10px] font-bold uppercase tracking-widest mb-3"
-                  style={{ color: "rgba(255,255,255,0.22)" }}
-                >
-                  What you earn
-                </p>
-                <CredentialCard visible={showCard} />
+            {/* ── Right: hero visual ── */}
+            <div className="flex justify-center lg:justify-end" style={fadeUp(showCard, "0.04s")}>
+              <div className="w-full max-w-sm">
+                <HeroVisual visible={showCard} />
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Bottom fade into light section */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: "linear-gradient(to bottom, transparent, oklch(0.99 0.004 264))" }}
-      />
     </section>
   );
 }

@@ -105,60 +105,150 @@ export default async function HomePage() {
 
         {/* ── Stats bar ────────────────────────────────────────────────────── */}
         {stats && (
-          <section className="border-y bg-card">
-            <div className="max-w-4xl mx-auto px-4">
-              <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border/60">
-                <StatPill
-                  value={stats.credential_count > 0 ? stats.credential_count.toLocaleString() : "—"}
-                  label="Credentials issued"
-                />
-                <StatPill
-                  value={stats.user_count > 0 ? stats.user_count.toLocaleString() : "—"}
-                  label="Learners joined"
-                />
-                <StatPill
-                  value={stats.country_count > 0 ? `${stats.country_count}+` : "—"}
-                  label="Countries"
-                />
-                <StatPill
-                  value={String(stats.skill_path_count)}
-                  label="Skill paths"
-                />
+          <section
+            className="py-6 px-6"
+            style={{ background: "rgba(255,255,255,0.72)", borderTop: "1px solid rgba(99,102,241,0.08)", borderBottom: "1px solid rgba(99,102,241,0.08)", backdropFilter: "blur(12px)" }}
+          >
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {[
+                  { value: stats.credential_count > 0 ? stats.credential_count.toLocaleString() : "—", label: "Credentials issued", color: "#6366F1" },
+                  { value: stats.user_count > 0 ? stats.user_count.toLocaleString() : "—",             label: "Learners joined",    color: "#8B5CF6" },
+                  { value: stats.country_count > 0 ? `${stats.country_count}+` : "—",                  label: "Countries",           color: "#06B6D4" },
+                  { value: String(stats.skill_path_count),                                              label: "Skill paths",         color: "#10B981" },
+                ].map((s) => (
+                  <div key={s.label} className="text-center px-4 py-3 rounded-2xl" style={{ background: "rgba(255,255,255,0.60)", border: "1px solid rgba(255,255,255,0.90)", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+                    <p className="text-2xl font-black mb-0.5" style={{ color: s.color }}>{s.value}</p>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide">{s.label}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
         )}
 
-        {/* ── How it works ─────────────────────────────────────────────────── */}
-        <section id="how-it-works" className="py-24 px-4 bg-background">
+        {/* ── Features bento grid (inspired by image 2) ───────────────────── */}
+        <section id="how-it-works" className="py-24 px-6"
+          style={{
+            background: `
+              radial-gradient(ellipse 60% 50% at 80% 30%, rgba(139,92,246,0.07) 0%, transparent 55%),
+              radial-gradient(ellipse 50% 50% at 20% 70%, rgba(6,182,212,0.06) 0%, transparent 55%),
+              #F8F9FF
+            `,
+          }}
+        >
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-14">
-              <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-3">Simple process</p>
-              <h2 className="text-3xl sm:text-4xl font-extrabold">Four steps to verified mastery</h2>
-              <p className="text-muted-foreground mt-3 max-w-lg mx-auto leading-relaxed">
+            <div className="text-center mb-12">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-3">How it works</p>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-800">Everything you need to prove your skills</h2>
+              <p className="text-gray-400 mt-3 max-w-lg mx-auto leading-relaxed">
                 From choosing a skill to owning a tamper-proof credential — all in under an hour.
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* 3-col bento grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
-                { step: "01", icon: <BookOpen className="h-5 w-5" />, title: "Pick a skill", desc: "Choose a skill path and level. Start with a diagnostic to see exactly where you stand." },
-                { step: "02", icon: <Zap className="h-5 w-5" />,      title: "Submit your work", desc: "Complete the task at your own pace. Paste your code, writing, or design directly." },
-                { step: "03", icon: <CheckCircle className="h-5 w-5" />, title: "AI grades it", desc: "Claude grades every dimension of the rubric with specific evidence quotes from your work." },
-                { step: "04", icon: <Award className="h-5 w-5" />,    title: "Earn a credential", desc: "Score 70+ and get a W3C Verifiable Credential you own forever — shareable, tamper-proof." },
-              ].map((item, i) => (
-                <div key={item.step} className="relative flex flex-col gap-4 p-6 rounded-2xl border bg-card shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-3xl font-black text-primary/10 leading-none select-none">{item.step}</span>
-                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">{item.icon}</div>
+                {
+                  icon: <BookOpen className="h-5 w-5" />,
+                  title: "Pick a skill path",
+                  desc: "Choose from Technology, Writing, Design, Data, Business, Operations, and more.",
+                  tag: "Step 01",
+                  gradient: "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)",
+                  iconBg: "linear-gradient(135deg, #6366F1, #8B5CF6)",
+                  tagColor: "#6366F1",
+                  tagBg: "rgba(99,102,241,0.10)",
+                },
+                {
+                  icon: <Zap className="h-5 w-5" />,
+                  title: "Submit your work",
+                  desc: "Complete the task at your own pace. Paste your code, writing, or design — no time pressure.",
+                  tag: "Step 02",
+                  gradient: "linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)",
+                  iconBg: "linear-gradient(135deg, #10B981, #059669)",
+                  tagColor: "#059669",
+                  tagBg: "rgba(5,150,105,0.10)",
+                },
+                {
+                  icon: <CheckCircle className="h-5 w-5" />,
+                  title: "AI grades it instantly",
+                  desc: "Claude scores every rubric dimension with specific evidence quotes pulled from your work.",
+                  tag: "Step 03",
+                  gradient: "linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)",
+                  iconBg: "linear-gradient(135deg, #F97316, #EA580C)",
+                  tagColor: "#EA580C",
+                  tagBg: "rgba(234,88,12,0.10)",
+                },
+                {
+                  icon: <Award className="h-5 w-5" />,
+                  title: "Earn your credential",
+                  desc: "Score 70+ and receive a W3C Verifiable Credential you own forever — signed, shareable, tamper-proof.",
+                  tag: "Step 04",
+                  gradient: "linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)",
+                  iconBg: "linear-gradient(135deg, #8B5CF6, #7C3AED)",
+                  tagColor: "#7C3AED",
+                  tagBg: "rgba(124,58,237,0.10)",
+                },
+                {
+                  icon: <ShieldCheck className="h-5 w-5" />,
+                  title: "Open reasoning, always",
+                  desc: "Every score comes with the AI's exact reasoning. No black boxes — you see exactly why you got each mark.",
+                  tag: "Transparent",
+                  gradient: "linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)",
+                  iconBg: "linear-gradient(135deg, #0EA5E9, #0284C7)",
+                  tagColor: "#0284C7",
+                  tagBg: "rgba(2,132,199,0.10)",
+                },
+                {
+                  icon: <Globe className="h-5 w-5" />,
+                  title: "You own your data",
+                  desc: "W3C VC 2.0 credentials are cryptographically signed and held by you — never locked to our platform.",
+                  tag: "Sovereign",
+                  gradient: "linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%)",
+                  iconBg: "linear-gradient(135deg, #F43F5E, #E11D48)",
+                  tagColor: "#E11D48",
+                  tagBg: "rgba(225,29,72,0.10)",
+                },
+              ].map((f) => (
+                <div
+                  key={f.title}
+                  className="rounded-2xl p-5 flex flex-col gap-3 transition-all hover:scale-[1.02] hover:shadow-lg"
+                  style={{
+                    background: f.gradient,
+                    border: "1.5px solid rgba(255,255,255,0.85)",
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  {/* Icon pair — like image 2 */}
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-sm"
+                      style={{ background: f.iconBg }}
+                    >
+                      {f.icon}
+                    </div>
+                    <div
+                      className="w-9 h-9 rounded-xl flex items-center justify-center"
+                      style={{ background: "rgba(255,255,255,0.70)", border: "1px solid rgba(255,255,255,0.90)" }}
+                    >
+                      <Zap className="h-4 w-4 text-gray-300" />
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-base mb-1.5">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+
+                  <div className="flex-1">
+                    <h3 className="font-bold text-gray-800 text-base mb-1.5">{f.title}</h3>
+                    <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
                   </div>
-                  {i < 3 && (
-                    <div className="hidden lg:block absolute -right-3 top-[2.25rem] w-6 border-t-2 border-dashed border-border z-10" />
-                  )}
+
+                  {/* Tag pill — like image 2 */}
+                  <div className="flex">
+                    <span
+                      className="text-[11px] font-bold px-3 py-1 rounded-full"
+                      style={{ background: f.tagBg, color: f.tagColor }}
+                    >
+                      {f.tag}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
