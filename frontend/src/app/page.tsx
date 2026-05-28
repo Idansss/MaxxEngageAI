@@ -156,97 +156,101 @@ export default async function HomePage() {
                   title: "Pick a skill path",
                   desc: "Choose from Technology, Writing, Design, Data, Business, Operations, and more.",
                   tag: "Step 01",
-                  gradient: "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)",
+                  gradient: "linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(139,92,246,0.10) 100%)",
                   iconBg: "linear-gradient(135deg, #6366F1, #8B5CF6)",
                   tagColor: "#6366F1",
-                  tagBg: "rgba(99,102,241,0.10)",
+                  tagBg: "rgba(99,102,241,0.15)",
                 },
                 {
                   icon: <Zap className="h-5 w-5" />,
                   title: "Submit your work",
                   desc: "Complete the task at your own pace. Paste your code, writing, or design — no time pressure.",
                   tag: "Step 02",
-                  gradient: "linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)",
+                  gradient: "linear-gradient(135deg, rgba(16,185,129,0.16) 0%, rgba(5,150,105,0.08) 100%)",
                   iconBg: "linear-gradient(135deg, #10B981, #059669)",
                   tagColor: "#059669",
-                  tagBg: "rgba(5,150,105,0.10)",
+                  tagBg: "rgba(5,150,105,0.15)",
                 },
                 {
                   icon: <CheckCircle className="h-5 w-5" />,
                   title: "AI grades it instantly",
                   desc: "Claude scores every rubric dimension with specific evidence quotes pulled from your work.",
                   tag: "Step 03",
-                  gradient: "linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)",
+                  gradient: "linear-gradient(135deg, rgba(249,115,22,0.16) 0%, rgba(234,88,12,0.08) 100%)",
                   iconBg: "linear-gradient(135deg, #F97316, #EA580C)",
                   tagColor: "#EA580C",
-                  tagBg: "rgba(234,88,12,0.10)",
+                  tagBg: "rgba(234,88,12,0.15)",
                 },
                 {
                   icon: <Award className="h-5 w-5" />,
                   title: "Earn your credential",
                   desc: "Score 70+ and receive a W3C Verifiable Credential you own forever — signed, shareable, tamper-proof.",
                   tag: "Step 04",
-                  gradient: "linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)",
+                  gradient: "linear-gradient(135deg, rgba(139,92,246,0.18) 0%, rgba(124,58,237,0.10) 100%)",
                   iconBg: "linear-gradient(135deg, #8B5CF6, #7C3AED)",
                   tagColor: "#7C3AED",
-                  tagBg: "rgba(124,58,237,0.10)",
+                  tagBg: "rgba(124,58,237,0.15)",
                 },
                 {
                   icon: <ShieldCheck className="h-5 w-5" />,
                   title: "Open reasoning, always",
                   desc: "Every score comes with the AI's exact reasoning. No black boxes — you see exactly why you got each mark.",
                   tag: "Transparent",
-                  gradient: "linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)",
+                  gradient: "linear-gradient(135deg, rgba(14,165,233,0.16) 0%, rgba(2,132,199,0.08) 100%)",
                   iconBg: "linear-gradient(135deg, #0EA5E9, #0284C7)",
                   tagColor: "#0284C7",
-                  tagBg: "rgba(2,132,199,0.10)",
+                  tagBg: "rgba(2,132,199,0.15)",
                 },
                 {
                   icon: <Globe className="h-5 w-5" />,
                   title: "You own your data",
                   desc: "W3C VC 2.0 credentials are cryptographically signed and held by you — never locked to our platform.",
                   tag: "Sovereign",
-                  gradient: "linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%)",
+                  gradient: "linear-gradient(135deg, rgba(244,63,94,0.16) 0%, rgba(225,29,72,0.08) 100%)",
                   iconBg: "linear-gradient(135deg, #F43F5E, #E11D48)",
                   tagColor: "#E11D48",
-                  tagBg: "rgba(225,29,72,0.10)",
+                  tagBg: "rgba(225,29,72,0.15)",
                 },
               ].map((f) => (
                 <div
                   key={f.title}
-                  className="rounded-2xl p-5 flex flex-col gap-3 transition-all hover:scale-[1.02] hover:shadow-lg"
+                  className="relative rounded-2xl p-5 flex flex-col gap-3 transition-all hover:scale-[1.02] hover:shadow-xl overflow-hidden"
                   style={{
                     background: f.gradient,
-                    border: "1.5px solid rgba(255,255,255,0.85)",
-                    boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+                    border: "1.5px solid rgba(255,255,255,0.70)",
+                    backdropFilter: "blur(24px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(24px) saturate(180%)",
+                    boxShadow: "0 8px 32px rgba(99,102,241,0.08), inset 0 1px 0 rgba(255,255,255,0.60)",
                   }}
                 >
-                  {/* Icon pair — like image 2 */}
-                  <div className="flex items-center gap-2">
+                  {/* Glass highlight sheen */}
+                  <div
+                    className="absolute inset-0 pointer-events-none rounded-2xl"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, transparent 45%)",
+                    }}
+                  />
+
+                  {/* Single icon */}
+                  <div className="relative">
                     <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-sm"
-                      style={{ background: f.iconBg }}
+                      className="w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-md"
+                      style={{ background: f.iconBg, boxShadow: "0 4px 14px rgba(0,0,0,0.10)" }}
                     >
                       {f.icon}
                     </div>
-                    <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center"
-                      style={{ background: "rgba(255,255,255,0.70)", border: "1px solid rgba(255,255,255,0.90)" }}
-                    >
-                      <Zap className="h-4 w-4 text-gray-300" />
-                    </div>
                   </div>
 
-                  <div className="flex-1">
+                  <div className="relative flex-1">
                     <h3 className="font-bold text-gray-800 text-base mb-1.5">{f.title}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">{f.desc}</p>
                   </div>
 
-                  {/* Tag pill — like image 2 */}
-                  <div className="flex">
+                  {/* Tag pill */}
+                  <div className="relative flex">
                     <span
-                      className="text-[11px] font-bold px-3 py-1 rounded-full"
-                      style={{ background: f.tagBg, color: f.tagColor }}
+                      className="text-[11px] font-bold px-3 py-1 rounded-full backdrop-blur"
+                      style={{ background: f.tagBg, color: f.tagColor, border: "1px solid rgba(255,255,255,0.50)" }}
                     >
                       {f.tag}
                     </span>
