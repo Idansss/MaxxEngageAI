@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HeroSection } from "@/components/hero-section";
+import { LandingNav } from "@/components/landing-nav";
 
 export const dynamic = "force-dynamic";
 
@@ -98,6 +99,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <LandingNav />
       <main className="flex-1">
 
         {/* ── Hero ─────────────────────────────────────────────────────────── */}

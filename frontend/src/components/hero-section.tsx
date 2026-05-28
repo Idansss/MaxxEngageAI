@@ -206,25 +206,12 @@ export function HeroSection() {
         }}
       />
 
-      <div className="relative pt-16 pb-20 sm:pt-24 sm:pb-28 px-6">
+      <div className="relative pt-10 pb-20 sm:pt-14 sm:pb-28 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-[1fr_400px] gap-10 lg:gap-16 items-center">
 
             {/* ── Left ── */}
             <div>
-              {/* Logo */}
-              <div className="flex justify-center lg:justify-start mb-7">
-                <Image
-                  src="/logo.png"
-                  alt="Maxx Engage"
-                  width={60}
-                  height={60}
-                  className="rounded-xl"
-                  style={{ filter: "invert(1)", mixBlendMode: "multiply" }}
-                  priority
-                />
-              </div>
-
               {/* Pill badge */}
               <div className="flex justify-center lg:justify-start mb-5">
                 <div
