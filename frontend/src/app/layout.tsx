@@ -5,6 +5,7 @@ import { Providers } from "@/lib/providers";
 import { Navbar } from "@/components/navbar";
 import { Sidebar } from "@/components/sidebar";
 import { ContentWrapper } from "@/components/content-wrapper";
+import { DesktopTopBar } from "@/components/desktop-topbar";
 import { ServiceWorkerRegistrar } from "@/components/sw-register";
 
 const jakartaSans = Plus_Jakarta_Sans({
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Sidebar />
           <ContentWrapper>
             <Navbar />
+            <DesktopTopBar />
             {children}
           </ContentWrapper>
         </Providers>

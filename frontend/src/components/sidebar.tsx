@@ -9,8 +9,6 @@ import {
   FolderOpen, GitBranch, LayoutDashboard, LogOut, Moon, Settings,
   ShieldAlert, ShieldCheck, Sun, Target, User, UserCheck, WalletCards, Zap,
 } from "lucide-react";
-import { NotificationBell } from "@/components/notification-bell";
-import { SearchModal } from "@/components/search-modal";
 import { useTheme } from "@/lib/theme-context";
 
 const ADMIN_EMAILS = new Set(
@@ -83,13 +81,6 @@ export function Sidebar() {
             <NavLink href="/projects"     label="Projects"   icon={<FolderOpen className="h-4 w-4" />}      pathname={pathname} />
             <NavLink href="/review-queue" label="Review"     icon={<UserCheck className="h-4 w-4" />}       pathname={pathname} />
 
-            <Divider />
-
-            {/* Search */}
-            <SearchModal sidebar />
-
-            {/* Notifications */}
-            <NotificationBell sidebar />
           </>
         ) : !loading ? (
           <>
