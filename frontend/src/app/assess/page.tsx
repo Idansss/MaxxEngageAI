@@ -23,10 +23,15 @@ import { assessmentSlugs } from "@/lib/assessments";
 // ── Rubric config ───────────────────────────────────────────────────────────
 
 const SUBMISSION_TYPE_FOR_RUBRIC: Record<string, AssessRequest["submission_type"]> = {
-  "web-dev-html-001":    "html_css_js",
-  "backend-api-001":     "code",
-  "copy-en-001":         "text",
-  "translate-yo-en-001": "text",
+  "web-dev-html-001":       "html_css_js",
+  "backend-api-001":        "code",
+  "copy-en-001":            "text",
+  "translate-yo-en-001":    "text",
+  "ux-design-001":          "text",
+  "business-analysis-001":  "text",
+  "data-analysis-001":      "text",
+  "ops-process-001":        "text",
+  "science-comm-001":       "text",
 };
 
 const PASS_THRESHOLD_FOR_RUBRIC: Record<string, number> = {
@@ -65,28 +70,65 @@ const RUBRIC_DIMENSIONS: Record<string, { label: string; pts: number }[]> = {
     { label: "Natural Yoruba",      pts: 25 },
     { label: "Translator's Note",   pts: 20 },
   ],
+  "ux-design-001": [
+    { label: "Visual Hierarchy",          pts: 20 },
+    { label: "Simplicity & Accessibility",pts: 25 },
+    { label: "User Flow",                 pts: 25 },
+    { label: "Feedback & Error States",   pts: 15 },
+    { label: "Rationale Quality",         pts: 15 },
+  ],
+  "business-analysis-001": [
+    { label: "Problem Clarity",       pts: 20 },
+    { label: "Customer Understanding",pts: 25 },
+    { label: "Solution Design",       pts: 25 },
+    { label: "Risk Identification",   pts: 15 },
+    { label: "Analytical Rigor",      pts: 15 },
+  ],
+  "data-analysis-001": [
+    { label: "Insight Quality",         pts: 30 },
+    { label: "Analytical Reasoning",    pts: 25 },
+    { label: "Problem Prioritisation",  pts: 20 },
+    { label: "Recommendation Clarity",  pts: 15 },
+    { label: "Communication",           pts: 10 },
+  ],
+  "ops-process-001": [
+    { label: "Completeness",         pts: 25 },
+    { label: "Clarity & Specificity",pts: 25 },
+    { label: "Decision Handling",    pts: 20 },
+    { label: "Format & Scannability",pts: 15 },
+    { label: "Practical Realism",    pts: 15 },
+  ],
+  "science-comm-001": [
+    { label: "Scientific Accuracy",   pts: 30 },
+    { label: "Clarity & Accessibility",pts: 25 },
+    { label: "Concern Addressal",     pts: 25 },
+    { label: "Trust-Building Tone",   pts: 10 },
+    { label: "Structure",             pts: 10 },
+  ],
 };
 
 // ── Assessment index ────────────────────────────────────────────────────────
 
 const DOMAIN_LABELS: Record<string, string> = {
-  technology: "Technology",
-  writing:    "Writing",
-  design:     "Design",
-  data:       "Data",
-  business:   "Business",
-  ops:        "Operations",
-  science:    "Science",
+  technology:    "Technology",
+  writing:       "Writing",
+  design:        "Design",
+  data:          "Data",
+  business:      "Business",
+  ops:           "Operations",
+  science:       "Science",
+  communication: "Communication",
 };
 
 const ESTIMATED_MINUTES: Record<string, string> = {
-  technology: "60–90 min",
-  writing:    "45 min",
-  data:       "60 min",
-  design:     "60 min",
-  business:   "45 min",
-  ops:        "45 min",
-  science:    "60 min",
+  technology:    "60–90 min",
+  writing:       "45 min",
+  data:          "60 min",
+  design:        "60 min",
+  business:      "60 min",
+  ops:           "45 min",
+  science:       "45 min",
+  communication: "45 min",
 };
 
 function domainStripe(domain: string) {
@@ -140,12 +182,11 @@ function AssessIndex() {
     return map;
   })();
 
-  const phase1SkillPaths = skillPaths.filter((path) => assessmentSlugs.has(path.slug));
-  const domains = ["all", ...Array.from(new Set(phase1SkillPaths.map((p) => p.domain))).sort()];
+  const domains = ["all", ...Array.from(new Set(skillPaths.map((p) => p.domain))).sort()];
 
   const filtered = activeFilter === "all"
-    ? phase1SkillPaths
-    : phase1SkillPaths.filter((p) => p.domain === activeFilter);
+    ? skillPaths
+    : skillPaths.filter((p) => p.domain === activeFilter);
 
   if (authLoading || isLoading) {
     return (
@@ -156,7 +197,7 @@ function AssessIndex() {
   }
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-10">
+    <main className="max-w-5xl px-6 py-10">
       {/* Header */}
       <div className="mb-8">
         <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">
@@ -214,12 +255,11 @@ function AssessIndex() {
       )}
 
       {activeFilter === "all" && (
-        <div className="mt-4 space-y-6">
-          {/* Multi-day projects CTA */}
-          <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="mt-4">
+          <div className="rounded-xl border bg-card p-5 flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <FolderOpen className="h-4 w-4 text-primary shrink-0" />
+                <FolderOpen className="h-4 w-4 text-foreground/60 shrink-0" />
                 <p className="text-sm font-semibold">Want something deeper? Try a Project.</p>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
@@ -231,30 +271,11 @@ function AssessIndex() {
               href="/projects"
               className={cn(
                 "inline-flex items-center justify-center gap-1.5 rounded-lg text-sm font-medium h-9 px-5 shrink-0",
-                "bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                "bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
               )}
             >
               Browse projects <ArrowRight className="h-3.5 w-3.5" />
             </Link>
-          </div>
-
-          {/* Coming soon */}
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
-              Coming soon
-            </p>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {["Design", "Business", "Communication"].map((label) => (
-                <Card key={label} className="opacity-60 border-dashed">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">{label}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">Assessments in this category are planned for a later phase.</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
           </div>
         </div>
       )}
@@ -383,7 +404,7 @@ function AssessDetail({ pathSlug }: { pathSlug: string }) {
   const isTranslation   = rubricId === "translate-yo-en-001";
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10">
+    <div className="max-w-2xl px-6 py-10">
       <Link
         href="/assess"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
@@ -575,7 +596,7 @@ function AssessForm({ pathSlug }: { pathSlug: string }) {
 
   if (taskError) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10">
+      <div className="max-w-3xl px-6 py-10">
         <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-5 text-sm text-destructive flex items-start gap-3">
           <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
           <div>
@@ -603,7 +624,7 @@ function AssessForm({ pathSlug }: { pathSlug: string }) {
   const hasDraft = chars >= 50;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
+    <div className="max-w-3xl px-6 py-10">
       <Link
         href={`/assess/${pathSlug}`}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
