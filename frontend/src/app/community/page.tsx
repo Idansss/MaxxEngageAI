@@ -70,7 +70,7 @@ export default function CommunityPage() {
                   <div>
                     <p className="font-bold">{data?.repo.name ?? "Idansss/MaxxEngageAI"}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      License {data?.repo.license ?? "AGPL-3.0"} Â· {data?.repo.open_issues ?? 0} open issues
+                      License {data?.repo.license ?? "AGPL-3.0"} · {data?.repo.open_issues ?? 0} open issues
                     </p>
                   </div>
                   <a

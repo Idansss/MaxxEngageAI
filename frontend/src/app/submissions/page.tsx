@@ -100,7 +100,7 @@ function AppealForm({ submissionId, onDone }: { submissionId: string; onDone: ()
       <textarea
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        placeholder="Explain why you believe this score is incorrect (min 20 characters)â€¦"
+        placeholder="Explain why you believe this score is incorrect (min 20 characters)…"
         rows={3}
         className="w-full text-xs rounded-lg border bg-background p-2.5 placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none transition-shadow"
       />
@@ -156,7 +156,7 @@ function SubmissionCard({ item }: { item: SubmissionHistoryItem }) {
               <div className="min-w-0">
                 <p className="text-sm font-semibold">
                   {item.skill_path_name}
-                  <span className="text-muted-foreground font-normal"> Â· Level {item.level}</span>
+                  <span className="text-muted-foreground font-normal"> · Level {item.level}</span>
                 </p>
                 {item.task_title && (
                   <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.task_title}</p>

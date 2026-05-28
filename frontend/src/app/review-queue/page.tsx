@@ -162,7 +162,7 @@ function VerdictCard({ item }: { item: PeerReviewQueueItem }) {
             onChange={(e) => setNotes(e.target.value)}
             placeholder={
               verdict === "reject"
-                ? "Explain why this translation should not be approvedâ€¦"
+                ? "Explain why this translation should not be approved…"
                 : "Optional: any notes for the submitter"
             }
             className="resize-none min-h-[80px] text-sm"
@@ -228,7 +228,7 @@ function SubmissionStatusCard({ item }: { item: PeerReviewQueueItem }) {
         {item.status === "approved" && (
           <div className="flex items-center gap-2 text-xs text-green-800">
             <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-            Approved â€” your credential has been issued.{" "}
+            Approved — your credential has been issued.{" "}
             <Link href="/identity" className="underline underline-offset-2">View credentials â†’</Link>
           </div>
         )}

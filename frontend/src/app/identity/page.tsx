@@ -48,7 +48,7 @@ const STAMPS: StampDef[] = [
     icon: <GitBranch className="h-7 w-7" />,
     iconBg: "bg-gray-100 text-gray-700",
     ptsBadge: "bg-gray-50 text-gray-700 border-gray-200",
-    description: "Account â‰¥ 6 months with at least 1 repo. Senior tier (+35) needs 2 yrs & 10 repos.",
+    description: "Account ≥ 6 months with at least 1 repo. Senior tier (+35) needs 2 yrs & 10 repos.",
     inputType: "github",
   },
   {
@@ -59,7 +59,7 @@ const STAMPS: StampDef[] = [
     icon: <ShieldCheck className="h-7 w-7" />,
     iconBg: "bg-violet-100 text-violet-600",
     ptsBadge: "bg-violet-50 text-violet-700 border-violet-200",
-    description: "Connect Web2 + Web3 stamps via your Ethereum wallet. Score â‰¥ 1 to qualify.",
+    description: "Connect Web2 + Web3 stamps via your Ethereum wallet. Score ≥ 1 to qualify.",
     inputType: "gitcoin",
     externalLink: "https://app.passport.xyz",
   },
@@ -106,7 +106,7 @@ export default function IdentityPage() {
     enabled: !!session,
   });
 
-  // Auto-claim email stamp â€” user is already verified by magic link sign-in
+  // Auto-claim email stamp — user is already verified by magic link sign-in
   useEffect(() => {
     if (!session || stampsLoading || !stampsData) return;
     const hasEmail = stampsData.stamps.some((s) => s.stamp_type === "email" && s.active);
@@ -282,7 +282,7 @@ export default function IdentityPage() {
             {usernameMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : profile?.username ? "Change" : "Set username"}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">3â€“20 characters, lowercase letters, numbers, and underscores only.</p>
+        <p className="text-xs text-muted-foreground mt-2">3–20 characters, lowercase letters, numbers, and underscores only.</p>
 
         {usernameMsg && (
           <p className={cn("text-xs flex items-start gap-1.5 mt-2", usernameMsg.ok ? "text-success" : "text-destructive")}>
@@ -387,11 +387,11 @@ function StampCard({
             {def.type === "github" && (
               <>
                 <p className="font-semibold">{String(meta?.github_username ?? "")}</p>
-                <p className="text-success/70">{String(meta?.account_age_days ?? "")} days Â· {String(meta?.public_repos ?? "")} repos Â· {String(meta?.tier ?? "")} tier</p>
+                <p className="text-success/70">{String(meta?.account_age_days ?? "")} days · {String(meta?.public_repos ?? "")} repos · {String(meta?.tier ?? "")} tier</p>
               </>
             )}
             {def.type === "gitcoin_passport" && (
-              <p className="font-semibold">Score {String(meta?.gitcoin_score ?? "")} Â· {String(meta?.tier ?? "")} tier</p>
+              <p className="font-semibold">Score {String(meta?.gitcoin_score ?? "")} · {String(meta?.tier ?? "")} tier</p>
             )}
             {def.type === "email" && (
               <p className="font-semibold">Email verified via magic link</p>
@@ -418,7 +418,7 @@ function StampCard({
         )}
       </div>
 
-      {/* Card bottom â€” action area */}
+      {/* Card bottom — action area */}
       {!def.comingSoon && !stampsLoading && (
         <div className="px-5 pb-5 space-y-2.5">
           {def.inputType === "github" && (

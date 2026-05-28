@@ -232,7 +232,7 @@ function VerifiedCredentialCard({ cred, user, sig }: {
           <Link href="/" className="text-primary font-medium hover:underline underline-offset-2">
             Maxx Engage
           </Link>{" "}
-          Â· AI-graded against a transparent rubric
+          · AI-graded against a transparent rubric
         </div>
       </CardContent>
     </Card>
@@ -252,7 +252,7 @@ function CredentialRow({ cred }: { cred: VerifyCredential }) {
       <div className={cn("h-1.5 w-1.5 rounded-full shrink-0 mt-0.5", domainStripe(cred.domain))} />
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm truncate">{cred.skill_name || cred.skill_path_name}</p>
-        <p className="text-xs text-muted-foreground">{cred.level_label} Â· Earned {earnedOn}</p>
+        <p className="text-xs text-muted-foreground">{cred.level_label} · Earned {earnedOn}</p>
       </div>
       <span className={cn("font-black text-lg shrink-0", scoreColor(cred.score))}>
         {Math.round(cred.score)}
@@ -302,7 +302,7 @@ function VerifyByIdTab() {
             sig = { valid: result.valid, reason: result.reason, issuer: result.issuer, subject_did: result.subject_did };
           }
         } catch {
-          // ignored â€” sig stays null
+          // ignored — sig stays null
         }
 
         setState({ kind: "credential", data: cred, user, sig });
@@ -372,7 +372,7 @@ function VerifyByIdTab() {
         <div className="flex items-center justify-center py-14">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">Checkingâ€¦</p>
+            <p className="text-sm text-muted-foreground">Checking…</p>
           </div>
         </div>
       )}
@@ -455,7 +455,7 @@ function VerifyByJsonTab() {
     try {
       parsed = JSON.parse(jsonText.trim());
     } catch {
-      setVerifyState({ kind: "error", message: "Invalid JSON â€” paste the full W3C VC JSON-LD document." });
+      setVerifyState({ kind: "error", message: "Invalid JSON — paste the full W3C VC JSON-LD document." });
       return;
     }
 

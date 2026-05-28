@@ -188,7 +188,7 @@ export default function LeaderboardPage() {
           Leaderboard
         </h1>
         <p className="text-muted-foreground text-sm mt-1.5 max-w-lg leading-relaxed">
-          Top scores across all skill assessments. Each person appears once per skill â€” their best result.
+          Top scores across all skill assessments. Each person appears once per skill — their best result.
         </p>
       </div>
 
@@ -215,7 +215,7 @@ export default function LeaderboardPage() {
       {!isLoading && total > 0 && (
         <p className="text-xs text-muted-foreground mb-4">
           {total} credential{total !== 1 ? "s" : ""} on the board
-          {domain ? ` Â· ${domain} domain` : ""}
+          {domain ? ` · ${domain} domain` : ""}
         </p>
       )}
 

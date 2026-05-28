@@ -393,7 +393,7 @@ export default function SettingsPage() {
                 {avatarUploading
                   ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   : <Upload className="h-3.5 w-3.5" />}
-                {avatarUploading ? "Uploadingâ€¦" : "Upload photo"}
+                {avatarUploading ? "Uploading…" : "Upload photo"}
               </button>
             </div>
           </div>
@@ -410,7 +410,7 @@ export default function SettingsPage() {
 
           <Field label="Bio" hint="A short introduction shown on your public profile">
             <Textarea
-              placeholder="I build APIs and love distributed systemsâ€¦"
+              placeholder="I build APIs and love distributed systems…"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={3}
@@ -465,7 +465,7 @@ export default function SettingsPage() {
                   maxx-engage.io/u/<span className="font-mono font-semibold text-foreground">{profile.username}</span>
                 </p>
               ) : (
-                <p className="text-xs text-muted-foreground mt-0.5">Not set â€” set one on your Identity page</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Not set — set one on your Identity page</p>
               )}
             </div>
             <Link
@@ -510,7 +510,7 @@ export default function SettingsPage() {
             </div>
             {visibilitySaving && (
               <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                <Loader2 className="h-3 w-3 animate-spin" /> Savingâ€¦
+                <Loader2 className="h-3 w-3 animate-spin" /> Saving…
               </p>
             )}
             {visibilityStatus && !visibilitySaving && (
@@ -548,7 +548,7 @@ export default function SettingsPage() {
                 <p className="text-xs text-muted-foreground">Composite across all credentials</p>
               </div>
               <Badge variant="secondary" className="text-base font-black px-3 py-1">
-                {profile?.overall_score != null ? profile.overall_score.toFixed(0) : "â€”"}
+                {profile?.overall_score != null ? profile.overall_score.toFixed(0) : "—"}
               </Badge>
             </div>
 

@@ -273,7 +273,7 @@ export default function AdminQueuePage() {
 
         {deciding && (
           <div className="fixed bottom-4 right-4 bg-white border shadow-lg rounded-lg px-4 py-2 flex items-center gap-2 text-sm">
-            <Loader2 className="h-4 w-4 animate-spin" /> Saving decisionâ€¦
+            <Loader2 className="h-4 w-4 animate-spin" /> Saving decision…
           </div>
         )}
       </main>

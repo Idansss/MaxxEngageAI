@@ -387,7 +387,7 @@ function FilterBar({ filters, onChange }: { filters: Filters; onChange: (f: Filt
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
         <input
           type="text"
-          placeholder="Name or usernameâ€¦"
+          placeholder="Name or username…"
           value={filters.q}
           onChange={(e) => onChange({ ...filters, q: e.target.value })}
           className="text-sm border border-border rounded-lg pl-8 pr-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 w-44 transition-shadow"
@@ -521,9 +521,9 @@ export default function EmployersPage() {
             <p className="text-xs text-muted-foreground mb-5">
               {total === 0 ? "No results" : `${total} verified professional${total !== 1 ? "s" : ""}`}
               {filters.q ? ` matching "${filters.q}"` : ""}
-              {filters.domain ? ` Â· ${filters.domain}` : ""}
-              {filters.country ? ` Â· ${filters.country}` : ""}
-              {filters.minScore ? ` Â· score â‰¥ ${filters.minScore}` : ""}
+              {filters.domain ? ` · ${filters.domain}` : ""}
+              {filters.country ? ` · ${filters.country}` : ""}
+              {filters.minScore ? ` · score ≥ ${filters.minScore}` : ""}
             </p>
           )}
 

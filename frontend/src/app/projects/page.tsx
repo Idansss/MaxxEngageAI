@@ -67,7 +67,7 @@ function ProjectCard({ brief }: { brief: ProjectBriefSummary }) {
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Calendar className="h-3.5 w-3.5" />
             {brief.estimated_days} day{brief.estimated_days !== 1 ? "s" : ""}
-            <span className="text-muted-foreground/40 mx-1">Â·</span>
+            <span className="text-muted-foreground/40 mx-1">·</span>
             {requiredCount} required file{requiredCount !== 1 ? "s" : ""}
           </div>
         </div>
@@ -108,9 +108,9 @@ export default function ProjectsPage() {
 
       {/* Difference from diagnostics */}
       <div className="mb-8 rounded-xl border bg-primary/5 border-primary/15 p-4 text-sm text-foreground/80 leading-relaxed">
-        <span className="font-semibold text-foreground">Projects vs Diagnostics â€”</span>{" "}
+        <span className="font-semibold text-foreground">Projects vs Diagnostics —</span>{" "}
         Diagnostics are timed tasks that test a specific skill in one sitting.
-        Projects are multi-day briefs with multiple deliverables â€” closer to real client work.
+        Projects are multi-day briefs with multiple deliverables — closer to real client work.
         Both award the same verifiable credential.
       </div>
 

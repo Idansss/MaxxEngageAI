@@ -105,7 +105,7 @@ function FeedRow({ item }: { item: FeedItem }) {
               {item.domain}
             </Badge>
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">Credential earned Â· {fmtDate(item.date)}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Credential earned · {fmtDate(item.date)}</p>
         </div>
         <div className="text-right shrink-0">
           <p className={cn("text-lg font-black tabular-nums", scoreColor(item.score))}>{item.score.toFixed(0)}</p>
@@ -125,7 +125,7 @@ function FeedRow({ item }: { item: FeedItem }) {
           <p className="text-sm font-medium truncate">{item.name}</p>
           <span className="text-xs text-muted-foreground shrink-0">Lv {item.level}</span>
         </div>
-        <p className="text-xs text-muted-foreground mt-0.5">Submission Â· {fmtDate(item.date)}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">Submission · {fmtDate(item.date)}</p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         {item.score !== null && (
@@ -261,7 +261,7 @@ export default function DashboardPage() {
 
   // Current path (most recent activity)
   const activeSlug    = submItems[0]?.skill_path_slug ?? skillPaths[0]?.slug ?? "";
-  const activePathName = submItems[0]?.skill_path_name ?? skillPaths[0]?.name ?? "â€”";
+  const activePathName = submItems[0]?.skill_path_name ?? skillPaths[0]?.name ?? "—";
   const activeDomain  = submItems[0]?.domain ?? skillPaths[0]?.domain ?? "technology";
   const pathSubmissions = submItems.filter((s) => s.skill_path_slug === activeSlug);
   const bestScore     = pathSubmissions.reduce<number | null>(
@@ -351,28 +351,28 @@ export default function DashboardPage() {
           accent="stat-accent-indigo"
           icon={<Award className="h-4 w-4 text-primary" />}
           label="Credentials"
-          value={credsLoading ? "â€¦" : String(credentials.length)}
+          value={credsLoading ? "…" : String(credentials.length)}
           sub="earned"
         />
         <StatCard
           accent="stat-accent-green"
           icon={<CheckCircle className="h-4 w-4 text-success" />}
           label="Submissions"
-          value={subsLoading ? "â€¦" : String(submissions?.total ?? 0)}
+          value={subsLoading ? "…" : String(submissions?.total ?? 0)}
           sub="total"
         />
         <StatCard
           accent="stat-accent-amber"
           icon={<Zap className="h-4 w-4 text-gold" />}
           label="Overall score"
-          value={profile?.overall_score ? profile.overall_score.toFixed(0) : "â€”"}
+          value={profile?.overall_score ? profile.overall_score.toFixed(0) : “—“}
           sub="average"
         />
         <StatCard
           accent="stat-accent-violet"
           icon={<Flame className="h-4 w-4 text-orange-500" />}
           label="Active days"
-          value={streak > 0 ? `${streak}` : "â€”"}
+          value={streak > 0 ? `${streak}` : “—“}
           sub={streak === 1 ? "day this week" : streak > 1 ? "days this week" : "no streak yet"}
         />
       </div>
@@ -561,7 +561,7 @@ export default function DashboardPage() {
                   {profile.did}
                 </code>
                 <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                  Your W3C Decentralized Identifier â€” lives on your credentials forever.
+                  Your W3C Decentralized Identifier — lives on your credentials forever.
                 </p>
               </CardContent>
             </Card>

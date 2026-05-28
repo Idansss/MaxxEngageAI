@@ -173,9 +173,9 @@ export default function ReferralPage() {
             <CardContent>
               <ol className="space-y-3">
                 {[
-                  { n: "1", text: "Share your invite link with anyone â€” no limit." },
+                  { n: "1", text: "Share your invite link with anyone — no limit." },
                   { n: "2", text: "They sign up and create their Maxx Engage account." },
-                  { n: "3", text: `Once ${data.stamp_threshold} friends join, you automatically earn +${data.stamp_points} humanity score â€” no action needed.` },
+                  { n: "3", text: `Once ${data.stamp_threshold} friends join, you automatically earn +${data.stamp_points} humanity score — no action needed.` },
                 ].map((step) => (
                   <li key={step.n} className="flex items-start gap-3">
                     <div className="h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
