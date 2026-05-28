@@ -8,6 +8,7 @@ import {
   Globe, Lock, ShieldCheck, Wifi, Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { HeroSection } from "@/components/hero-section";
 
 export const dynamic = "force-dynamic";
 
@@ -100,49 +101,7 @@ export default async function HomePage() {
       <main className="flex-1">
 
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
-        <section className="hero-bg dot-grid relative overflow-hidden py-24 sm:py-32 px-4">
-          <div className="orb w-[600px] h-[600px] top-[-20%] left-[-10%] bg-white/5" />
-          <div className="orb w-[450px] h-[450px] bottom-[-15%] right-[-5%] bg-white/4" />
-
-          <div className="relative max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 mb-7 rounded-full border border-white/20 bg-white/8 px-4 py-1.5 text-xs font-semibold text-white/60 tracking-wider uppercase">
-              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-pulse" />
-              Engine 1 of Civilization OS
-            </div>
-
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-[1.08] mb-7 tracking-tight">
-              Prove What You Know.{" "}
-              <span className="text-white/70">
-                Own Your Credentials.
-              </span>
-            </h1>
-
-            <p className="text-lg sm:text-xl text-white/55 mb-10 max-w-2xl mx-auto leading-relaxed">
-              AI-graded skill assessments that issue tamper-proof W3C Verifiable Credentials.
-              No gatekeeping. No expensive courses. Your work, fairly judged — for every talent on Earth.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                href="/assess"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl bg-white text-black font-bold text-base hover:bg-white/90 transition-colors"
-              >
-                Start Free Assessment
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl border border-white/25 text-white/75 font-medium text-base hover:bg-white/8 hover:border-white/40 transition-all"
-              >
-                See How It Works
-              </Link>
-            </div>
-
-            <p className="mt-7 text-sm text-white/35">
-              Free forever for learners &middot; No account required to try
-            </p>
-          </div>
-        </section>
+        <HeroSection />
 
         {/* ── Stats bar ────────────────────────────────────────────────────── */}
         {stats && (
