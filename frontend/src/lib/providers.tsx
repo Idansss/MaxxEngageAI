@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { AuthProvider } from "./auth-context";
 import { ThemeProvider } from "./theme-context";
+import { SidebarProvider } from "./sidebar-context";
 import { ReferralClaimer } from "@/components/referral-claimer";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -20,10 +21,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={client}>
       <ThemeProvider>
-        <AuthProvider>
-          <ReferralClaimer />
-          {children}
-        </AuthProvider>
+        <SidebarProvider>
+          <AuthProvider>
+            <ReferralClaimer />
+            {children}
+          </AuthProvider>
+        </SidebarProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

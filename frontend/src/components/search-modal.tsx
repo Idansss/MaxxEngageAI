@@ -160,7 +160,7 @@ export function SearchModal({ sidebar = false }: { sidebar?: boolean }) {
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+      <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md" />
 
       {/* Modal shell */}
       <div className="fixed inset-0 z-50 flex items-start justify-center pt-[14vh] px-4">
